@@ -1,12 +1,12 @@
 # dwooods.github.io
 
-Personal site/blog built with [Hugo](https://gohugo.io/) and the [PaperMod](https://github.com/adityatelange/hugo-PaperMod) theme, deployed to GitHub Pages via GitHub Actions.
+Personal site/blog built with [Hugo](https://gohugo.io/) and the [LoveIt](https://github.com/dillonzq/LoveIt) theme, deployed to GitHub Pages via GitHub Actions.
 
 Live at: https://dwooods.github.io/
 
 ## Local development
 
-Requires Hugo **extended**, v0.146.0+.
+Requires Hugo **extended**, v0.128.0+.
 
 ```bash
 git clone --recurse-submodules https://github.com/dwooods/dwooods.github.io.git
@@ -30,4 +30,8 @@ New posts are created with `draft: true` — flip it to `false` (or drop the lin
 
 ## Comments
 
-Not enabled yet. See the TODO in `layouts/_partials/comments.html` for how to wire up giscus when ready.
+Not enabled yet. LoveIt has built-in giscus support (GitHub Discussions-based) — see the setup steps and config in `hugo.toml` under `params.page.comment.giscus`.
+
+## Search
+
+Client-side search (Fuse.js) is already enabled via `params.search` — no external service needed.

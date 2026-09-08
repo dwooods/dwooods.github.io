@@ -1,68 +1,126 @@
 baseURL = "https://dwooods.github.io/"
-languageCode = "en-us"
-title = "David Woods"
-theme = "PaperMod"
+theme = "LoveIt"
 
+languageCode = "en"
+languageName = "English"
+title = "David Woods"
+
+copyright = "David Woods"
 enableRobotsTXT = true
-buildDrafts = false
-buildFuture = false
-buildExpired = false
 enableEmoji = true
+enableGitInfo = false
 
 [pagination]
   pagerSize = 10
 
-[minify]
-  disableXML = true
+[menu]
+  [[menu.main]]
+    weight = 1
+    identifier = "posts"
+    name = "Posts"
+    url = "/posts/"
+  [[menu.main]]
+    weight = 2
+    identifier = "tags"
+    name = "Tags"
+    url = "/tags/"
 
 [params]
-  env = "production"
+  defaultTheme = "auto"
   title = "David Woods"
   description = "Notes from hardware, software, and whatever else I'm building."
-  keywords = ["blog", "raspberry pi", "led", "software"]
-  author = "David Woods"
-  defaultTheme = "auto"
-  disableThemeToggle = false
-  ShowShareButtons = false
-  ShowReadingTime = true
-  ShowBreadCrumbs = true
-  ShowPostNavLinks = true
-  ShowCodeCopyButtons = true
-  ShowWordCount = false
-  ShowRssButtonInSectionTermList = true
-  ShowToc = true
-  TocOpen = false
-  comments = false  # flip to true once giscus is wired up in layouts/_partials/comments.html
+  images = []
 
-  [params.homeInfoParams]
-    Title = "Hi, I'm David \U0001F44B"
-    Content = "This is where I write up projects I've built — starting with an LED strip driven off a Raspberry Pi 5."
+  [params.author]
+    name = "David Woods"
+    email = ""
+    link = "https://github.com/dwooods"
 
-  [[params.socialIcons]]
-    name = "github"
-    url = "https://github.com/dwooods"
+  [params.header]
+    desktopMode = "fixed"
+    mobileMode = "auto"
+    [params.header.title]
+      name = "David Woods"
+      typeit = false
 
-[[menu.main]]
-  identifier = "posts"
-  name = "Posts"
-  url = "/posts/"
-  weight = 10
+  [params.footer]
+    enable = true
+    hugo = false
+    copyright = true
+    author = true
+    since = 2026
 
-[[menu.main]]
-  identifier = "tags"
-  name = "Tags"
-  url = "/tags/"
-  weight = 20
+  # Fuse.js client-side search, no external service needed
+  [params.search]
+    enable = true
+    type = "fuse"
+    contentLength = 4000
+    maxResultLength = 10
+
+  [params.home]
+    [params.home.profile]
+      enable = true
+      # Using the GitHub-hosted profile photo for dwooods so there's no broken
+      # image before a real headshot is added — swap avatarURL for your own
+      # image (e.g. "/images/avatar.png" under static/) whenever you want.
+      avatarURL = "https://github.com/dwooods.png"
+      subtitle = "Notes from hardware, software, and whatever else I'm building."
+      typeit = true
+      social = true
+    [params.home.posts]
+      enable = true
+      paginate = 6
+
+  [params.social]
+    GitHub = "https://github.com/dwooods"
+    RSS = "true"
+
+  [params.page]
+    [params.page.toc]
+      enable = true
+      keepStatic = false
+      auto = true
+    [params.page.code]
+      copy = true
+      maxShownLines = 50
+    # Comments framework is on; giscus itself stays off until it's configured
+    # (see the setup steps in the giscus block below).
+    [params.page.comment]
+      enable = true
+      [params.page.comment.giscus]
+        enable = false
+        # Setup, when ready:
+        #   1. Enable "Discussions" on the dwooods.github.io repo
+        #      (Settings -> General -> Features).
+        #   2. Install the giscus GitHub App: https://github.com/apps/giscus
+        #   3. Get repoId/categoryId from https://giscus.app (it reads the
+        #      repo and fills these in for you) and paste them below.
+        #   4. Flip enable = true here.
+        repo = "dwooods/dwooods.github.io"
+        repoId = ""
+        category = "Comments"
+        categoryId = ""
+        mapping = "pathname"
+        reactionsEnabled = "1"
+        inputPosition = "bottom"
+        lightTheme = "light"
+        darkTheme = "dark"
 
 [outputs]
   home = ["HTML", "RSS", "JSON"]
+  page = ["HTML"]
+  section = ["HTML", "RSS"]
+  taxonomy = ["HTML", "RSS"]
 
 [markup]
   [markup.highlight]
-    noClasses = false
     codeFences = true
     guessSyntax = true
-    lineNos = false
-    style = "monokai"
+    lineNos = true
+    lineNumbersInTable = true
+    noClasses = false
   [markup.goldmark.renderer]
     unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 6

@@ -4,11 +4,6 @@ date: 2026-09-08
 draft: true
 tags: ["raspberry-pi", "led", "ws2812", "sk6812", "python", "hardware"]
 description: "A menu-driven controller for an addressable SK6812/WS2812B LED strip on a Raspberry Pi 5, driven over hardware SPI, with a dozen animated effects and a browser-based simulator."
-cover:
-  image: ""
-  alt: ""
-  caption: ""
-ShowToc: true
 ---
 
 <!--
