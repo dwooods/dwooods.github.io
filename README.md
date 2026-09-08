@@ -1,16 +1,16 @@
-# blog
+# dwooods.github.io
 
-Personal blog built with [Hugo](https://gohugo.io/) and the [PaperMod](https://github.com/adityatelange/hugo-PaperMod) theme, deployed to GitHub Pages via GitHub Actions.
+Personal site/blog built with [Hugo](https://gohugo.io/) and the [PaperMod](https://github.com/adityatelange/hugo-PaperMod) theme, deployed to GitHub Pages via GitHub Actions.
 
-Live at: https://dwooods.github.io/blog/
+Live at: https://dwooods.github.io/
 
 ## Local development
 
 Requires Hugo **extended**, v0.146.0+.
 
 ```bash
-git clone --recurse-submodules https://github.com/dwooods/blog.git
-cd blog
+git clone --recurse-submodules https://github.com/dwooods/dwooods.github.io.git
+cd dwooods.github.io
 hugo server --buildDrafts
 ```
 

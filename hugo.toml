@@ -1,4 +1,4 @@
-baseURL = "https://dwooods.github.io/blog/"
+baseURL = "https://dwooods.github.io/"
 languageCode = "en-us"
 title = "David Woods"
 theme = "PaperMod"
