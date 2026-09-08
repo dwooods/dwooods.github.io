@@ -1,0 +1,68 @@
+baseURL = "https://dwooods.github.io/blog/"
+languageCode = "en-us"
+title = "David Woods"
+theme = "PaperMod"
+
+enableRobotsTXT = true
+buildDrafts = false
+buildFuture = false
+buildExpired = false
+enableEmoji = true
+
+[pagination]
+  pagerSize = 10
+
+[minify]
+  disableXML = true
+
+[params]
+  env = "production"
+  title = "David Woods"
+  description = "Notes from hardware, software, and whatever else I'm building."
+  keywords = ["blog", "raspberry pi", "led", "software"]
+  author = "David Woods"
+  defaultTheme = "auto"
+  disableThemeToggle = false
+  ShowShareButtons = false
+  ShowReadingTime = true
+  ShowBreadCrumbs = true
+  ShowPostNavLinks = true
+  ShowCodeCopyButtons = true
+  ShowWordCount = false
+  ShowRssButtonInSectionTermList = true
+  ShowToc = true
+  TocOpen = false
+  comments = false  # flip to true once giscus is wired up in layouts/_partials/comments.html
+
+  [params.homeInfoParams]
+    Title = "Hi, I'm David \U0001F44B"
+    Content = "This is where I write up projects I've built — starting with an LED strip driven off a Raspberry Pi 5."
+
+  [[params.socialIcons]]
+    name = "github"
+    url = "https://github.com/dwooods"
+
+[[menu.main]]
+  identifier = "posts"
+  name = "Posts"
+  url = "/posts/"
+  weight = 10
+
+[[menu.main]]
+  identifier = "tags"
+  name = "Tags"
+  url = "/tags/"
+  weight = 20
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+[markup]
+  [markup.highlight]
+    noClasses = false
+    codeFences = true
+    guessSyntax = true
+    lineNos = false
+    style = "monokai"
+  [markup.goldmark.renderer]
+    unsafe = true
