@@ -63,7 +63,7 @@ enableGitInfo = false
       # Using the GitHub-hosted profile photo for dwooods so there's no broken
       # image before a real headshot is added — swap avatarURL for your own
       # image (e.g. "/images/avatar.png" under static/) whenever you want.
-      avatarURL = "https://github.com/dwooods.png"
+      avatarURL = "/images/avatar.jpg"
       subtitle = "Notes from hardware, software, and whatever else I'm building."
       typeit = true
       social = true
