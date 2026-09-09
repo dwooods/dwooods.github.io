@@ -73,6 +73,7 @@ enableGitInfo = false
 
   [params.social]
     GitHub = "https://github.com/dwooods"
+    Linkedin = "https://www.linkedin.com/in/woodsdavid/"
     RSS = "true"
 
   [params.page]
