@@ -1,9 +1,9 @@
 ---
-title: "Building a Menu-Driven LED Strip Controller on a Raspberry Pi 5"
+title: "Building a Raspberry Pi LED Controller with Claude"
 date: 2026-09-10
 draft: false
 tags: ["raspberry-pi", "led", "ws2812", "sk6812", "python", "hardware", "cowork"]
-description: "A menu-driven controller for an addressable SK6812/WS2812B LED strip on a Raspberry Pi 5, driven over hardware SPI, with eleven animated effects and a browser-based simulator — built with Cowork doing the actual coding."
+description: "A menu-driven controller for an addressable SK6812/WS2812B LED strip on a Raspberry Pi 5, driven over hardware SPI, with eleven animated effects and a browser-based simulator — built by directing Claude Cowork through the implementation."
 featuredImage: "/images/led-strip-full-setup.jpg"
 featuredImagePreview: "/images/led-strip-full-setup.jpg"
 ---
@@ -12,7 +12,7 @@ featuredImagePreview: "/images/led-strip-full-setup.jpg"
 
 I plugged in a strip of addressable LEDs and applied power without connecting the data signal. It immediately started blinking random colors at me. My first thought was "great, it's broken already." Turns out it wasn't broken — that's exactly what an addressable strip (WS2812B/SK6812-family) does when it has power but no data telling it what to display. A plain non-addressable strip would've just lit up one steady color. That random blinking was actually good news, and it's how this project started: not knowing that, and finding out before wiring anything wrong.
 
-The result is eleven effects, a terminal-based menu, and a browser-based simulator. Here's how it came together — including the part where I let an AI write most of the code.
+The result is eleven effects, a terminal-based menu, and a browser-based simulator. Here's how it came together — including what I learned from having AI do most of the implementation.
 
 ## Why I built this
 
@@ -69,9 +69,7 @@ graph LR
 
 ## Building the Project with Claude
 
-To be explicit about it, since the rest of this post takes it for granted: I used **Claude Cowork** throughout the build. This wasn't a case of using AI to help with a tricky function or generate a few lines of code — I used Cowork as my primary development partner for the project.
-
-I didn't write the code, make the commits, manage the repo, or maintain the project documentation. Cowork wrote all eleven effects, `led.py`, `led_common.py`, and `off.py`, and handled the `git` operations end-to-end.
+To be explicit about it, since the rest of this post takes it for granted: I used **Claude Cowork** throughout the build — not just to help with a tricky function. I didn't write the code, make the commits, or manage the repo. Instead, I focused on describing what I wanted to build, making design decisions, testing the results, and deciding what to tackle next. Cowork handled the implementation — all eleven effects, `led.py`, `led_common.py`, `off.py`, and every `git` operation end-to-end.
 
 But the interesting part wasn't simply having AI write the code. It was learning how to work with AI to turn an idea into a working project.
 
@@ -82,10 +80,6 @@ But the interesting part wasn't simply having AI write the code. It was learning
 There was another reason: I didn't want the history of the project trapped in a single chat session, or tied to one interface or one AI. I wanted the project context to be something I could pick up from anywhere — whether I was using the Claude app, a CLI, or a different AI entirely.
 
 So I asked Cowork to create a `JOURNEY.md` file that could serve as a persistent journal for the project. Cowork maintained the file as the project evolved, capturing the decisions, discoveries, and changes along the way — instead of relying on the AI to remember everything from previous conversations, I gave it a shared source of project context that could travel with the code.
-
-Cowork also wrote the retrospective in `JOURNEY.md` itself, then handed me the exact commands to paste into my Pi's SSH session to publish it. If you read that file, you're reading a retrospective written by the AI about a project the AI largely built — worth being transparent about rather than presenting the work as if I'd written all of it myself.
-
-I've since taken this idea further on other projects: moving the project history and context into a database alongside feature tables, so I can carry a persistent understanding of the project across sessions, tools, and models instead of starting from scratch each time.
 
 **The barrier got pretty low.** One of the more interesting demonstrations of this came from my 13-year-old, who has never written a line of code. He sent Cowork a few chat requests of his own and ended up with the Rocket Launch effect in the menu — that's probably the part that stuck with me most: the barrier between having an idea and something actually working had gotten surprisingly low.
 
@@ -129,7 +123,7 @@ If I started over, I'd probably go straight to the one-file-per-effect-plus-menu
 
 The bigger lesson is about where my attention went. Not having to write the Python myself meant I spent my time on the actual decisions — what should happen when the lights won't turn off, when do we need letters instead of digits, is a browser simulator worth building — instead of on syntax and library documentation. That's the difference between this project shipping and the version of this project from a few years ago that didn't.
 
-Stepping back, this project is really a compact demo of four things clicking together — Raspberry Pi, IoT-style hardware, programming, and Cowork doing the implementation — and that combination is what's kept me wanting to build the next thing instead of losing steam after one project. That's the actual point of this blog: more of these, written up honestly, as I go.
+Stepping back, this project is really a demo of a different way of building: I stuck to the idea, the direction, the decisions, and validating the result on real hardware, and Cowork handled most of the implementation. That split is what's kept me wanting to build the next thing instead of losing steam after one project — Raspberry Pi, IoT-style hardware, and programming stopped being three separate skill walls I had to climb, because I only had to actually climb one of them. That's the actual point of this blog: more of these, written up honestly, as I go.
 
 ## Try it yourself
 
