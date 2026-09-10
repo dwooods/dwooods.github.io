@@ -16,11 +16,16 @@ enableGitInfo = false
 [menu]
   [[menu.main]]
     weight = 1
+    identifier = "about"
+    name = "About"
+    url = "/about/"
+  [[menu.main]]
+    weight = 2
     identifier = "posts"
     name = "Posts"
     url = "/posts/"
   [[menu.main]]
-    weight = 2
+    weight = 3
     identifier = "tags"
     name = "Tags"
     url = "/tags/"
@@ -64,8 +69,9 @@ enableGitInfo = false
       # image before a real headshot is added — swap avatarURL for your own
       # image (e.g. "/images/avatar.png" under static/) whenever you want.
       avatarURL = "/images/avatar.jpg"
-      subtitle = "Tinkering with local AI agents, Raspberry Pi hardware, and practical code."
-      typeit = true
+      title = "Building things, solving problems, and figuring out what AI can do"
+      subtitle = "I'm a product builder who likes turning ideas into things that actually work. I'm experimenting with Raspberry Pi, hardware, software, and AI-assisted development — spending less time writing code and more time deciding what to build, solving problems, and testing ideas.<br><br>This is where I document what I build, what I learn, and what I'm figuring out along the way."
+      typeit = false
       social = true
     [params.home.posts]
       enable = true

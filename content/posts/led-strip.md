@@ -4,6 +4,7 @@ date: 2026-09-10
 draft: false
 tags: ["raspberry-pi", "led", "ws2812", "sk6812", "python", "hardware", "cowork"]
 description: "A menu-driven controller for an addressable SK6812/WS2812B LED strip on a Raspberry Pi 5, driven over hardware SPI, with eleven animated effects and a browser-based simulator — built by directing Claude Cowork through the implementation."
+summary: "What happens when you have an idea for a hardware project but don't particularly want to spend days writing the code? I used Claude Cowork as my primary development partner to build a Raspberry Pi LED controller — and ended up experimenting with a different way of turning ideas into working projects."
 featuredImage: "/images/led-strip-full-setup.jpg"
 featuredImagePreview: "/images/led-strip-full-setup.jpg"
 ---
