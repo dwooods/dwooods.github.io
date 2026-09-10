@@ -69,7 +69,7 @@ graph LR
 
 ## Building the Project with Claude
 
-To be explicit about it, since the rest of this post takes it for granted: I used **Claude Cowork** throughout the build — not just to help with a tricky function. I didn't write the code, make the commits, or manage the repo. Instead, I focused on describing what I wanted to build, making design decisions, testing the results, and deciding what to tackle next. Cowork handled the implementation — all eleven effects, `led.py`, `led_common.py`, `off.py`, and every `git` operation end-to-end.
+To be explicit about it, since the rest of this post takes it for granted: I used **Claude Cowork** throughout the build — not just to help with a tricky function. I didn't write the code, make the commits, or manage the repo. Instead, I focused on describing what I wanted to build, making design decisions, testing the results, identifying problems, and deciding what to tackle next. Cowork handled the implementation — all eleven effects, `led.py`, `led_common.py`, `off.py`, and every `git` operation end-to-end.
 
 But the interesting part wasn't simply having AI write the code. It was learning how to work with AI to turn an idea into a working project.
 
@@ -123,7 +123,9 @@ If I started over, I'd probably go straight to the one-file-per-effect-plus-menu
 
 The bigger lesson is about where my attention went. Not having to write the Python myself meant I spent my time on the actual decisions — what should happen when the lights won't turn off, when do we need letters instead of digits, is a browser simulator worth building — instead of on syntax and library documentation. That's the difference between this project shipping and the version of this project from a few years ago that didn't.
 
-Stepping back, this project is really a demo of a different way of building: I stuck to the idea, the direction, the decisions, and validating the result on real hardware, and Cowork handled most of the implementation. That split is what's kept me wanting to build the next thing instead of losing steam after one project — Raspberry Pi, IoT-style hardware, and programming stopped being three separate skill walls I had to climb, because I only had to actually climb one of them. That's the actual point of this blog: more of these, written up honestly, as I go.
+Stepping back, the LED strip isn't really the point of this project. The interesting part for me was discovering a different way to build. By having AI handle much of the implementation, I could spend more of my time deciding what to build, solving problems, testing ideas, and figuring out what to try next.
+
+I'm still learning what this new way of working looks like. This project was one experiment, and the `JOURNEY.md` approach has already evolved into something more structured in later projects. That's really what I want this blog to document — not just the things I build, but how I'm learning to incorporate AI into the process and make it easier to turn ideas into things that actually work.
 
 ## Try it yourself
 
