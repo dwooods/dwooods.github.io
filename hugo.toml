@@ -84,6 +84,8 @@ enableGitInfo = false
     [params.page.code]
       copy = true
       maxShownLines = 50
+       render = { mermaid = true } # Useful for architecture flowcharts in posts like the LED strip one
+       
     # Comments framework is on; giscus itself stays off until it's configured
     # (see the setup steps in the giscus block below).
     [params.page.comment]
