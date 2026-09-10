@@ -4,13 +4,11 @@ date: 2026-09-10
 draft: false
 tags: ["raspberry-pi", "led", "ws2812", "sk6812", "python", "hardware", "cowork"]
 description: "A menu-driven controller for an addressable SK6812/WS2812B LED strip on a Raspberry Pi 5, driven over hardware SPI, with eleven animated effects and a browser-based simulator — built with Cowork doing the actual coding."
-featuredImage: "/images/led-strip-rainbow-lit.jpg"
-featuredImagePreview: "/images/led-strip-rainbow-lit.jpg"
+featuredImage: "/images/led-strip-full-setup.jpg"
+featuredImagePreview: "/images/led-strip-full-setup.jpg"
 ---
 
 **Repo:** [github.com/dwooods/led-strip](https://github.com/dwooods/led-strip)
-
-![The strip running the Rainbow effect, mounted on the wall next to the Pi](/images/led-strip-rainbow-lit.jpg)
 
 I plugged in a strip of addressable LEDs, applied power with no data signal connected, and it started blinking random colors at me. My first thought was "great, it's broken already." Turns out that's not a broken strip — that's an addressable strip (WS2812B/SK6812-family) doing exactly what it does with no data signal telling it what color to be. A plain non-addressable strip would've just lit up one steady color. That random blinking was actually good news, and it's how this project started: not knowing that, and finding out before wiring anything wrong.
 
