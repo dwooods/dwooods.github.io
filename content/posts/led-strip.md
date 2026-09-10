@@ -67,15 +67,29 @@ graph LR
 
 `run.sh` (symlinked as `ledstrip` on `PATH`) just erases the "was it `source venv/bin/activate` first or `cd` first?" friction — it creates the venv if one doesn't exist yet and launches the menu.
 
-### Tools & AI assist, for the record
+## Building the Project with Claude
 
-To be explicit about it, since the rest of this post takes it for granted: I used **Claude Cowork** for the entire build, not "helped with a tricky function." I didn't write the code, make the commits, manage the repo, or keep the project notes — Cowork wrote all eleven effects, `led.py`, `led_common.py`, and `off.py`, and handled every `git` operation end-to-end. A couple of things worth calling out beyond what's above:
+To be explicit about it, since the rest of this post takes it for granted: I used **Claude Cowork** throughout the build. This wasn't a case of using AI to help with a tricky function or generate a few lines of code — I used Cowork as my primary development partner for the project.
 
-- The browser simulator wasn't my idea — Cowork suggested it partway through, as a way to preview effects without hardware in front of me.
-- Cowork wrote `JOURNEY.md` itself, the retrospective write-up of the whole build, then handed me the exact commands to paste into my Pi's SSH session to publish it. If you read that file, you're reading something Cowork wrote about a project Cowork built, which felt worth admitting rather than passing off as my own narration.
-- How low the barrier got: my 13-year-old, who has never written a line of code, sent Cowork a few chat requests of his own and ended up with the Rocket Launch effect in the menu.
+I didn't write the code, make the commits, manage the repo, or maintain the project documentation. Cowork wrote all eleven effects, `led.py`, `led_common.py`, and `off.py`, and handled the `git` operations end-to-end.
 
-I didn't run into a dramatic "confidently wrong" moment worth calling out — no bug it introduced that I had to catch and fix myself. The real friction was architectural growing pains as the design evolved (more on that below), not AI mistakes. What changed was where my time went: instead of losing days to syntax, library research, and debugging, I spent it testing on real hardware, deciding what to build next, and pivoting when something didn't work. That's a genuinely different way to work than the "days of web searching" version of this project I've attempted before.
+But the interesting part wasn't simply having AI write the code. It was learning how to work with AI to turn an idea into a working project.
+
+**Building without the hardware.** At one point, I wanted an easier way to see what a new LED program would look like without having to plug in the Raspberry Pi and LED strip every time. If I was going to keep building new effects, I wanted a way to experiment with them virtually. I suggested building a visual validation tool that would let me preview effects without the physical hardware, and Cowork took that idea and built the browser-based simulator. That ended up changing how I worked on the project — I could build and test new effects virtually, then use the actual LED strip when I wanted to validate the final result on hardware.
+
+**Keeping a journal of the build.** I also wanted to capture the project as I built it — not just the final code, but the things we discovered along the way: design decisions, changes in direction, problems, solutions, and lessons learned. I knew I eventually wanted to turn the experience into a blog post, but manually documenting everything would have been another project in itself.
+
+There was another reason: I didn't want the history of the project trapped in a single chat session, or tied to one interface or one AI. I wanted the project context to be something I could pick up from anywhere — whether I was using the Claude app, a CLI, or a different AI entirely.
+
+So I asked Cowork to create a `JOURNEY.md` file that could serve as a persistent journal for the project. Cowork maintained the file as the project evolved, capturing the decisions, discoveries, and changes along the way — instead of relying on the AI to remember everything from previous conversations, I gave it a shared source of project context that could travel with the code.
+
+Cowork also wrote the retrospective in `JOURNEY.md` itself, then handed me the exact commands to paste into my Pi's SSH session to publish it. If you read that file, you're reading a retrospective written by the AI about a project the AI largely built — worth being transparent about rather than presenting the work as if I'd written all of it myself.
+
+I've since taken this idea further on other projects: moving the project history and context into a database alongside feature tables, so I can carry a persistent understanding of the project across sessions, tools, and models instead of starting from scratch each time.
+
+**The barrier got pretty low.** One of the more interesting demonstrations of this came from my 13-year-old, who has never written a line of code. He sent Cowork a few chat requests of his own and ended up with the Rocket Launch effect in the menu — that's probably the part that stuck with me most: the barrier between having an idea and something actually working had gotten surprisingly low.
+
+I didn't run into a dramatic "confidently wrong" moment worth calling out here — no bug it introduced that I had to catch and fix myself. The real friction was architectural growing pains as the design evolved (more on that below), not AI mistakes. What changed was where my time went: instead of losing days to syntax, library research, and debugging, I spent it testing on real hardware, deciding what to build next, and pivoting when something didn't work. That's a genuinely different way to work than the "days of web searching" version of this project I've attempted before.
 
 ## Key technical insights & challenges
 
