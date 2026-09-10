@@ -64,7 +64,7 @@ enableGitInfo = false
       # image before a real headshot is added — swap avatarURL for your own
       # image (e.g. "/images/avatar.png" under static/) whenever you want.
       avatarURL = "/images/avatar.jpg"
-      subtitle = "Notes from hardware, software, and whatever else I'm building."
+      subtitle = "Tinkering with local AI agents, Raspberry Pi hardware, and practical code."
       typeit = true
       social = true
     [params.home.posts]
