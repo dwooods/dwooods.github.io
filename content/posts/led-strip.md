@@ -12,7 +12,7 @@ featuredImagePreview: "/images/led-strip-full-setup.jpg"
 
 I plugged in a strip of addressable LEDs and applied power without connecting the data signal. It immediately started blinking random colors at me. My first thought was "great, it's broken already." Turns out it wasn't broken — that's exactly what an addressable strip (WS2812B/SK6812-family) does when it has power but no data telling it what to display. A plain non-addressable strip would've just lit up one steady color. That random blinking was actually good news, and it's how this project started: not knowing that, and finding out before wiring anything wrong.
 
-The result is eleven effects, a terminal-based menu, and a browser-based simulator. Here's how it came together — including what I learned from having AI do most of the implementation.
+The result is eleven effects, a terminal-based menu, and a browser-based simulator. But the LED strip is really just the vehicle for a bigger experiment: what happens when I use AI to handle most of the implementation and spend my time deciding what to build, testing it, and figuring out what to do next?
 
 ## Why I built this
 
