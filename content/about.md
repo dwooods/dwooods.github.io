@@ -6,10 +6,10 @@ description: "About David Woods"
 hiddenFromHomePage: true
 ---
 
-I'm interested in the intersection of product thinking, software, hardware, and AI. I've spent my career building products, but I've always enjoyed the problem-solving part more than the coding itself.
+I've spent the last 14+ years building products in FinTech, payments, APIs, and platform infrastructure. My work has ranged from payment processing and card networks to real-time data platforms and Open Banking. I've always been drawn to complicated problems where product, technology, and systems have to come together.
 
-Lately I'm experimenting with AI — Claude Cowork, mainly — as a development partner on projects like this: not just to generate code, but to see whether it changes the whole process of going from an idea to something that actually works. I focus on the idea, the decisions, and testing whether it's any good; the AI handles most of the implementation.
+But I've always enjoyed the building and problem-solving part of product work more than writing code itself. I started my career as a developer, and that background has stayed with me even as my career moved toward product leadership.
+
+Lately, I've been experimenting with AI as a development partner. Instead of spending days writing code, I focus on the idea, the decisions, and testing whether it's any good; the AI handles most of the implementation.
 
 This blog is where I document that, project by project — what I built, what actually happened building it, and what I'm still figuring out.
-
-**Repo for this site:** [github.com/dwooods/dwooods.github.io](https://github.com/dwooods/dwooods.github.io)
