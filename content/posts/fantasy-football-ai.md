@@ -232,25 +232,15 @@ So we went back to screenshots.
 
 The screenshots won.
 
-## The cache dashboard lied to me
+## Building in a cache before I got throttled
 
-Adding a cache should have been the easy part.
+FantasyPros' free tier caps me at 50 requests a day, and I didn't want every question in a Claude conversation to quietly burn through that limit. So once the MCP server itself was working, caching became the next thing I had to build, not a nice-to-have.
 
-It wasn't.
+Adding it should have been the easy part.
 
-`wrangler kv namespace create` failed with an authentication error despite having a properly scoped login token. I ended up creating the namespace from the Cloudflare dashboard and copying the ID into `wrangler.jsonc`.
+`wrangler kv namespace create` failed with an authentication error despite having a properly scoped login token. I ended up creating the namespace from the Cloudflare dashboard instead and copying the ID into `wrangler.jsonc`.
 
-Then came the really fun part.
-
-After deploying, the Cloudflare Metrics and KV Pairs dashboards sat at zero even though I knew the cache was working.
-
-At first I assumed I'd built it wrong.
-
-Then I realized something I should probably have remembered from every debugging session I've ever had:
-
-**Don't debug from the dashboard. Debug from reality.**
-
-So I added logging directly to the Worker:
+To confirm the cache was actually being hit, I added logging directly to the Worker:
 
 ```typescript
 const cached = await env.FP_CACHE.get(key, "json");
@@ -263,25 +253,13 @@ if (cached !== null) {
 console.log(`[cache] MISS ${key}`);
 ```
 
-Then I ran:
-
-```bash
-npx wrangler tail
-```
-
-and triggered a real tool call.
-
-When the terminal said:
+Then I ran `npx wrangler tail` and triggered a real tool call. When the terminal showed:
 
 ```text
 [cache] HIT fp:/news?...
 ```
 
-I knew the cache was working.
-
-A dashboard eventually catching up is nice.
-
-A log line telling me what actually happened is better.
+I knew it was working — the Cloudflare dashboard took a while to catch up and show any traffic, but I wasn't relying on it. The logs told me what I needed to know.
 
 ## So... does it actually help manage my team?
 
@@ -333,7 +311,7 @@ I asked Claude for a replacement.
 
 It pointed me toward Demarcus Robinson, a 0%-rostered waiver option who benefited from the same snaps Stribling would have taken.
 
-![Accurate summary of my waiver-wire strategy](/images/fantasy-football-meme-toilet-store.png)
+<img src="/images/fantasy-football-meme-toilet-store.png" alt="Accurate summary of my waiver-wire strategy" style="max-width: 90px; width: 100%; height: auto; display: block; margin: 0 auto;">
 
 ![Sleeper's "Trending up" panel, unfiltered — Demarcus Robinson still visible mid-list](/images/fantasy-football-trending-all.png)
 
