@@ -446,6 +446,4 @@ And, most importantly, a co-manager that lets me keep up with the trash talk wit
 
 So there's clearly still some work to do — starting with watching more than just the 49ers on Sundays.
 
-If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API and want to compare notes, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues).
-
-I'd genuinely like to know if the screenshot fallback is a universal law of fantasy-football tooling — or if it's just something about our family.
+If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues). I'd genuinely like to compare notes.
