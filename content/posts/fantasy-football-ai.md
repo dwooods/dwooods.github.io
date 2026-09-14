@@ -426,6 +426,8 @@ The README walks through the Cloudflare setup, secrets, the KV cache, and connec
 
 The MCP server itself is intentionally generic. The interesting part isn't the server — it's the context you give the AI: your scoring rules, rosters, league history, and the weird little things that make your league different.
 
+If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues) — I'd genuinely like to compare notes.
+
 That's what turns a generic fantasy football data source into something that actually feels like a co-manager.
 
 I didn't build a fantasy football robot.
@@ -441,7 +443,3 @@ A co-manager who occasionally reminds me to check my lineup.
 And, most importantly, a co-manager that lets me keep up with the trash talk without actually having to track my own roster.
 
 So there's clearly still some work to do — starting with watching more than just the 49ers on Sundays.
-
----
-
-If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues) — I'd genuinely like to compare notes.
