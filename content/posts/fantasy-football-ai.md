@@ -397,6 +397,18 @@ But I don't have to spend as much time collecting all the information required t
 
 That's a pretty good deal.
 
+One honest update before I get to what's next: FantasyPros now has an official, hosted MCP server. OAuth login, no API key required, and it does more than mine does — native league sync, a Trade Analyzer, a Waiver Assistant, Start/Sit recommendations.
+
+I found out about it after I'd already built the whole thing.
+
+Worse, it turns out it was already live when I started. I began the Cloudflare Worker on September 5th. FantasyPros' own docs for their MCP server are dated September 1st.
+
+If I'd found it first, I probably would have just used theirs.
+
+So why is this post still about the one I built? Because the actual value here was never "I'm the only way to get FantasyPros data into an AI." It was building a Cloudflare Worker, wiring up MCP tools, debugging a caching layer, and figuring out an auth header the hard way. That's the same skill whether or not FantasyPros later makes the specific wrapper redundant.
+
+I'll probably switch my own workflow over to their server. The lessons from building mine don't go anywhere.
+
 What's next?
 
 The injury and lineup check-ins are still one-off scheduled tasks rather than a standing weekly routine. I'd like to make those more proactive before the fantasy playoffs.
