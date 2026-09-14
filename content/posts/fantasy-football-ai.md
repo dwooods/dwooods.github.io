@@ -5,8 +5,8 @@ draft: false
 tags: ["fantasy-football", "sleeper", "mcp", "cloudflare-workers", "claude", "cowork", "typescript"]
 description: "How I connected our family Sleeper league, a custom FantasyPros MCP server on Cloudflare Workers, and a Claude Project into a fantasy football co-manager — and learned that AI is pretty good at making dad life easier."
 summary: "I have an 8-team keeper league with my son, my nephew, my father-in-law, and three brothers-in-law. The scoring is weird, the trash talk is free, and I spend way too much time managing it. So I built Claude a memory of our league and an MCP server for rankings and news, and spent the season finding out what AI is actually good for — and whether it can finally help me beat my father-in-law."
-featuredImage: "/images/fantasy-football-trending-wr.png"
-featuredImagePreview: "/images/fantasy-football-trending-wr.png"
+featuredImage: "/images/fantasy-football-meme-toilet-store.png"
+featuredImagePreview: "/images/fantasy-football-meme-toilet-store.png"
 ---
 
 **Repo:** [github.com/dwooods/fantasypros-mcp](https://github.com/dwooods/fantasypros-mcp)
@@ -333,9 +333,9 @@ I asked Claude for a replacement.
 
 It pointed me toward Demarcus Robinson, a 0%-rostered waiver option who benefited from the same snaps Stribling would have taken.
 
-![Sleeper's "Trending up" panel, filtered to WR, showing Demarcus Robinson at 0% rostered](/images/fantasy-football-trending-wr.png)
+![Accurate summary of my waiver-wire strategy](/images/fantasy-football-meme-toilet-store.png)
 
-![The same panel with no position filter — Demarcus Robinson still visible mid-list](/images/fantasy-football-trending-all.png)
+![Sleeper's "Trending up" panel, unfiltered — Demarcus Robinson still visible mid-list](/images/fantasy-football-trending-all.png)
 
 I still had to make the actual $1 FAAB bid myself.
 
@@ -423,7 +423,12 @@ We're watching games on Sunday.
 
 And now I get to build ridiculous little AI tools around it.
 
-That's fun.
+That's fun. Roughly as fun as this, which is a completely accurate depiction of half the league every Sunday:
+
+<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@fantasyfootballforlife1/video/7679609970131815711" data-video-id="7679609970131815711" style="max-width: 605px;min-width: 325px;">
+  <section></section>
+</blockquote>
+<script async src="https://www.tiktok.com/embed.js"></script>
 
 The project gives me a reason to learn something new, but the thing I'm building is connected to something I already enjoy.
 
