@@ -9,7 +9,7 @@ summary: "I have an 8-team keeper league with my son, my nephew, my father-in-la
 
 **Repo:** [github.com/dwooods/fantasypros-mcp](https://github.com/dwooods/fantasypros-mcp)
 
-I'd never played fantasy football before this season. Neither had most of the rest of our league.
+I'd never played fantasy football before this season and my first one was with family. 
 
 The actual appeal was never the competition — it's the trash talk and the excuse to stay connected with my son, my father-in-law, and the rest of the group. The problem is I have almost no time or patience to track who's playing, who's hurt, or who I should be starting each week. Given a choice between managing my roster and watching the 49ers, my actual favorite team, the 49ers win every time.
 
