@@ -9,7 +9,7 @@ summary: "I have an 8-team keeper league with my son, my nephew, my father-in-la
 
 **Repo:** [github.com/dwooods/fantasypros-mcp](https://github.com/dwooods/fantasypros-mcp)
 
-I'd never played fantasy football before this season and my first one was with family. 
+I'd never played fantasy football before this season. Neither had most of the rest of our league.
 
 The actual appeal was never the competition — it's the trash talk and the excuse to stay connected with my son, my father-in-law, and the rest of the group. The problem is I have almost no time or patience to track who's playing, who's hurt, or who I should be starting each week. Given a choice between managing my roster and watching the 49ers, my actual favorite team, the 49ers win every time.
 
@@ -308,8 +308,6 @@ But it did mean I had a bench spot tied up that I could probably use somewhere e
 I asked Claude for a replacement.
 
 It pointed me toward Demarcus Robinson, a 0%-rostered waiver option who benefited from the same snaps Stribling would have taken.
-
-<img src="/images/fantasy-football-meme-toilet-store.png" alt="Accurate summary of my waiver-wire strategy" style="max-width: 90px; width: 100%; height: auto; display: block; margin: 0 auto;">
 
 ![Sleeper's "Trending up" panel, unfiltered — Demarcus Robinson still visible mid-list](/images/fantasy-football-trending-all.png)
 
