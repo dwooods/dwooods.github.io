@@ -152,9 +152,7 @@ That token gates the Worker so it isn't just an open proxy to my FantasyPros API
 
 My actual FantasyPros key lives as a Cloudflare secret. It never gets typed into a chat, committed to git, or copied into a client configuration.
 
-That also means the same MCP endpoint works whether I'm asking from my desktop, my phone, or somewhere completely different.
-
-Which is nice.
+That also means the same MCP endpoint works whether I'm asking from my desktop, my phone, or somewhere completely different — which is nice.
 
 Because apparently fantasy football is now a distributed systems problem.
 
@@ -222,11 +220,7 @@ There was another moment that was worth paying attention to.
 
 Because of the network restriction around Sleeper, Claude tried to find a workaround using a third-party CORS relay.
 
-It didn't work.
-
-More importantly, a built-in safety check caught and blocked the attempt before it went anywhere.
-
-That was the right outcome.
+It didn't work, and more importantly, a built-in safety check caught and blocked the attempt before it went anywhere. That was the right outcome.
 
 "Find a clever way around a policy or network restriction" isn't necessarily the same thing as solving the problem.
 
@@ -277,15 +271,7 @@ And once the season started, some of the little things turned out to be surprisi
 
 ### Trading from a position of knowledge, not vibes
 
-My starting tight end, Harold Fannin, had zero insurance behind him.
-
-That's a real problem in our league because we have two FLEX spots, which makes roster depth more important.
-
-The Project notes already had a picture of the other seven rosters.
-
-My nephew Gavin was sitting on two good tight ends.
-
-I had surplus WR depth.
+My starting tight end, Harold Fannin, had zero insurance behind him — a real problem in our league because we have two FLEX spots, which makes roster depth more important. The Project notes already had a picture of the other seven rosters: my nephew Gavin was sitting on two good tight ends, and I had surplus WR depth.
 
 So we traded Jaylen Waddle for Kyle Pitts.
 
@@ -295,25 +281,15 @@ Was this some revolutionary AI-generated trade?
 
 No.
 
-It was a trade I probably could have figured out myself.
-
-The difference was that Claude had the whole league in its head at the same time.
-
-I didn't have to remember who was deep at tight end, who needed a receiver, and what I'd already traded away.
+It was a trade I probably could have figured out myself. The difference was that Claude had the whole league in its head at the same time — I didn't have to remember who was deep at tight end, who needed a receiver, and what I'd already traded away.
 
 That's where the AI started feeling less like a chatbot and more like a co-manager.
 
 ### Catching an injury before it cost me a roster spot
 
-FantasyPros' injury news flagged my WR5, De'Zhaun Stribling, as out for at least a month with an ankle injury.
+FantasyPros' injury news flagged my WR5, De'Zhaun Stribling, as out for at least a month with an ankle injury. He wasn't starting, so it wasn't exactly a five-alarm emergency, but it did mean I had a bench spot tied up that I could probably use somewhere else.
 
-He wasn't starting, so it wasn't exactly a five-alarm emergency.
-
-But it did mean I had a bench spot tied up that I could probably use somewhere else.
-
-I asked Claude for a replacement.
-
-It pointed me toward Demarcus Robinson, a 0%-rostered waiver option who benefited from the same snaps Stribling would have taken.
+I asked Claude for a replacement, and it pointed me toward Demarcus Robinson, a 0%-rostered waiver option who benefited from the same snaps Stribling would have taken.
 
 ![Sleeper's "Trending up" panel, unfiltered — Demarcus Robinson still visible mid-list](/images/fantasy-football-trending-all.png)
 
@@ -335,17 +311,11 @@ More like:
 
 I also set up a scheduled check to confirm that one of my players was active before Sunday Night Football.
 
-It came back active.
+It came back active, so no lineup change was needed.
 
-No lineup change needed.
+Not exactly an exciting result. But that's the point.
 
-Not exactly an exciting result.
-
-But that's the point.
-
-The AI didn't need to discover a hidden gem or predict a breakout player.
-
-It just prevented me from having to remember to check.
+The AI didn't need to discover a hidden gem or predict a breakout player. It just prevented me from having to remember to check.
 
 That is the sort of thing AI is surprisingly good at.
 
@@ -355,15 +325,7 @@ Remembering the thing the person doesn't want to remember.
 
 ## What I actually learned
 
-The technical lessons were useful.
-
-I learned how to build an MCP server.
-
-I learned more about Cloudflare Workers and KV.
-
-I learned that APIs can be weird.
-
-I learned that screenshots are a surprisingly effective API fallback.
+The technical lessons were useful. I learned how to build an MCP server, got more comfortable with Cloudflare Workers and KV, and learned that APIs can be surprisingly weird. I also learned that screenshots are a surprisingly effective API fallback.
 
 But the bigger lesson had almost nothing to do with fantasy football.
 
@@ -387,37 +349,21 @@ The AI handles a lot of the implementation and information gathering.
 
 I make the decisions.
 
-## The best part might be that it's fun
+## The best part? It's actually fun
 
-There's also something I don't want to lose in all the technical details.
-
-This is a family fantasy football league.
-
-I get to play against my son, my nephew, my father-in-law, and my brothers-in-law.
-
-We're talking trash in the group chat.
-
-We're arguing about trades.
-
-We're watching games on Sunday.
+There's also something I don't want to lose in all the technical details: this is a family fantasy football league. I get to play against my son, my nephew, my father-in-law, and my brothers-in-law. We talk trash in the group chat, argue about trades, and watch games on Sunday.
 
 And now I get to build ridiculous little AI tools around it.
 
-That's fun.
+That's the part I really enjoy.
 
 <img src="/images/fantasy-football-meme-planning.png" alt="Men will deny being good at planning things until fantasy football comes around" style="max-width: 350px; width: 100%; height: auto; display: block; margin: 0 auto;">
 
-The project gives me a reason to learn something new, but the thing I'm building is connected to something I already enjoy.
+The project gives me a reason to learn something new, but the thing I'm building is connected to something I already enjoy. That makes a big difference. I wasn't trying to learn MCP because I needed another technology to put on my resume. I wanted to make fantasy football easier, and MCP happened to be a pretty good way to do it.
 
-That's probably why this worked better for me than a lot of "learn this new technology" projects.
+Somewhere along the way, I ended up learning how to build an AI tool that actually does something useful for me.
 
-I wasn't trying to learn MCP because I needed another technology to put on my resume.
-
-I wanted to make fantasy football easier.
-
-MCP happened to be a pretty good way to do it.
-
-And somewhere along the way, I learned how to build an AI tool that actually does something useful for me.
+And honestly, that's a lot more fun than building another toy project just to say I learned a new technology.
 
 ## Lessons learned & what's next
 
