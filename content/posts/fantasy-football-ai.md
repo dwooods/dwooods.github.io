@@ -35,7 +35,7 @@ Also, I now have an AI assistant that can remind me that my player is inactive b
 
 Our league is eight teams, full PPR, snake draft, one keeper per year — and it's really just family.
 
-My son drafts against my nephew, my father-in-law, and all three of my brothers-in-law. The trash talk is competitive, but not exactly cutthroat. Somebody is usually hosting Thanksgiving for half the league, so nobody wants to completely destroy the family dynamic over a second-round running back.
+My son drafts against my nephew, my father-in-law, and all three of my brothers-in-law. The trash talk is competitive, but not exactly cutthroat. We get together regularly for family events throughout the year, so nobody wants to completely destroy the family dynamic over a second-round running back.
 
 The problem is that our scoring isn't exactly standard.
 
@@ -423,12 +423,7 @@ We're watching games on Sunday.
 
 And now I get to build ridiculous little AI tools around it.
 
-That's fun. Roughly as fun as this, which is a completely accurate depiction of half the league every Sunday:
-
-<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@fantasyfootballforlife1/video/7679609970131815711" data-video-id="7679609970131815711" style="max-width: 605px;min-width: 325px;">
-  <section></section>
-</blockquote>
-<script async src="https://www.tiktok.com/embed.js"></script>
+That's fun.
 
 The project gives me a reason to learn something new, but the thing I'm building is connected to something I already enjoy.
 
