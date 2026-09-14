@@ -261,6 +261,8 @@ I knew it was working — the Cloudflare dashboard took a while to catch up and 
 
 ## So... does it actually help manage my team?
 
+At this point, I had the infrastructure working, the league context loaded, and Claude talking to FantasyPros. The only question left was whether any of this actually made managing my team easier.
+
 This is the part I care about most.
 
 I didn't build this because I wanted to spend more time engineering a fantasy football system.
@@ -411,9 +413,7 @@ I probably shouldn't give the AI the ability to make roster moves anyway. That's
 
 ## Want to try it?
 
-The FantasyPros MCP server is open source if you want to experiment with giving Claude access to real fantasy football rankings, projections, player news, and injury information.
-
-You can start with the repo:
+If you want to experiment with this yourself, the FantasyPros MCP server is open source.
 
 ```bash
 git clone https://github.com/dwooods/fantasypros-mcp.git
@@ -422,15 +422,11 @@ npm install
 npx wrangler login
 ```
 
-From there, the README walks through the Cloudflare setup, secrets, the KV cache, and connecting the Worker to Claude as a custom connector.
+The README walks through the Cloudflare setup, secrets, the KV cache, and connecting it to Claude.
 
-The MCP server itself is intentionally generic. It doesn't know anything about my family league. It just gives Claude access to FantasyPros' v2 API.
+The MCP server itself is intentionally generic. The interesting part isn't the server — it's the context you give the AI: your scoring rules, rosters, league history, and the weird little things that make your league different.
 
-The interesting part is what you put around it.
-
-In my case, that's the Claude Project containing our scoring rules, rosters, trade history, and the little details that make our league different from every other fantasy league on the internet. That's what turns a generic fantasy football data source into something that actually feels like a co-manager — and that's probably the part I like most about the whole experiment.
-
-You don't need to recreate my entire setup to play with the idea. Even starting with the MCP server and giving Claude the rules for your own league would get you pretty far.
+That's what turns a generic fantasy football data source into something that actually feels like a co-manager.
 
 I didn't build a fantasy football robot.
 
@@ -446,4 +442,6 @@ And, most importantly, a co-manager that lets me keep up with the trash talk wit
 
 So there's clearly still some work to do — starting with watching more than just the 49ers on Sundays.
 
-If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues). I'd genuinely like to compare notes.
+---
+
+If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues) — I'd genuinely like to compare notes.
