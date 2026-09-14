@@ -107,15 +107,7 @@ This is probably what my computer science degree was preparing me for.
 
 The FantasyPros piece became its own little project.
 
-> **A note about the MCP server**
->
-> There's now an official FantasyPros-hosted MCP server, which is more capable than the one I built here. It uses OAuth, doesn't require an API key, and includes features like native league sync, Trade Analyzer, Waiver Assistant, and Start/Sit recommendations.
->
-> I didn't know about it when I started this project. I began building my Cloudflare Worker on September 5; FantasyPros' MCP documentation is dated September 1.
->
-> If I'd found it first, I probably would have used theirs.
->
-> That doesn't really change what I wanted to learn by building this one. The interesting part for me was figuring out how to build and connect an MCP server, deal with authentication, add caching, debug the integration, and make it useful. The specific FantasyPros wrapper may now be redundant, but the experience of building it isn't.
+One note before I get into it: FantasyPros now has an official hosted MCP server that does more than mine does. I discovered it after I had already built this one. I'll come back to that later, but for now, here's what I actually built and what I learned from doing it.
 
 I built a Cloudflare Worker that wraps FantasyPros' v2 API and exposes it as MCP tools. I also added a Workers KV cache because FantasyPros' free tier gives me 50 requests per day, and I didn't want every question in a conversation to become another API request.
 
@@ -407,7 +399,11 @@ But I don't have to spend as much time collecting all the information required t
 
 That's a pretty good deal.
 
-I mentioned it earlier, but it's worth repeating here: I'll probably switch my own day-to-day workflow over to FantasyPros' official server at some point. That doesn't undo any of the above — the decisions were still mine to make either way.
+Back to that note from earlier: FantasyPros' official, hosted MCP server does more than mine does — native league sync, a Trade Analyzer, a Waiver Assistant, Start/Sit recommendations, OAuth instead of an API key.
+
+I found out about it after I'd already built the whole thing. Worse, it was already live when I started — I began the Cloudflare Worker on September 5th, and FantasyPros' own MCP docs are dated September 1st. If I'd found it first, I probably would have just used theirs.
+
+The specific wrapper is likely redundant now. The experience of building it isn't — the Worker, the MCP mechanics, the auth header, the caching layer all transfer regardless of whether FantasyPros ships something nicer. I'll probably switch my own workflow over to their server at some point. The decisions along the way were still mine to make either way.
 
 What's next?
 
