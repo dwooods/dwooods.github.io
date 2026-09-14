@@ -1,3 +1,5 @@
 ## What I'm building
 
-Turned out "more of these" didn't mean more LED strips — it meant a fantasy football AI co-manager next. One project at a time, whatever it happens to be.
+The projects are probably going to be all over the place. That's part of the fun.
+
+The common thread is using AI to turn an idea into something real, then figuring out what works, what breaks, and what I should try next.

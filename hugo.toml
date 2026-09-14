@@ -70,7 +70,7 @@ enableGitInfo = false
       # image (e.g. "/images/avatar.png" under static/) whenever you want.
       avatarURL = "/images/avatar.jpg"
       title = "Building things, solving problems, and figuring out what AI can do"
-      subtitle = "I'm a product builder who likes turning ideas into things that actually work. I'm experimenting with Raspberry Pi, hardware, software, and AI-assisted development — spending less time writing code and more time deciding what to build, solving problems, and testing ideas.<br><br>This is where I document what I build, what I learn, and what I'm figuring out along the way."
+      subtitle = "I'm a product builder who likes turning ideas into things that actually work. I'm exploring what happens when AI handles more of the implementation and I spend more time deciding what to build, solving problems, and testing ideas.<br><br>Sometimes that means wiring up a Raspberry Pi. Sometimes it means building an MCP server for my fantasy football league. Either way, I'm interested in the same thing: using AI to turn ideas into useful things — and having some fun along the way.<br><br>This is where I document what I build, what I learn, and what doesn't quite go according to plan."
       typeit = false
       social = true
     [params.home.posts]
