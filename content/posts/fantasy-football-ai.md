@@ -4,20 +4,20 @@ date: 2026-09-14
 draft: false
 tags: ["fantasy-football", "sleeper", "mcp", "cloudflare-workers", "claude", "cowork", "typescript"]
 description: "How I connected our family Sleeper league, a custom FantasyPros MCP server on Cloudflare Workers, and a Claude Project into a fantasy football co-manager — and learned that AI is pretty good at making dad life easier."
-summary: "I have an 8-team keeper league with my son, my nephew, my father-in-law, and three brothers-in-law. The scoring is weird, the trash talk is free, and I spend way too much time managing it. So I built Claude a memory of our league and an MCP server for rankings and news, and spent the season finding out what AI is actually good for — and whether it can finally help me beat my father-in-law."
+summary: "I have an 8-team keeper league with my son, my nephew, my father-in-law, and three brothers-in-law. The scoring is weird, the trash talk is free, and I don't have the time or patience to actually manage a roster properly. So I built Claude a memory of our league and an MCP server for rankings and news, and spent the season finding out whether AI could handle the tracking so I could just enjoy the trash talk."
 featuredImage: "/images/fantasy-football-meme-toilet-store.png"
 featuredImagePreview: "/images/fantasy-football-meme-toilet-store.png"
 ---
 
 **Repo:** [github.com/dwooods/fantasypros-mcp](https://github.com/dwooods/fantasypros-mcp)
 
-My father-in-law has been quietly beating me in fantasy football since before I met his daughter.
+I'd never played fantasy football before this season. Neither had most of the rest of our league.
 
-He's in his 70s, drafts a kicker like it's a skill position, and still manages to finish around the middle of the standings most years through what I can only assume is a combination of experience, stubbornness, and divine intervention.
+The actual appeal was never the competition — it's the trash talk and the excuse to stay connected with my son, my father-in-law, and the rest of the group. The problem is I have almost no time or patience to track who's playing, who's hurt, or who I should be starting each week. Given a choice between managing my roster and watching the 49ers, my actual favorite team, the 49ers win every time.
 
-So this season, instead of getting better at fantasy football, I decided to get better at building AI tools and see if that would close the gap.
+So instead of learning to actually manage a fantasy team properly, I decided to get better at building AI tools and see if one could manage it for me.
 
-Jury's still out on the fantasy football part.
+Jury's still out on whether that actually worked.
 
 But I did end up with a pretty fun experiment: I connected our family Sleeper league to Claude, gave Claude a persistent memory of our league, and built an MCP server so it could pull real FantasyPros rankings, projections, player news, and injury information.
 
@@ -484,9 +484,7 @@ Every actual roster move is still a manual click.
 
 Honestly, I'm okay with that.
 
-I probably shouldn't give the AI the ability to make roster moves anyway.
-
-My father-in-law would never let me hear the end of it.
+I probably shouldn't give the AI the ability to make roster moves anyway. That's the one decision I actually want to stay mine.
 
 ## Try it yourself
 
@@ -519,9 +517,9 @@ A co-manager who remembers which players everyone owns.
 
 A co-manager who occasionally reminds me to check my lineup.
 
-And, most importantly, a co-manager who still hasn't figured out how to stop my father-in-law from drafting kickers in the fifth round.
+And, most importantly, a co-manager that finally lets me keep up with the trash talk without actually having to track my own roster.
 
-So there's clearly still some work to do.
+So there's clearly still some work to do — starting with watching more than just the 49ers on Sundays.
 
 If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API and want to compare notes on what actually worked, [open an issue](https://github.com/dwooods/fantasypros-mcp/issues).
 
