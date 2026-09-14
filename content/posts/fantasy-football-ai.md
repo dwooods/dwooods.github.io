@@ -351,13 +351,13 @@ I make the decisions.
 
 ## The best part? It's actually fun
 
+<img src="/images/fantasy-football-meme-planning.png" alt="Men will deny being good at planning things until fantasy football comes around" style="max-width: 350px; width: 100%; height: auto; display: block; margin: 0 auto;">
+
 There's also something I don't want to lose in all the technical details: this is a family fantasy football league. I get to play against my son, my nephew, my father-in-law, and my brothers-in-law. We talk trash in the group chat, argue about trades, and watch games on Sunday.
 
 And now I get to build ridiculous little AI tools around it.
 
 That's the part I really enjoy.
-
-<img src="/images/fantasy-football-meme-planning.png" alt="Men will deny being good at planning things until fantasy football comes around" style="max-width: 350px; width: 100%; height: auto; display: block; margin: 0 auto;">
 
 The project gives me a reason to learn something new, but the thing I'm building is connected to something I already enjoy. That makes a big difference. I wasn't trying to learn MCP because I needed another technology to put on my resume. I wanted to make fantasy football easier, and MCP happened to be a pretty good way to do it.
 
@@ -409,9 +409,11 @@ Honestly, I'm okay with that.
 
 I probably shouldn't give the AI the ability to make roster moves anyway. That's the one decision I actually want to stay mine.
 
-## Try it yourself
+## Want to try it?
 
-The FantasyPros MCP server is open source if you want to build your own AI assistant that can pull real rankings instead of guessing:
+The FantasyPros MCP server is open source if you want to experiment with giving Claude access to real fantasy football rankings, projections, player news, and injury information.
+
+You can start with the repo:
 
 ```bash
 git clone https://github.com/dwooods/fantasypros-mcp.git
@@ -420,15 +422,15 @@ npm install
 npx wrangler login
 ```
 
-The repo's README walks through the rest — Cloudflare setup, secrets, the KV cache, and connecting it to Claude as a custom connector.
+From there, the README walks through the Cloudflare setup, secrets, the KV cache, and connecting the Worker to Claude as a custom connector.
 
-It's built against FantasyPros' generic v2 API, so you can use it for any league.
+The MCP server itself is intentionally generic. It doesn't know anything about my family league. It just gives Claude access to FantasyPros' v2 API.
 
-The part that makes this useful for **your** league is the context you give the AI:
+The interesting part is what you put around it.
 
-your scoring rules, your rosters, your league history, and the things that make your league different from every generic fantasy football ranking on the internet.
+In my case, that's the Claude Project containing our scoring rules, rosters, trade history, and the little details that make our league different from every other fantasy league on the internet. That's what turns a generic fantasy football data source into something that actually feels like a co-manager — and that's probably the part I like most about the whole experiment.
 
-And that's probably the part I like most about the whole experiment.
+You don't need to recreate my entire setup to play with the idea. Even starting with the MCP server and giving Claude the rules for your own league would get you pretty far.
 
 I didn't build a fantasy football robot.
 
@@ -440,10 +442,10 @@ A co-manager who remembers which players everyone owns.
 
 A co-manager who occasionally reminds me to check my lineup.
 
-And, most importantly, a co-manager that finally lets me keep up with the trash talk without actually having to track my own roster.
+And, most importantly, a co-manager that lets me keep up with the trash talk without actually having to track my own roster.
 
 So there's clearly still some work to do — starting with watching more than just the 49ers on Sundays.
 
-If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API and want to compare notes on what actually worked, [open an issue](https://github.com/dwooods/fantasypros-mcp/issues).
+If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API and want to compare notes, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues).
 
 I'd genuinely like to know if the screenshot fallback is a universal law of fantasy-football tooling — or if it's just something about our family.
