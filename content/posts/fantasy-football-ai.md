@@ -107,6 +107,16 @@ This is probably what my computer science degree was preparing me for.
 
 The FantasyPros piece became its own little project.
 
+> **A note about the MCP server**
+>
+> There's now an official FantasyPros-hosted MCP server, which is more capable than the one I built here. It uses OAuth, doesn't require an API key, and includes features like native league sync, Trade Analyzer, Waiver Assistant, and Start/Sit recommendations.
+>
+> I didn't know about it when I started this project. I began building my Cloudflare Worker on September 5; FantasyPros' MCP documentation is dated September 1.
+>
+> If I'd found it first, I probably would have used theirs.
+>
+> That doesn't really change what I wanted to learn by building this one. The interesting part for me was figuring out how to build and connect an MCP server, deal with authentication, add caching, debug the integration, and make it useful. The specific FantasyPros wrapper may now be redundant, but the experience of building it isn't.
+
 I built a Cloudflare Worker that wraps FantasyPros' v2 API and exposes it as MCP tools. I also added a Workers KV cache because FantasyPros' free tier gives me 50 requests per day, and I didn't want every question in a conversation to become another API request.
 
 The flow looks like this:
@@ -397,17 +407,7 @@ But I don't have to spend as much time collecting all the information required t
 
 That's a pretty good deal.
 
-One honest update before I get to what's next: FantasyPros now has an official, hosted MCP server. OAuth login, no API key required, and it does more than mine does — native league sync, a Trade Analyzer, a Waiver Assistant, Start/Sit recommendations.
-
-I found out about it after I'd already built the whole thing.
-
-Worse, it turns out it was already live when I started. I began the Cloudflare Worker on September 5th. FantasyPros' own docs for their MCP server are dated September 1st.
-
-If I'd found it first, I probably would have just used theirs.
-
-So why is this post still about the one I built? Because the actual value here was never "I'm the only way to get FantasyPros data into an AI." It was building a Cloudflare Worker, wiring up MCP tools, debugging a caching layer, and figuring out an auth header the hard way. That's the same skill whether or not FantasyPros later makes the specific wrapper redundant.
-
-I'll probably switch my own workflow over to their server. The lessons from building mine don't go anywhere.
+I mentioned it earlier, but it's worth repeating here: I'll probably switch my own day-to-day workflow over to FantasyPros' official server at some point. That doesn't undo any of the above — the decisions were still mine to make either way.
 
 What's next?
 
