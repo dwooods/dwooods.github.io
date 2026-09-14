@@ -5,7 +5,13 @@ draft: false
 tags: ["fantasy-football", "sleeper", "mcp", "cloudflare-workers", "claude", "cowork", "typescript"]
 description: "How I connected our family Sleeper league, a custom FantasyPros MCP server on Cloudflare Workers, and a Claude Project into a fantasy football co-manager — and learned that AI is pretty good at making dad life easier."
 summary: "I have an 8-team keeper league with my son, my nephew, my father-in-law, and three brothers-in-law. The scoring is weird, the trash talk is free, and I don't have the time or patience to actually manage a roster properly. So I built Claude a memory of our league and an MCP server for rankings and news, and spent the season finding out whether AI could handle the tracking so I could just enjoy the trash talk."
+featuredImage: "/images/fantasy-football-meme-toilet-store.png"
+featuredImagePreview: "/images/fantasy-football-meme-toilet-store.png"
 ---
+
+<style>
+.featured-image img, .featured-image img.lazyloaded { max-width: 492px; width: 100% !important; }
+</style>
 
 **Repo:** [github.com/dwooods/fantasypros-mcp](https://github.com/dwooods/fantasypros-mcp)
 
@@ -398,6 +404,8 @@ We're watching games on Sunday.
 And now I get to build ridiculous little AI tools around it.
 
 That's fun.
+
+<img src="/images/fantasy-football-meme-planning.png" alt="Men will deny being good at planning things until fantasy football comes around" style="max-width: 350px; width: 100%; height: auto; display: block; margin: 0 auto;">
 
 The project gives me a reason to learn something new, but the thing I'm building is connected to something I already enjoy.
 
