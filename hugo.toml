@@ -115,6 +115,9 @@ enableGitInfo = false
         inputPosition = "bottom"
         lightTheme = "light"
         darkTheme = "dark"
+      [params.page.comment.waline]
+        enable = true
+        serverURL = "https://dwooods-blog-comments.vercel.app"
 
 [outputs]
   home = ["HTML", "RSS", "JSON"]
