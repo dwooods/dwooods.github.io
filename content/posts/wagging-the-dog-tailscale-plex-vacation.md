@@ -23,7 +23,7 @@ This is the story of how I un-decided that, mostly by asking Claude a lot of inc
 
 We rely entirely on our own library — no subscriptions, no "well we could just watch something on Netflix instead." So when the TV at the vacation house flatly refused to play a movie I own, on a server I own, that's not a minor inconvenience, that's the entertainment plan for the week collapsing.
 
-The actual message wasn't even honest about what was happening — it just acted like the content wasn't available, the same as if the file had been deleted. It took some digging to learn Plex has been actively enforcing a subscription requirement for remote streaming of personal media since late 2025, rolling it out to TV platforms first. Unless the server owner or the viewer has an active Plex Pass, or the viewer buys a "Remote Watch Pass," remote playback is just blocked. Not throttled, not watermarked — blocked.
+The actual message wasn't even honest about what was happening — it just acted like the content wasn't available, the same as if the file had been deleted. It took some digging to learn that Plex began enforcing a subscription requirement for remote streaming of personal media in late 2025, with the change showing up on TV platforms first. Unless the server owner or the viewer has an active Plex Pass, or the viewer buys a "Remote Watch Pass," remote playback is just blocked. Not throttled, not watermarked — blocked.
 
 <p align="center"><img src="/images/plex-remote-watch-pass-paywall.png" alt="Plex's &quot;you need a Remote Watch Pass&quot; paywall, shown here as a deliberate test with Tailscale turned off" style="max-width:340px; width:100%;"></p>
 
