@@ -24,8 +24,6 @@ Here's what I found, with real numbers.
 | OS | Windows 11 Home | Debian GNU/Linux 13 ("trixie") 64-bit |
 | Runtime | Ollama 0.33.2, exposed on `localhost:11434` | Ollama 0.33.2 |
 
-![AMD Radeon RX 6700 XT, the 12GB card doing all the local inference on the PC side of this project](/images/pc-gpu-rx6700xt.png)
-
 ## Getting the PC's GPU actually used
 
 Ollama's default behavior on my machine was to quietly fall back to the CPU. That's easy to miss — it still generates text, just slowly — and it took a real benchmark run to notice: **6.88 tokens/sec** on `phi4:14b`, which is CPU-bound and painfully slow for anything interactive.
