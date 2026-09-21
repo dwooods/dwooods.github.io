@@ -1,0 +1,28 @@
+// ==============================
+// Custom style
+// ==============================
+
+// LoveIt's default home-page post entry (".summary") is separated from the
+// next one by a single 1px dashed rule with about 1rem of padding — with a
+// featured image and a few lines of summary text, consecutive posts end up
+// reading as one continuous scroll instead of distinct entries. Give each
+// one a card treatment instead: a visible border, rounded corners, a subtle
+// background tint, and real breathing room between cards.
+.home[data-home=posts] {
+  .summary {
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    border: 1px solid $global-border-color;
+    @include border-radius(8px);
+    background-color: rgba(0, 0, 0, .02);
+
+    [theme=dark] & {
+      border-color: $global-border-color-dark;
+      background-color: rgba(255, 255, 255, .03);
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
