@@ -38,7 +38,11 @@ Cowork wrote every promptfoo config, the voice-assistant pipeline later in this 
 
 It also got things wrong, more than once. The GPU env vars below are one example: Cowork's first pass at "optimizing" them cost me a 3x speed regression before we caught it. The Pi thermal watchdog's first version silently didn't work at all. Both are covered in place, where they actually happened, rather than saved up for a highlight reel here.
 
-## Getting the PC's GPU actually used
+## The PC
+
+Everything in this section runs on the Windows desktop — the i7-13700K and the RX 6700 XT.
+
+### Getting the GPU actually used
 
 Ollama's default behavior on my machine was to quietly fall back to the CPU. That's easy to miss — it still generates text, just slowly — and it took a real benchmark run to notice: **6.88 tokens/sec** on `phi4:14b`, which is CPU-bound and painfully slow for anything interactive.
 
@@ -54,7 +58,7 @@ The fix, since the RX 6700 XT is an AMD card and Ollama's GPU detection can be f
 
 **The one that went wrong.** Once those three were confirmed working, Cowork suggested two more as further "optimizations": `OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0`, aimed at trimming VRAM usage for the KV cache. Neither had been checked against AMD/Vulkan first — they're more mature on NVIDIA/CUDA — and the very next verbose run showed why that matters: eval rate dropped from 150.39 tok/s to 52.07 tok/s, prompt-eval from 464.14 to 108.60 tok/s. Roughly a 3x regression, not noise. Unsetting both and restarting Ollama brought it straight back to 150.07 tok/s. **Verdict: don't set either one on this card.** Worth remembering next time an "optimization" gets suggested without a "have we actually confirmed this on your specific hardware" attached to it — including, apparently, when the suggestion comes from the thing doing the suggesting.
 
-## The 12GB VRAM cliff
+### The 12GB VRAM cliff
 
 Once the GPU was actually engaged, the difference was dramatic — but only up to a point, and the point matters more than I expected.
 
@@ -73,7 +77,7 @@ The practical rule that fell out of this: **~13B parameters at Q4_K_M quantizati
 
 One more data point on `deepseek-r1:14b` worth calling out: I ran it against four different prompts to check consistency, and generation speed held steady between 8.05 and 8.58 tok/s the whole time, with prompt-processing (how fast it chews through your input before generating) running much faster, 38–75 tok/s depending on prompt length. No sign of throttling or slowdown across runs — reassuring, since a model that's fast on the first prompt and degrades on the fourth is a much worse product experience than one that's consistently modest.
 
-## Which installed model for which job
+### Which installed model for which job
 
 Once you've got a handful of models pulled, the "fastest" one isn't always the right default — it's worth matching the model to the task instead of always reaching for whichever benchmarks best. Here's how mine shook out in practice:
 
@@ -89,7 +93,7 @@ Once you've got a handful of models pulled, the "fastest" one isn't always the r
 
 This is informal usage-pattern guidance, not a rigorous quality score for each task — but it's a reasonable starting hypothesis before you burn time benchmarking every model against every workload. I eventually did burn that time, and the results below are a reminder that this table is a hypothesis, not a verdict.
 
-## Testing it properly: what an automated eval harness found
+### Testing it properly: what an automated eval harness found
 
 Raw tok/s is the easy number, and it's what most of this post is built on so far. It also tells you nothing about whether a model is actually *right*. To get real pass/fail data instead of vibes, I set up `promptfoo` — a Node-based eval tool — to score models against four workloads (coding, agentic/tool use, structured extraction, chat) plus a fifth I added later for vision, using a fixed judge model (`deepseek-r1:14b`) kept separate from the models under test so nothing could grade its own homework.
 
@@ -124,7 +128,7 @@ What came back wasn't a clean leaderboard. It was three separate places where th
 
 **The meta-lesson.** Three of these findings aren't really about the models — they're about how easily a benchmark can lie to you. A tool-calling test can score a false 0% because a config key was nested wrong. A judge can confidently grade a correct answer as wrong. A strict JSON check can fail a model producing perfectly good JSON wrapped in markdown fences it wasn't told to expect. The rule I've landed on: a uniform failure across every model is almost always your harness, not their capability — models fail in different, idiosyncratic ways, a scoring bug fails everyone identically — and any single surprising result is worth pulling the raw output and checking by hand before it goes in a table.
 
-## Config tuning that actually mattered
+### Config tuning that actually mattered
 
 A few settings made a bigger difference than I expected, mostly around context size:
 
@@ -134,7 +138,7 @@ A few settings made a bigger difference than I expected, mostly around context s
 - **Repeat penalty** — worth turning on if it's off by default in your client. Qwen models in particular can fall into repetition loops at a repeat penalty of 1 (disabled); 1.05–1.1 clears that up without hurting output quality.
 - **Temperature** — 0.8 is a reasonable default for general chat; drop to 0.2–0.3 for coding tasks where you want deterministic, less "creative" output.
 
-## Calling Ollama directly (bypassing the GUI)
+### Calling Ollama directly (bypassing the GUI)
 
 Ollama exposes a REST API on `localhost:11434` by default, which is handy for testing or building your own front end. A one-shot request from a browser console or Node script:
 
@@ -156,13 +160,94 @@ Set `stream: true` and read the response body with `response.body.getReader()` i
 
 One more Windows-specific snag: if you kill and relaunch `ollama serve` to pick up new environment variables and get `bind: Only one usage of each socket address is normally permitted`, a background `ollama_app.exe` process is probably still holding port 11434. `taskkill /F /IM "ollama*"` (note the wildcard) clears both the CLI and the tray-app process; `Get-NetTCPConnection -LocalPort 11434` confirms the port's actually free before you relaunch.
 
-## Ollama Cloud: the option for models too big for your hardware
+### Ollama Cloud: the option for models too big for your hardware
 
 Some of the largest model tags in Ollama's library — `gemma4:31b`, `gpt-oss:120b`, and similar — are really meant to run on Ollama's cloud compute rather than local hardware, once you've authenticated with `ollama login`. Your prompt gets routed to a remote GPU and tokens stream back, using essentially none of your local VRAM.
 
 Worth knowing the tradeoffs before reaching for this: it needs a stable internet connection (no more fully-offline story), it adds real round-trip latency on top of generation time, your prompts and outputs are leaving your machine, and free-tier usage is presumably subject to whatever rate limits Ollama sets. It's a legitimate way to try a model too big for your rig, but it quietly gives up the two biggest reasons to run local in the first place — privacy and zero ongoing dependency. Worth treating as a "try before you buy more GPU" tool rather than a default.
 
-## The Raspberry Pi 5: CPU-only, and it shows
+### Keeping the stack current
+
+Worth a periodic check rather than a set-and-forget: it's easy for the GPU acceleration to silently regress back to CPU-only after a Windows or AMD driver update, exactly the problem that started all this.
+
+- **Ollama itself:** `ollama --version` to check, then either right-click the Ollama icon in the system tray and choose "Check for Updates," or grab the latest installer from ollama.com/download — it updates the engine in place without touching your downloaded models.
+- **Python tooling:** `python -m pip install --upgrade pip` and `pip install --upgrade llm-benchmark` if you're using it for quick speed checks.
+- **Models themselves:** `ollama list` to see what's installed, then `ollama pull <model>` again for any tag you want refreshed — upstream fixes, tokenizer corrections, and quantization tweaks do land on existing tags over time.
+- **GPU acceleration, after any driver update:** run something like `ollama run qwen2.5:3b --verbose "hi"` and check that `library=Vulkan` (or your platform's equivalent) shows up in the output or in `%LOCALAPPDATA%\Ollama\server.log`. If it's silently gone, you're back to CPU-only until you catch it — and the tok/s difference is large enough that it's worth checking after every driver update, not just once.
+
+### What people are actually building with this
+
+A few patterns kept coming up in projects other people have built on Pi-class hardware, worth stealing ideas from:
+
+- **Fully offline voice assistants** — Whisper for speech-to-text, a local LLM via Ollama for the response, Piper for text-to-speech, no cloud round-trip at all.
+- **Natural-language smart home control** — Home Assistant talks to a local Ollama instance so voice or text commands get parsed into device actions on-device. This is a much more realistic "agentic" use case for small models than open-ended tool use — a small, fixed set of possible actions (turn this light off, set that thermostat) is exactly where a 3B model can be reliable, versus open-ended multi-step planning where it usually isn't.
+
+### Building my own voice assistant: three gotchas that ate an afternoon
+
+Talk is cheap until you actually wire up `faster-whisper` → Ollama → Piper and hit record. Cowork built exactly the pattern described above — push-to-talk, `faster-whisper` (`base.en`, CPU, int8) for speech-to-text, Ollama's streaming `/api/chat` for the LLM, `piper-tts` for the voice — specifically to get a real, measured time-to-first-token number instead of the derived estimate I'd been using elsewhere in this project. Three things broke in ways worth writing down.
+
+**Ollama's default 5-minute keep_alive turns every idle gap into a full reload.** The first time I ran the script, the LLM's time-to-first-token was 12.27 seconds — appalling for a model that benchmarks at ~18 tok/s on this card. The second turn, after a few minutes of me reading and reacting to the first result, TTFT jumped to 32.51 seconds — worse, not better. Ollama's default `keep_alive` is 5 minutes; once that clock runs out, the model gets evicted from VRAM, and the next request pays a full reload cost that gets counted as part of "time to first token" even though it has nothing to do with actual inference speed. The fix is a one-line addition to the request payload: `"keep_alive": -1` keeps the model loaded indefinitely for the life of the session. Only after that did TTFT numbers actually reflect inference speed instead of disk I/O.
+
+**A reasoning model can silently starve itself of tokens to answer with.** With `num_ctx` hardcoded at 4096 — a sensible default for most non-reasoning models on this card — one turn crashed outright: the assistant printed nothing, and the script died trying to write an empty WAV file to disk. The cause: `qwen3.5:9b` is a reasoning model that emits a separate `thinking` block before its actual answer — even a trivial "hi" burned 258 tokens on internal reasoning before the visible reply. On a harder question, that thinking process ate the entire 4096-token budget, leaving zero tokens left for the actual answer. This is the exact same failure mode I'd already hit benchmarking vision models earlier in this project (`qwen3-vl:8b` hitting an empty-output wall at the same context size) — doubling `num_ctx` to 8192 fixed it there and fixed it here too. As I found out a few days later running a much longer-context test (see below), this "just double it" fix has limits of its own.
+
+**LLMs write in Markdown by default, and Markdown read aloud sounds ridiculous.** The first clean response I got back was littered with `**bold**` around numbers and facts — a TTS engine has no idea what to do with asterisks, so it just reads them as if they were words. Two fixes, because a system prompt alone isn't reliable enough: first, a system message telling the model explicitly that this is a voice interface and to skip Markdown, bullets, headers, and code blocks entirely; second, a small regex cleanup pass that strips any `**bold**`, `*italic*`, backticks, header markers, and list bullets that get through anyway, before the text ever reaches Piper. Belt and suspenders — models don't follow "no formatting" instructions with 100% reliability, so the pipeline can't assume they will.
+
+**Bonus finding: confident and wrong.** Asked what year the Raspberry Pi 5 came out and how much RAM the base model has, `qwen3.5:9b` nailed the year (2023) but invented product details that don't exist — describing a "Plus" or "higher-end" RAM tier that Raspberry Pi never made (the Pi 5 just ships in 4GB/8GB/16GB configurations of the same board, no branded tiering). It repeated a version of the same invented tiering across two independently-phrased attempts at the question. A useful reminder that a model can nail the easy part of a factual question and confidently fabricate the specific detail sitting right next to it — a failure that's much easier to catch out loud, mid-conversation, than buried in a benchmark spreadsheet.
+
+None of these three are exotic bugs — they're exactly the kind of thing that only shows up once you build the actual end-to-end pipeline instead of just benchmarking the model in isolation. Worth remembering next time "the model" gets blamed for something that's actually the harness around it.
+
+#### The actual answer to "what's local TTFT," and it's not what the tok/s numbers implied
+
+Here's the twist: after fixing the context-starvation crash, I ran five more turns through the assistant and time-to-first-token was consistently awful — 14 to 84 seconds, scaling almost exactly with how "hard" the question seemed. Doing the math on the printed latency breakdown made the cause obvious: on every single turn, 83–99% of the model's total generation time happened *before* the first audible word. `qwen3.5:9b` is a hybrid-reasoning model, and its entire chain-of-thought block generates silently before any of the actual answer streams out — Ollama's `/api/chat` doesn't expose that thinking phase as separate timing, so from the outside it just looks like a shockingly slow model, even though the same model benchmarks at ~18 tok/s raw generation speed.
+
+The fix is a single field: adding `"think": false` to the request payload suppresses the reasoning trace entirely. Before and after, same five kinds of question, same warm model:
+
+| | With reasoning (default) | With `think: false` |
+|---|---|---|
+| TTFT range | 14.4s – 83.6s | 2.39s – 2.47s |
+| Total generation | 15.2s – 100.6s | 2.7s – 4.8s |
+| "47 × 89?" | 17.0s TTFT | 2.47s TTFT |
+
+That's a 6–30x latency improvement depending on the question, and — at least on the handful of questions I tried — no visible quality regression; if anything the answers came back cleaner and more direct with reasoning off. This is the real, measured answer to "what's local TTFT" that the rest of this project had only ever estimated: it isn't a property of the model or the GPU at all, it's almost entirely a property of whether reasoning is switched on. A benchmark that only measures raw tok/s — which is every speed number earlier in this post — will completely miss this, because reasoning and non-reasoning modes generate at basically the same tok/s; the difference only shows up in how much gets generated invisibly before the part a user actually sees. Anyone building a live voice or chat product on a hybrid-reasoning model needs to know this switch exists, because leaving reasoning on by default is close to a 10-30x hidden latency tax with no warning.
+
+**Then I added a third arm, and it complicated the story in a useful way.** If `think: false` closes most of the gap to a fast model, what happens if you just skip the reasoning model entirely and run something genuinely small and non-reasoning — `qwen2.5:3b`, the same tag that hit 138.94 tok/s on the raw GPU benchmark earlier in this post? Same pipeline, same five questions, same `keep_alive: -1` warm-model setup:
+
+| | Reasoning on (default) | `qwen3.5:9b` + `think: false` | `qwen2.5:3b` (no reasoning mode to disable) |
+|---|---|---|---|
+| TTFT range | 14.4s – 83.6s | 2.39s – 2.47s | **2.13s – 2.16s** |
+| Answers materially wrong | 0 of 5 (one fabricated detail, see above) | 0 of 5 | **2 of 5** |
+
+`qwen2.5:3b` posted the flattest, lowest TTFT of any model or setting tested anywhere in this project — consistently around 2.1s regardless of question difficulty, edging out even the tuned `qwen3.5:9b`. It also got the arithmetic question wrong (47 × 89 is 4,183; it answered 4,103) and gave a genuinely garbled answer on the Raspberry Pi 5 question — first claiming the Pi 5 "didn't come out yet," then in the same breath saying it "was released in 2022" (it's neither; it shipped in 2023), and inventing RAM figures for both the Pi 4 and Pi 5 that don't match either board. It also completely missed the point of a question about my own AMD RX 6700 XT and Ollama setup, describing Ollama as game-rendering software rather than recognizing it as the very runtime serving the conversation. (The first turn of this run also cost 6.63s TTFT before settling into its ~2.14s baseline — the same cold-load-versus-warm-model tax documented above for `qwen3.5:9b`, confirming it's a property of any model's first request, not something specific to reasoning or size.)
+
+So the honest takeaway isn't "use the smallest model for the fastest chat experience" — it's that TTFT and answer quality are separate axes that don't trade off the way that instinct predicts. Dropping a full model-size class below `qwen3.5:9b` bought roughly a quarter-second of additional TTFT headroom and cost two wrong answers out of five, on the exact same battery `qwen3.5:9b` + `think: false` handled cleanly. For a latency-sensitive product, `qwen3.5:9b` with reasoning turned off looks like the better trade than reaching for a smaller model — the "obvious" latency fix (go smaller) turns out to be the wrong lever; the flag was the right one all along.
+
+### How far can you actually push context? A needle in a 32,000-token haystack
+
+The `qwen3.5:9b` tag on Ollama's library advertises a 256K token context window. That number is doing a lot of marketing work, and I wanted an actual measurement instead of taking it on faith — especially after just watching `num_ctx` bite the voice assistant twice above. So I built the standard test for this: bury a single, distinctive fact somewhere inside a much longer block of unrelated filler text, then ask the model to find it. I used an invented "generator override code" (`ZULU-FOXTROT-8841`) that couldn't possibly appear anywhere in the model's training data, planted it at five different positions within the text (right at the start, a quarter of the way through, dead center, three-quarters through, right at the end), and swept the haystack size from roughly 1,000 tokens up to 32,000. Scoring was a simple exact-string check rather than another LLM grading the answer — after already catching my own judge model grading a correct answer wrong earlier in this post, I wasn't about to trust a second model to tell me whether the first one found an exact string.
+
+The headline is almost anticlimactic: **every single test passed.** All 30 combinations of size and position, from 1K tokens to 32K tokens, found the needle every time. If the goal was "prove the 256K claim is fake," this test didn't get there — 32K is still an eighth of the advertised ceiling, and I have no evidence recall would fail anywhere I actually tested.
+
+But recall was never really the interesting number, once I looked at what else moved.
+
+| Context size | Prefill speed | Generation speed | Time to first token (warm) |
+|---|---|---|---|
+| 1,024 tokens | ~655 tok/s | ~62 tok/s | ~3.7s |
+| 4,096 tokens | ~628 tok/s | ~60 tok/s | ~8.4s |
+| 8,192 tokens | ~400–470 tok/s | ~33–40 tok/s | ~19–22s |
+| 16,384 tokens | ~277 tok/s | ~17.8 tok/s | ~58s |
+| 32,768 tokens | ~203 tok/s | ~11.8 tok/s | ~154s |
+
+Generation speed fell by more than 5x over that range, and it happened with the model still fully resident in VRAM the entire time — `ollama ps` confirmed 100% GPU at every single measurement, and VRAM usage barely moved (5.4GB at 1K tokens, 6.6GB at 32K). That's worth sitting with for a second, because it means this is a *different* bottleneck than the 12GB VRAM cliff earlier in this post. The VRAM cliff is about data placement — a model's weights either fit in fast VRAM or they get pushed into slow system RAM, and the penalty comes from shuttling data across the PCIe bus. Nothing here got pushed anywhere. This slowdown is happening entirely inside the GPU's own fast memory, which means it's not a placement problem at all — it's a compute problem. Every token a transformer model generates has to be compared against every token already in its context window; that comparison gets more expensive as the window grows, memory placement aside. By 32K tokens, `qwen3.5:9b`'s generation speed (11.8 tok/s) has fallen to roughly what `deepseek-r1:14b` — a much bigger, dramatically slower reasoning model — manages as its baseline. A long conversation costs about as much throughput as swapping in a model with 50% more parameters.
+
+Time-to-first-token is the number that actually kills a real product idea here. Even fully warm, with the cold-reload penalty from the voice-assistant work already eliminated, TTFT went from under 4 seconds at 1K tokens to about two and a half minutes at 32K. That's stacked on top of, not instead of, the reasoning-mode TTFT tax from the section above — this test ran with `think: false` throughout specifically so it would measure only the context-length cost in isolation. A voice assistant with a 30-turn conversation history behind it, still with reasoning switched off, is not a "hidden latency tax," it's an unusable product. The 256K context number on the model card is a statement about what the model will *accept* without erroring, not a statement about what stays fast enough to build around.
+
+One loose thread I'm flagging rather than pretending is resolved: the two runs I did at the 8,192-token size don't agree with each other. The first pass measured a clean ~400 tok/s prefill and ~40 tok/s generation across three positions. A second pass, run minutes later as part of extending the test to larger sizes, measured a faster ~470 tok/s prefill but a *slower* ~33 tok/s generation, consistently across all five positions that time. Every other size I tested reproduced cleanly between runs. I don't have an explanation for the 8K-specific discrepancy, and I'd rather say so than paper over it with a guess — it's logged as open, and if it ever matters for something I actually ship, it's worth an isolated rerun to chase down.
+
+## The Raspberry Pi 5
+
+Everything in this section runs on the Pi 5 — 8GB RAM, no discrete GPU, CPU-only inference.
+
+### CPU-only, and it shows
 
 No GPU means every model lives or dies by CPU throughput and the Pi's ~17GB/s memory bandwidth. The math is straightforward: generation speed is roughly that bandwidth divided by model size, which is why the gap between a 1.5B and an 8B model here is so much larger than the parameter count alone would suggest.
 
@@ -199,7 +284,7 @@ A couple of things that'll bite you if you skip them: the Pi's BCM2712 chip is r
 
 If CPU-only inference turns out to be the actual bottleneck rather than model choice, Raspberry Pi's own **AI HAT+ 2** ($130) is worth a look — it's a Hailo-10H accelerator with 8GB of *dedicated* RAM (separate from the Pi's own 8GB), supporting 1–1.5B models at genuinely practical speeds without competing with the OS for memory. Not something to buy before you've actually hit the CPU-only ceiling, but the real lever if you do.
 
-## Six crashes and a watchdog: closing out the Pi's vision suite
+### Six crashes and a watchdog: closing out the Pi's vision suite
 
 The Pi's vision suite — the same receipt-extraction workload from the PC showdown above — was supposed to be the last item on the Pi side, a quick coda to the speed and quality tables above. It turned into the most disruptive week of this whole project, because the assumption I walked in with was backwards: an active cooler is not a fix for sustained CPU-bound inference on a Pi 5. It's a mitigation, and there's a real difference between the two.
 
@@ -226,84 +311,7 @@ With that, I closed the Pi vision suite: `qwen3-vl:2b` at 4 out of 6, 66.67% wei
 
 The practical upshot for anything I actually build on this board: active cooling is necessary, but treating it as sufficient was the mistake that cost the week. Any real product running sustained inference on a Pi 5 needs an application-level watchdog and auto-restart designed in from the start — and tuned per-workload, not borrowed wholesale from this one. The exact kill-window mismatch that sidelined the watchdog for `qwen3-vl:2b` here is the reminder: "the watchdog works" and "the watchdog works for this model's timing" are two different claims, and only one of them is the one that matters in production.
 
-## Keeping the stack current
-
-Worth a periodic check rather than a set-and-forget: it's easy for the GPU acceleration to silently regress back to CPU-only after a Windows or AMD driver update, exactly the problem that started all this.
-
-- **Ollama itself:** `ollama --version` to check, then either right-click the Ollama icon in the system tray and choose "Check for Updates," or grab the latest installer from ollama.com/download — it updates the engine in place without touching your downloaded models.
-- **Python tooling:** `python -m pip install --upgrade pip` and `pip install --upgrade llm-benchmark` if you're using it for quick speed checks.
-- **Models themselves:** `ollama list` to see what's installed, then `ollama pull <model>` again for any tag you want refreshed — upstream fixes, tokenizer corrections, and quantization tweaks do land on existing tags over time.
-- **GPU acceleration, after any driver update:** run something like `ollama run qwen2.5:3b --verbose "hi"` and check that `library=Vulkan` (or your platform's equivalent) shows up in the output or in `%LOCALAPPDATA%\Ollama\server.log`. If it's silently gone, you're back to CPU-only until you catch it — and the tok/s difference is large enough that it's worth checking after every driver update, not just once.
-
-## What people are actually building with this
-
-A few patterns kept coming up in projects other people have built on Pi-class hardware, worth stealing ideas from:
-
-- **Fully offline voice assistants** — Whisper for speech-to-text, a local LLM via Ollama for the response, Piper for text-to-speech, no cloud round-trip at all.
-- **Natural-language smart home control** — Home Assistant talks to a local Ollama instance so voice or text commands get parsed into device actions on-device. This is a much more realistic "agentic" use case for small models than open-ended tool use — a small, fixed set of possible actions (turn this light off, set that thermostat) is exactly where a 3B model can be reliable, versus open-ended multi-step planning where it usually isn't.
-
-## Building my own voice assistant: three gotchas that ate an afternoon
-
-Talk is cheap until you actually wire up `faster-whisper` → Ollama → Piper and hit record. Cowork built exactly the pattern described above — push-to-talk, `faster-whisper` (`base.en`, CPU, int8) for speech-to-text, Ollama's streaming `/api/chat` for the LLM, `piper-tts` for the voice — specifically to get a real, measured time-to-first-token number instead of the derived estimate I'd been using elsewhere in this project. Three things broke in ways worth writing down.
-
-**Ollama's default 5-minute keep_alive turns every idle gap into a full reload.** The first time I ran the script, the LLM's time-to-first-token was 12.27 seconds — appalling for a model that benchmarks at ~18 tok/s on this card. The second turn, after a few minutes of me reading and reacting to the first result, TTFT jumped to 32.51 seconds — worse, not better. Ollama's default `keep_alive` is 5 minutes; once that clock runs out, the model gets evicted from VRAM, and the next request pays a full reload cost that gets counted as part of "time to first token" even though it has nothing to do with actual inference speed. The fix is a one-line addition to the request payload: `"keep_alive": -1` keeps the model loaded indefinitely for the life of the session. Only after that did TTFT numbers actually reflect inference speed instead of disk I/O.
-
-**A reasoning model can silently starve itself of tokens to answer with.** With `num_ctx` hardcoded at 4096 — a sensible default for most non-reasoning models on this card — one turn crashed outright: the assistant printed nothing, and the script died trying to write an empty WAV file to disk. The cause: `qwen3.5:9b` is a reasoning model that emits a separate `thinking` block before its actual answer — even a trivial "hi" burned 258 tokens on internal reasoning before the visible reply. On a harder question, that thinking process ate the entire 4096-token budget, leaving zero tokens left for the actual answer. This is the exact same failure mode I'd already hit benchmarking vision models earlier in this project (`qwen3-vl:8b` hitting an empty-output wall at the same context size) — doubling `num_ctx` to 8192 fixed it there and fixed it here too. As I found out a few days later running a much longer-context test (see below), this "just double it" fix has limits of its own.
-
-**LLMs write in Markdown by default, and Markdown read aloud sounds ridiculous.** The first clean response I got back was littered with `**bold**` around numbers and facts — a TTS engine has no idea what to do with asterisks, so it just reads them as if they were words. Two fixes, because a system prompt alone isn't reliable enough: first, a system message telling the model explicitly that this is a voice interface and to skip Markdown, bullets, headers, and code blocks entirely; second, a small regex cleanup pass that strips any `**bold**`, `*italic*`, backticks, header markers, and list bullets that get through anyway, before the text ever reaches Piper. Belt and suspenders — models don't follow "no formatting" instructions with 100% reliability, so the pipeline can't assume they will.
-
-**Bonus finding: confident and wrong.** Asked what year the Raspberry Pi 5 came out and how much RAM the base model has, `qwen3.5:9b` nailed the year (2023) but invented product details that don't exist — describing a "Plus" or "higher-end" RAM tier that Raspberry Pi never made (the Pi 5 just ships in 4GB/8GB/16GB configurations of the same board, no branded tiering). It repeated a version of the same invented tiering across two independently-phrased attempts at the question. A useful reminder that a model can nail the easy part of a factual question and confidently fabricate the specific detail sitting right next to it — a failure that's much easier to catch out loud, mid-conversation, than buried in a benchmark spreadsheet.
-
-None of these three are exotic bugs — they're exactly the kind of thing that only shows up once you build the actual end-to-end pipeline instead of just benchmarking the model in isolation. Worth remembering next time "the model" gets blamed for something that's actually the harness around it.
-
-### The actual answer to "what's local TTFT," and it's not what the tok/s numbers implied
-
-Here's the twist: after fixing the context-starvation crash, I ran five more turns through the assistant and time-to-first-token was consistently awful — 14 to 84 seconds, scaling almost exactly with how "hard" the question seemed. Doing the math on the printed latency breakdown made the cause obvious: on every single turn, 83–99% of the model's total generation time happened *before* the first audible word. `qwen3.5:9b` is a hybrid-reasoning model, and its entire chain-of-thought block generates silently before any of the actual answer streams out — Ollama's `/api/chat` doesn't expose that thinking phase as separate timing, so from the outside it just looks like a shockingly slow model, even though the same model benchmarks at ~18 tok/s raw generation speed.
-
-The fix is a single field: adding `"think": false` to the request payload suppresses the reasoning trace entirely. Before and after, same five kinds of question, same warm model:
-
-| | With reasoning (default) | With `think: false` |
-|---|---|---|
-| TTFT range | 14.4s – 83.6s | 2.39s – 2.47s |
-| Total generation | 15.2s – 100.6s | 2.7s – 4.8s |
-| "47 × 89?" | 17.0s TTFT | 2.47s TTFT |
-
-That's a 6–30x latency improvement depending on the question, and — at least on the handful of questions I tried — no visible quality regression; if anything the answers came back cleaner and more direct with reasoning off. This is the real, measured answer to "what's local TTFT" that the rest of this project had only ever estimated: it isn't a property of the model or the GPU at all, it's almost entirely a property of whether reasoning is switched on. A benchmark that only measures raw tok/s — which is every speed number earlier in this post — will completely miss this, because reasoning and non-reasoning modes generate at basically the same tok/s; the difference only shows up in how much gets generated invisibly before the part a user actually sees. Anyone building a live voice or chat product on a hybrid-reasoning model needs to know this switch exists, because leaving reasoning on by default is close to a 10-30x hidden latency tax with no warning.
-
-**Then I added a third arm, and it complicated the story in a useful way.** If `think: false` closes most of the gap to a fast model, what happens if you just skip the reasoning model entirely and run something genuinely small and non-reasoning — `qwen2.5:3b`, the same tag that hit 138.94 tok/s on the raw GPU benchmark earlier in this post? Same pipeline, same five questions, same `keep_alive: -1` warm-model setup:
-
-| | Reasoning on (default) | `qwen3.5:9b` + `think: false` | `qwen2.5:3b` (no reasoning mode to disable) |
-|---|---|---|---|
-| TTFT range | 14.4s – 83.6s | 2.39s – 2.47s | **2.13s – 2.16s** |
-| Answers materially wrong | 0 of 5 (one fabricated detail, see above) | 0 of 5 | **2 of 5** |
-
-`qwen2.5:3b` posted the flattest, lowest TTFT of any model or setting tested anywhere in this project — consistently around 2.1s regardless of question difficulty, edging out even the tuned `qwen3.5:9b`. It also got the arithmetic question wrong (47 × 89 is 4,183; it answered 4,103) and gave a genuinely garbled answer on the Raspberry Pi 5 question — first claiming the Pi 5 "didn't come out yet," then in the same breath saying it "was released in 2022" (it's neither; it shipped in 2023), and inventing RAM figures for both the Pi 4 and Pi 5 that don't match either board. It also completely missed the point of a question about my own AMD RX 6700 XT and Ollama setup, describing Ollama as game-rendering software rather than recognizing it as the very runtime serving the conversation. (The first turn of this run also cost 6.63s TTFT before settling into its ~2.14s baseline — the same cold-load-versus-warm-model tax documented above for `qwen3.5:9b`, confirming it's a property of any model's first request, not something specific to reasoning or size.)
-
-So the honest takeaway isn't "use the smallest model for the fastest chat experience" — it's that TTFT and answer quality are separate axes that don't trade off the way that instinct predicts. Dropping a full model-size class below `qwen3.5:9b` bought roughly a quarter-second of additional TTFT headroom and cost two wrong answers out of five, on the exact same battery `qwen3.5:9b` + `think: false` handled cleanly. For a latency-sensitive product, `qwen3.5:9b` with reasoning turned off looks like the better trade than reaching for a smaller model — the "obvious" latency fix (go smaller) turns out to be the wrong lever; the flag was the right one all along.
-
-## How far can you actually push context? A needle in a 32,000-token haystack
-
-The `qwen3.5:9b` tag on Ollama's library advertises a 256K token context window. That number is doing a lot of marketing work, and I wanted an actual measurement instead of taking it on faith — especially after just watching `num_ctx` bite the voice assistant twice above. So I built the standard test for this: bury a single, distinctive fact somewhere inside a much longer block of unrelated filler text, then ask the model to find it. I used an invented "generator override code" (`ZULU-FOXTROT-8841`) that couldn't possibly appear anywhere in the model's training data, planted it at five different positions within the text (right at the start, a quarter of the way through, dead center, three-quarters through, right at the end), and swept the haystack size from roughly 1,000 tokens up to 32,000. Scoring was a simple exact-string check rather than another LLM grading the answer — after already catching my own judge model grading a correct answer wrong earlier in this post, I wasn't about to trust a second model to tell me whether the first one found an exact string.
-
-The headline is almost anticlimactic: **every single test passed.** All 30 combinations of size and position, from 1K tokens to 32K tokens, found the needle every time. If the goal was "prove the 256K claim is fake," this test didn't get there — 32K is still an eighth of the advertised ceiling, and I have no evidence recall would fail anywhere I actually tested.
-
-But recall was never really the interesting number, once I looked at what else moved.
-
-| Context size | Prefill speed | Generation speed | Time to first token (warm) |
-|---|---|---|---|
-| 1,024 tokens | ~655 tok/s | ~62 tok/s | ~3.7s |
-| 4,096 tokens | ~628 tok/s | ~60 tok/s | ~8.4s |
-| 8,192 tokens | ~400–470 tok/s | ~33–40 tok/s | ~19–22s |
-| 16,384 tokens | ~277 tok/s | ~17.8 tok/s | ~58s |
-| 32,768 tokens | ~203 tok/s | ~11.8 tok/s | ~154s |
-
-Generation speed fell by more than 5x over that range, and it happened with the model still fully resident in VRAM the entire time — `ollama ps` confirmed 100% GPU at every single measurement, and VRAM usage barely moved (5.4GB at 1K tokens, 6.6GB at 32K). That's worth sitting with for a second, because it means this is a *different* bottleneck than the 12GB VRAM cliff earlier in this post. The VRAM cliff is about data placement — a model's weights either fit in fast VRAM or they get pushed into slow system RAM, and the penalty comes from shuttling data across the PCIe bus. Nothing here got pushed anywhere. This slowdown is happening entirely inside the GPU's own fast memory, which means it's not a placement problem at all — it's a compute problem. Every token a transformer model generates has to be compared against every token already in its context window; that comparison gets more expensive as the window grows, memory placement aside. By 32K tokens, `qwen3.5:9b`'s generation speed (11.8 tok/s) has fallen to roughly what `deepseek-r1:14b` — a much bigger, dramatically slower reasoning model — manages as its baseline. A long conversation costs about as much throughput as swapping in a model with 50% more parameters.
-
-Time-to-first-token is the number that actually kills a real product idea here. Even fully warm, with the cold-reload penalty from the voice-assistant work already eliminated, TTFT went from under 4 seconds at 1K tokens to about two and a half minutes at 32K. That's stacked on top of, not instead of, the reasoning-mode TTFT tax from the section above — this test ran with `think: false` throughout specifically so it would measure only the context-length cost in isolation. A voice assistant with a 30-turn conversation history behind it, still with reasoning switched off, is not a "hidden latency tax," it's an unusable product. The 256K context number on the model card is a statement about what the model will *accept* without erroring, not a statement about what stays fast enough to build around.
-
-One loose thread I'm flagging rather than pretending is resolved: the two runs I did at the 8,192-token size don't agree with each other. The first pass measured a clean ~400 tok/s prefill and ~40 tok/s generation across three positions. A second pass, run minutes later as part of extending the test to larger sizes, measured a faster ~470 tok/s prefill but a *slower* ~33 tok/s generation, consistently across all five positions that time. Every other size I tested reproduced cleanly between runs. I don't have an explanation for the 8K-specific discrepancy, and I'd rather say so than paper over it with a guess — it's logged as open, and if it ever matters for something I actually ship, it's worth an isolated rerun to chase down.
-
-## Where this leaves me
+## Lessons learned & what's next
 
 On the PC, the fast path is clear: get the GPU env vars right, stay under ~13B params at Q4_K_M unless you've specifically tested a bigger model's split-mode performance, and tune `num_ctx` down before you conclude a model is "slow" when it's actually just spilling out of VRAM. `qwen3.5:9b` is my current daily-driver candidate — good balance of speed and capability, comfortably inside the 12GB budget, and the most consistently reliable model across every real eval-harness suite I ran it through — as long as I keep `think: false` on for anything latency-sensitive and keep an eye on how long the conversation has gotten.
 
@@ -311,4 +319,13 @@ On the Pi, both halves of the picture are in now — real speed measurements acr
 
 If you want to run any of this yourself rather than take my numbers on faith, the repo has everything: the promptfoo suites for both machines, the receipt images and encoder script behind the vision tests, the voice assistant script, and a `FINDINGS.md` with the full data behind every table above — the README covers PC and Pi setup separately since the env vars and model lists differ. [github.com/dwooods/local-llm-benchmark](https://github.com/dwooods/local-llm-benchmark)
 
-The bigger lesson threading through both machines, though, is the one from the eval harness section, and the needle-in-haystack test just added a fourth voice to it. The PC's shortlisted best agentic-coding model doesn't reliably call tools at all. The judge grading my own benchmark suite got a right answer wrong. The purpose-built OCR model lost to a generalist because it can't stop repeating itself. The fastest model on the Pi is the one I'd trust least. The fastest TTFT I measured anywhere in this project came from the model that also got two of five answers wrong. And the model whose spec sheet promises 256K tokens of context becomes unusably slow — 40x worse TTFT, 5x worse throughput — at an eighth of that number, with VRAM sitting nearly flat the entire time so it can't even be blamed on running out of memory. None of that shows up until you actually run the test and check the raw output by hand — a fast wrong answer isn't a win on either machine, a big context window isn't the same thing as a usable one, and neither is a plausible-sounding number from a model, a judge, or a spec sheet you haven't verified yourself.
+The bigger lesson threading through both machines is the one from the eval harness section, and the needle-in-haystack test just added a fourth voice to it — none of this shows up until you actually run the test and check the raw output by hand:
+
+- The PC's shortlisted best agentic-coding model doesn't reliably call tools at all.
+- The judge grading my own benchmark suite got a right answer wrong.
+- The purpose-built OCR model lost to a generalist because it can't stop repeating itself.
+- The fastest model on the Pi is the one I'd trust least.
+- The fastest TTFT I measured anywhere in this project came from the model that also got two of five answers wrong.
+- The model whose spec sheet promises 256K tokens of context becomes unusably slow — 40x worse TTFT, 5x worse throughput — at an eighth of that number, with VRAM sitting nearly flat the entire time, so it can't even be blamed on running out of memory.
+
+A fast wrong answer isn't a win on either machine, a big context window isn't the same thing as a usable one, and neither is a plausible-sounding number from a model, a judge, or a spec sheet you haven't verified yourself.
