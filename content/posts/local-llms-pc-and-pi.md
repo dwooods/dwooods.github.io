@@ -22,12 +22,9 @@ Here's what I found, with real numbers.
 | GPU | AMD Radeon RX 6700 XT, 12GB VRAM | None — CPU-only |
 | Storage | NVMe SSD | — |
 | OS | Windows 11 Home | Debian GNU/Linux 13 ("trixie") 64-bit |
-| Runtime | Ollama 0.33.2, with Jan and Cursor as front-end clients over `localhost:11434` | Ollama 0.33.2 |
+| Runtime | Ollama 0.33.2, exposed on `localhost:11434` | Ollama 0.33.2 |
 
 ![AMD Radeon RX 6700 XT, the 12GB card doing all the local inference on the PC side of this project](/images/pc-gpu-rx6700xt.png)
-*The RX 6700 XT — 12GB of VRAM, and the card every "VRAM cliff" number in this post is measured against.*
-
-With no GPU on the Pi side, everything there runs on the CPU — so the entire performance story for the Pi is about its memory bandwidth (roughly 17GB/s) divided by however big the model is.
 
 ## Getting the PC's GPU actually used
 
@@ -41,7 +38,7 @@ The fix, since the RX 6700 XT is an AMD card and Ollama's GPU detection can be f
 [System.Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS", "*", "User")
 ```
 
-`HSA_OVERRIDE_GFX_VERSION` tells the ROCm/HIP runtime to target the RX 6700 XT's actual architecture (RDNA2 / Navi 22) instead of guessing wrong and falling back to CPU. `OLLAMA_NUM_PARALLEL=1` stops Ollama from fragmenting the 12GB VRAM buffer across multiple parallel request slots you probably don't need for single-user use. `OLLAMA_ORIGINS=*` opens up CORS so local tools (Jan, Cursor, a browser console) can actually talk to the Ollama server. Set as User-scope variables, these survive a reboot with no startup script needed.
+`HSA_OVERRIDE_GFX_VERSION` tells the ROCm/HIP runtime to target the RX 6700 XT's actual architecture (RDNA2 / Navi 22) instead of guessing wrong and falling back to CPU. `OLLAMA_NUM_PARALLEL=1` stops Ollama from fragmenting the 12GB VRAM buffer across multiple parallel request slots you probably don't need for single-user use. `OLLAMA_ORIGINS=*` opens up CORS so local tools and a browser console can actually talk to the Ollama server. Set as User-scope variables, these survive a reboot with no startup script needed.
 
 ## The 12GB VRAM cliff
 
@@ -119,7 +116,7 @@ A few settings made a bigger difference than I expected, mostly around context s
 
 - **`num_ctx`** — the default context window (32K–128K depending on the model) eats 2–6GB of VRAM just for the KV cache before you've generated a single token. For anything in the 14B range on a 12GB card, dropping this to somewhere between 8192 and 16384 keeps the KV cache from silently pushing model layers out of VRAM and into much slower system RAM.
 - **Quantization** — Ollama's default `Q4_K_M` (~4.9 bits/weight) is the right call for most things. Q8_0 is there if you have VRAM to spare and want to test whether it actually changes output quality for your use case — it often doesn't, enough to justify the size.
-- **`OLLAMA_MAX_LOADED_MODELS=1`** — if you're running multiple local AI tools at once (I had Jan and Cursor both pointed at the same Ollama instance), this stops VRAM from getting split across simultaneously-loaded models.
+- **`OLLAMA_MAX_LOADED_MODELS=1`** — if you're running multiple local AI tools at once, this stops VRAM from getting split across simultaneously-loaded models.
 - **Repeat penalty** — worth turning on if it's off by default in your client. Qwen models in particular can fall into repetition loops at a repeat penalty of 1 (disabled); 1.05–1.1 clears that up without hurting output quality.
 - **Temperature** — 0.8 is a reasonable default for general chat; drop to 0.2–0.3 for coding tasks where you want deterministic, less "creative" output.
 
