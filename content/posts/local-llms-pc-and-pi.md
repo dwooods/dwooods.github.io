@@ -3,8 +3,8 @@ title: "Local LLMs on a PC and a Pi: Almost Every Obvious Answer Was Wrong"
 date: 2026-09-21
 draft: true
 tags: ["ai", "llm", "ollama", "raspberry-pi", "self-hosted", "benchmarking"]
-description: "Benchmarking open-weight LLMs locally on a Windows PC with a 12GB AMD GPU and a Raspberry Pi 5 — GPU fallbacks, a VRAM cliff that can run slower than no GPU at all, a broken eval harness, six Pi hard crashes, and the one hidden flag that fixes local LLM latency more than the GPU, the quantization, or the hardware ever did."
-summary: "I set out to benchmark open-weight LLMs on a high-end Windows PC and a Raspberry Pi 5, and kept hitting the same pattern: the obvious read was wrong. A GPU silently fell back to CPU. A 'bigger' model in stretch mode ran slower than no GPU at all. An eval harness caught a shortlisted top pick that can't actually call tools, a judge model that graded a correct answer wrong, and a Pi benchmark where the fastest model was also the worst one. And the single biggest latency fix in the whole project wasn't the GPU, the quantization, or the hardware — it was one hidden flag. Even the model's own advertised context window turned out to be more marketing than promise."
+description: "Benchmarking open-weight LLMs locally on a Windows PC with a 12GB AMD GPU and a Raspberry Pi 5 — a silent GPU fallback, a VRAM cliff that runs slower than no GPU at all, an eval harness that caught its own judge grading a right answer wrong, six Pi hard crashes, and the one hidden flag that fixed latency more than the hardware ever did."
+summary: "I benchmarked open-weight LLMs on a Windows PC and a Raspberry Pi 5, and nearly every obvious answer turned out wrong — a GPU silently running on CPU, a 'bigger' model slower than no GPU at all, a judge model that graded a correct answer wrong. The biggest latency fix wasn't the hardware — it was one hidden flag."
 featuredImage: "/images/hero-pc-vs-pi.png"
 featuredImagePreview: "/images/hero-pc-vs-pi.png"
 ---
