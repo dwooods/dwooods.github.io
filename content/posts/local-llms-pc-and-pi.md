@@ -15,12 +15,19 @@ Here's what I found, with real numbers.
 
 ## The hardware
 
-**Windows PC ("DavidPC"):** Intel Core i7-13700K, 128GB DDR RAM, AMD Radeon RX 6700 XT with 12GB of VRAM, NVMe SSD, Windows 11 Home. Running Ollama 0.33.2, with Jan and Cursor as the front-end clients talking to it over `localhost:11434`.
+| | Windows PC ("DavidPC") | Raspberry Pi 5 |
+|---|---|---|
+| CPU | Intel Core i7-13700K | — |
+| RAM | 128GB DDR | 8GB (7.87GB usable) |
+| GPU | AMD Radeon RX 6700 XT, 12GB VRAM | None — CPU-only |
+| Storage | NVMe SSD | — |
+| OS | Windows 11 Home | Debian GNU/Linux 13 ("trixie") 64-bit |
+| Runtime | Ollama 0.33.2, with Jan and Cursor as front-end clients over `localhost:11434` | Ollama 0.33.2 |
 
 ![AMD Radeon RX 6700 XT, the 12GB card doing all the local inference on the PC side of this project](/images/pc-gpu-rx6700xt.png)
 *The RX 6700 XT — 12GB of VRAM, and the card every "VRAM cliff" number in this post is measured against.*
 
-**Raspberry Pi 5:** 8GB RAM (7.87GB usable), Debian GNU/Linux 13 ("trixie") 64-bit, also running Ollama 0.33.2. No GPU — everything here runs on the CPU, so the entire performance story is about the Pi's memory bandwidth (roughly 17GB/s) divided by however big the model is.
+With no GPU on the Pi side, everything there runs on the CPU — so the entire performance story for the Pi is about its memory bandwidth (roughly 17GB/s) divided by however big the model is.
 
 ## Getting the PC's GPU actually used
 
