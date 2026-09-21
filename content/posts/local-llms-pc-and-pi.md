@@ -9,7 +9,11 @@ featuredImage: "/images/hero-pc-vs-pi.png"
 featuredImagePreview: "/images/hero-pc-vs-pi.png"
 ---
 
-I wanted to know what running an LLM entirely on my own hardware actually gets you — no API bill, no cloud dependency, no data leaving the building — and whether it's fast enough to be more than a novelty. I ran it on two very different machines: a high-end Windows desktop with a discrete AMD GPU, and a Raspberry Pi 5. The short version: the PC is genuinely usable for daily work if you tune it right, the Pi is a real option for narrow, patient tasks but not a chat replacement, and there are a handful of gotchas on both sides that cost more time than the actual setup did.
+I've spent the last few years living entirely inside closed models — ChatGPT, Gemini, Claude — and, like most people, never had much reason to look past them. Open-weight models rarely come up in that conversation, mostly because the GPU most people actually own can't run something that competes with what a closed model already gives you for free. I wanted to find out for myself what running an open-weight model entirely on my own hardware actually gets you — no API bill, no cloud dependency, no data leaving the building — and whether it's good enough to be more than a curiosity.
+
+I tested that on two very different machines, and they weren't really answering the same question. On a high-end Windows desktop with a discrete AMD GPU, the question was whether local inference could get close enough to a closed model to be genuinely useful for daily work. On a Raspberry Pi 5, it wasn't a bake-off against the PC at all — it was a feasibility check for a future Pi project: can this hardware even run an open-weight model well enough to build something useful on top of it.
+
+The short version: the PC is genuinely usable for daily work if you tune it right, the Pi can handle narrow, patient tasks but isn't a chat replacement, and even where the hardware clears the bar, the convenience and accuracy of a closed model make a free open-weight model a harder sell than it should be. There are also a handful of gotchas on both sides that cost more time than the actual setup did.
 
 Here's what I found, with real numbers.
 
