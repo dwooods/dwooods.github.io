@@ -137,13 +137,7 @@ What came back wasn't a clean leaderboard. It was five separate places where the
 
 ### Config tuning that actually mattered
 
-A few settings made a bigger difference than I expected, mostly around context size:
-
-- **`num_ctx`** — the default context window (32K–128K depending on the model) eats 2–6GB of VRAM just for the KV cache before you've generated a single token. For anything in the 14B range on a 12GB card, dropping this to somewhere between 8192 and 16384 keeps the KV cache from silently pushing model layers out of VRAM and into much slower system RAM.
-- **Quantization** — Ollama's default `Q4_K_M` (~4.9 bits/weight) is the right call for most things. Q8_0 is there if you have VRAM to spare and want to test whether it actually changes output quality for your use case — it often doesn't, enough to justify the size.
-- **`OLLAMA_MAX_LOADED_MODELS=1`** — if you're running multiple local AI tools at once, this stops VRAM from getting split across simultaneously-loaded models.
-- **Repeat penalty** — worth turning on if it's off by default in your client. Qwen models in particular can fall into repetition loops at a repeat penalty of 1 (disabled); 1.05–1.1 clears that up without hurting output quality.
-- **Temperature** — 0.8 is a reasonable default for general chat; drop to 0.2–0.3 for coding tasks where you want deterministic, less "creative" output.
+A few settings mattered more than expected, mostly around context size. `num_ctx` is the big one: the default context window (32K–128K depending on the model) eats 2–6GB of VRAM in KV cache before generating a single token, and for anything in the 14B range on a 12GB card, dropping it to 8192–16384 keeps that cache from silently pushing model layers out of VRAM. `OLLAMA_MAX_LOADED_MODELS=1` stops VRAM from splitting across simultaneously-loaded models if you're running more than one local tool at once. Quantization's default `Q4_K_M` is right for most things — Q8_0 is there if you want to test whether it changes output quality for your use case, and it usually doesn't enough to justify the size. Repeat penalty is worth turning on if your client has it off (Qwen models loop at 1/disabled; 1.05–1.1 fixes it without hurting output), and temperature around 0.8 for general chat, 0.2–0.3 for coding, is a reasonable default.
 
 ### Calling Ollama directly (bypassing the GUI)
 
@@ -163,35 +157,19 @@ async function chat(promptText) {
 
 Set `stream: true` and read the response body with `response.body.getReader()` if you want tokens streaming in as they're generated instead of waiting for the whole thing.
 
-**The gotcha:** modern Chromium browsers block a public web page (or even `about:blank`) from fetching `localhost` under Private Network Access (PNA) rules — it treats your local Ollama server as a more-private address space that untrusted origins shouldn't be able to reach. Disabling the relevant `chrome://flags` entry works but is a moving target Chromium keeps deprecating, so it's not a real fix. The actual fix is server-side: start Ollama with both `OLLAMA_ORIGINS="*"` and `OLLAMA_ALLOW_PRIVATE_NETWORKS="true"` set, which makes Ollama respond to the browser's preflight check correctly. The alternative that sidesteps the whole problem is just running your test script in Node instead of a browser console — no CORS, no PNA, no CSP to fight.
-
-One more Windows-specific snag: if you kill and relaunch `ollama serve` to pick up new environment variables and get `bind: Only one usage of each socket address is normally permitted`, a background `ollama_app.exe` process is probably still holding port 11434. `taskkill /F /IM "ollama*"` (note the wildcard) clears both the CLI and the tray-app process; `Get-NetTCPConnection -LocalPort 11434` confirms the port's actually free before you relaunch.
+**The gotcha:** modern Chromium browsers block a page from fetching `localhost` under Private Network Access (PNA) rules, treating your local Ollama server as a more-private address space untrusted origins shouldn't reach. The fix is server-side, not a browser flag: start Ollama with `OLLAMA_ORIGINS="*"` and `OLLAMA_ALLOW_PRIVATE_NETWORKS="true"` set, or just run your test script in Node instead of a browser console and skip the CORS/PNA fight entirely.
 
 ### Ollama Cloud: the option for models too big for your hardware
 
-Some of the largest model tags in Ollama's library — `gemma4:31b`, `gpt-oss:120b`, and similar — are really meant to run on Ollama's cloud compute rather than local hardware, once you've authenticated with `ollama login`. Your prompt gets routed to a remote GPU and tokens stream back, using essentially none of your local VRAM.
-
-Worth knowing the tradeoffs before reaching for this: it needs a stable internet connection (no more fully-offline story), it adds real round-trip latency on top of generation time, your prompts and outputs are leaving your machine, and free-tier usage is presumably subject to whatever rate limits Ollama sets. It's a legitimate way to try a model too big for your rig, but it quietly gives up the two biggest reasons to run local in the first place — privacy and zero ongoing dependency. Worth treating as a "try before you buy more GPU" tool rather than a default.
+Some of the largest model tags in Ollama's library — `gemma4:31b`, `gpt-oss:120b`, and similar — are meant to run on Ollama's cloud compute instead of local hardware, once you've authenticated with `ollama login`; your prompt routes to a remote GPU and tokens stream back, using almost none of your local VRAM. It's a legitimate way to try a model too big for your rig, but it gives up the two biggest reasons to run local at all — privacy and zero ongoing dependency — on top of needing a stable connection and adding real round-trip latency. Worth treating as "try before you buy more GPU," not a default.
 
 ### Keeping the stack current
 
-Worth a periodic check rather than a set-and-forget: it's easy for the GPU acceleration to silently regress back to CPU-only after a Windows or AMD driver update, exactly the problem that started all this.
-
-- **Ollama itself:** `ollama --version` to check, then either right-click the Ollama icon in the system tray and choose "Check for Updates," or grab the latest installer from ollama.com/download — it updates the engine in place without touching your downloaded models.
-- **Python tooling:** `python -m pip install --upgrade pip` and `pip install --upgrade llm-benchmark` if you're using it for quick speed checks.
-- **Models themselves:** `ollama list` to see what's installed, then `ollama pull <model>` again for any tag you want refreshed — upstream fixes, tokenizer corrections, and quantization tweaks do land on existing tags over time.
-- **GPU acceleration, after any driver update:** run something like `ollama run qwen2.5:3b --verbose "hi"` and check that `library=Vulkan` (or your platform's equivalent) shows up in the output or in `%LOCALAPPDATA%\Ollama\server.log`. If it's silently gone, you're back to CPU-only until you catch it — and the tok/s difference is large enough that it's worth checking after every driver update, not just once.
-
-### What people are actually building with this
-
-A few patterns kept coming up in projects other people have built on Pi-class hardware, worth stealing ideas from:
-
-- **Fully offline voice assistants** — Whisper for speech-to-text, a local LLM via Ollama for the response, Piper for text-to-speech, no cloud round-trip at all.
-- **Natural-language smart home control** — Home Assistant talks to a local Ollama instance so voice or text commands get parsed into device actions on-device. This is a much more realistic "agentic" use case for small models than open-ended tool use — a small, fixed set of possible actions (turn this light off, set that thermostat) is exactly where a 3B model can be reliable, versus open-ended multi-step planning where it usually isn't.
+Worth a periodic check rather than a set-and-forget: it's easy for GPU acceleration to silently regress back to CPU-only after a Windows or AMD driver update — the exact problem that started this whole post. Check `ollama --version` and update via the tray icon or ollama.com/download; keep Python tooling current with `pip install --upgrade llm-benchmark`; refresh models with `ollama pull <model>` since upstream fixes and quantization tweaks land on existing tags over time. Most important: after any driver update, run something like `ollama run qwen2.5:3b --verbose "hi"` and confirm `library=Vulkan` (or your platform's equivalent) still shows up — if it's silently gone, you're back to CPU-only until you catch it, and the tok/s gap is big enough to make that check worth doing every time.
 
 ### Building my own voice assistant: three gotchas that ate an afternoon
 
-Talk is cheap until you actually wire up `faster-whisper` → Ollama → Piper and hit record. Cowork built exactly the pattern described above — push-to-talk, `faster-whisper` (`base.en`, CPU, int8) for speech-to-text, Ollama's streaming `/api/chat` for the LLM, `piper-tts` for the voice — specifically to get a real, measured time-to-first-token number instead of the derived estimate I'd been using elsewhere in this project. Three things broke in ways worth writing down.
+Fully offline voice assistants — Whisper for speech-to-text, a local LLM via Ollama for the response, Piper for text-to-speech, no cloud round-trip at all — are one of the more common patterns people build on Pi-class hardware, and talk is cheap until you actually wire one up and hit record. Cowork built exactly that pattern — push-to-talk, `faster-whisper` (`base.en`, CPU, int8) for speech-to-text, Ollama's streaming `/api/chat` for the LLM, `piper-tts` for the voice — specifically to get a real, measured time-to-first-token number instead of the derived estimate I'd been using elsewhere in this project. Three things broke in ways worth writing down.
 
 **Ollama's default 5-minute keep_alive turns every idle gap into a full reload.** The first time I ran the script, the LLM's time-to-first-token was 12.27 seconds — appalling for a model that benchmarks at ~18 tok/s on this card. The second turn, after a few minutes of me reading and reacting to the first result, TTFT jumped to 32.51 seconds — worse, not better. Ollama's default `keep_alive` is 5 minutes; once that clock runs out, the model gets evicted from VRAM, and the next request pays a full reload cost that gets counted as part of "time to first token" even though it has nothing to do with actual inference speed. The fix is a one-line addition to the request payload: `"keep_alive": -1` keeps the model loaded indefinitely for the life of the session. Only after that did TTFT numbers actually reflect inference speed instead of disk I/O.
 
