@@ -17,6 +17,8 @@ The short version: the PC is genuinely usable for daily work if you tune it righ
 
 Here's what I found, with real numbers.
 
+*Repo: [github.com/dwooods/local-llm-benchmark](https://github.com/dwooods/local-llm-benchmark) — every promptfoo config, the voice assistant script, and the full `FINDINGS.md` this post distills.*
+
 ## The hardware
 
 | | Windows PC ("DavidPC") | Raspberry Pi 5 |
@@ -306,5 +308,7 @@ One loose thread I'm flagging rather than pretending is resolved: the two runs I
 On the PC, the fast path is clear: get the GPU env vars right, stay under ~13B params at Q4_K_M unless you've specifically tested a bigger model's split-mode performance, and tune `num_ctx` down before you conclude a model is "slow" when it's actually just spilling out of VRAM. `qwen3.5:9b` is my current daily-driver candidate — good balance of speed and capability, comfortably inside the 12GB budget, and the most consistently reliable model across every real eval-harness suite I ran it through — as long as I keep `think: false` on for anything latency-sensitive and keep an eye on how long the conversation has gotten.
 
 On the Pi, both halves of the picture are in now — real speed measurements across the sub-4B tier, and real quality scores across four separate workloads. The two don't point the same direction: the fastest model on the shortlist is also the weakest one, and `llama3.2:3b`/`qwen2.5:3b` are the actual recommendation despite running at less than half the speed.
+
+If you want to run any of this yourself rather than take my numbers on faith, the repo has everything: the promptfoo suites for both machines, the receipt images and encoder script behind the vision tests, the voice assistant script, and a `FINDINGS.md` with the full data behind every table above — the README covers PC and Pi setup separately since the env vars and model lists differ. [github.com/dwooods/local-llm-benchmark](https://github.com/dwooods/local-llm-benchmark)
 
 The bigger lesson threading through both machines, though, is the one from the eval harness section, and the needle-in-haystack test just added a fourth voice to it. The PC's shortlisted best agentic-coding model doesn't reliably call tools at all. The judge grading my own benchmark suite got a right answer wrong. The purpose-built OCR model lost to a generalist because it can't stop repeating itself. The fastest model on the Pi is the one I'd trust least. The fastest TTFT I measured anywhere in this project came from the model that also got two of five answers wrong. And the model whose spec sheet promises 256K tokens of context becomes unusably slow — 40x worse TTFT, 5x worse throughput — at an eighth of that number, with VRAM sitting nearly flat the entire time so it can't even be blamed on running out of memory. None of that shows up until you actually run the test and check the raw output by hand — a fast wrong answer isn't a win on either machine, a big context window isn't the same thing as a usable one, and neither is a plausible-sounding number from a model, a judge, or a spec sheet you haven't verified yourself.
