@@ -9,8 +9,6 @@ featuredImage: "/images/hero-pc-vs-pi.png"
 featuredImagePreview: "/images/hero-pc-vs-pi.png"
 ---
 
-![Side by side: an AMD Radeon RX 6700 XT graphics card and a Raspberry Pi 5 with its Active Cooler installed](/images/hero-pc-vs-pi.png)
-
 I wanted to know what running an LLM entirely on my own hardware actually gets you — no API bill, no cloud dependency, no data leaving the building — and whether it's fast enough to be more than a novelty. I ran it on two very different machines: a high-end Windows desktop with a discrete AMD GPU, and a Raspberry Pi 5. The short version: the PC is genuinely usable for daily work if you tune it right, the Pi is a real option for narrow, patient tasks but not a chat replacement, and there are a handful of gotchas on both sides that cost more time than the actual setup did.
 
 Here's what I found, with real numbers.
