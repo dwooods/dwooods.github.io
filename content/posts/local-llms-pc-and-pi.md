@@ -9,7 +9,7 @@ featuredImage: "/images/hero-pc-vs-pi.png"
 featuredImagePreview: "/images/hero-pc-vs-pi.png"
 ---
 
-I've spent the last few years living entirely inside closed models — ChatGPT, Gemini, Claude — and, like most people, never had much reason to look past them. Open-weight models rarely come up in that conversation, mostly because the GPU most people actually own can't run something that competes with what a closed model already gives you for free. I wanted to find out for myself what running an open-weight model entirely on my own hardware actually gets you — no API bill, no cloud dependency, no data leaving the building — and whether it's good enough to be more than a curiosity.
+I've spent the past two years living entirely inside closed models — ChatGPT, Gemini, Claude — and, like most people, never had much reason to look past them. Open-weight models rarely come up in that conversation, mostly because the GPU most people actually own can't run something that competes with what a closed model already gives you for free. I wanted to find out for myself what running an open-weight model entirely on my own hardware actually gets you — no API bill, no cloud dependency, no data leaving the building — and whether it's good enough to be more than a curiosity.
 
 I tested that on two very different machines, and they weren't really answering the same question. On a high-end Windows desktop with a discrete AMD GPU, the question was whether local inference could get close enough to a closed model to be genuinely useful for daily work. On a Raspberry Pi 5, it wasn't a bake-off against the PC at all — it was a feasibility check for a future Pi project: can this hardware even run an open-weight model well enough to build something useful on top of it.
 
