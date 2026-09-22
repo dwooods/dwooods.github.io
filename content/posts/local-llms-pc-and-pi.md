@@ -13,7 +13,7 @@ I've spent the past two years living entirely inside closed models — ChatGPT, 
 
 I tested that on two very different machines, and they weren't really answering the same question. On a high-end Windows desktop with a discrete AMD GPU, the question was whether local inference could get close enough to a closed model to be genuinely useful for daily work. On a Raspberry Pi 5, it wasn't a bake-off against the PC at all — it was a feasibility check for a future Pi project: can this hardware even run an open-weight model well enough to build something useful on top of it.
 
-The short version: the PC is genuinely usable for daily work if you tune it right, the Pi can handle narrow, patient tasks but isn't a chat replacement, and even where the hardware clears the bar, the convenience and accuracy of a closed model make a free open-weight model a harder sell than it should be. There are also a handful of gotchas on both sides that cost more time than the actual setup did.
+The short version: the PC can do real work if you tune it right but doesn't replace a closed model, the Pi can handle narrow, patient tasks but isn't a chat replacement, and the honest answer to "more than a curiosity?" turned out to be: only for the lightweight stuff. I'll come back to that at the end. There are also a handful of gotchas on both sides that cost more time than the actual setup did.
 
 Here's what I found, with real numbers.
 
@@ -78,6 +78,8 @@ Everything that fits fully inside the 12GB VRAM buffer runs at native VRAM bandw
 
 The practical rule that fell out of this: **~13B parameters at Q4_K_M quantization (7–9GB) is the sweet spot** on a 12GB card — big enough to be genuinely useful, small enough to stay fully in VRAM with headroom for context.
 
+The other half of staying inside that budget is configuration, mostly around context size. `num_ctx` is the big one: the default context window (32K–128K depending on the model) eats 2–6GB of VRAM in KV cache before generating a single token, and for anything in the 14B range on a 12GB card, dropping it to 8192–16384 keeps that cache from silently pushing model layers out of VRAM. `OLLAMA_MAX_LOADED_MODELS=1` stops VRAM from splitting across simultaneously-loaded models if you're running more than one local tool at once. Quantization's default `Q4_K_M` is right for most things — Q8_0 is there if you want to test whether it changes output quality for your use case, and it rarely changes enough to justify the size. Repeat penalty is worth turning on if your client has it off (Qwen models loop at 1/disabled; 1.05–1.1 fixes it without hurting output), and temperature around 0.8 for general chat, 0.2–0.3 for coding, is a reasonable default.
+
 One more data point on `deepseek-r1:14b` worth calling out: I ran it against four different prompts to check consistency, and generation speed held steady between 8.05 and 8.58 tok/s the whole time, with prompt-processing (how fast it chews through your input before generating) running much faster, 38–75 tok/s depending on prompt length. No sign of throttling or slowdown across runs — reassuring, since a model that's fast on the first prompt and degrades on the fourth is a much worse product experience than one that's consistently modest.
 
 ### Which installed model for which job
@@ -134,34 +136,6 @@ The corrected score didn't change what it's measuring. `glm-ocr` hit the context
 **The assertion that let a wrong answer through.** Chat's real score is 10 out of 12 — `qwen3.5:9b`, `phi4:14b`, and `gpt-oss:20b` all in the mix — but it took a second pass to get there. `phi4:14b` genuinely fails two questions: it denies the Raspberry Pi 5 has been officially released, and its answer for the Pi's idle RAM usage (~7.5GB) reflects the same stale-knowledge gap. The first of those originally passed. The test's assertion was a plain `contains-any` substring check, and `phi4:14b`'s wrong answer happened to contain a right-looking substring — a false PASS that inflated the score to 11 out of 12 until I swapped that assertion for `llm-rubric` (and, while I was in there, turned a placeholder multi-turn test into an actual 5-turn exchange). Same shape of problem as the vision-showdown scorer above: a strict, literal check passing or failing by accident rather than on whether the answer was actually right. I went back afterward and hand-verified all six `llm-rubric` grades in the chat suite against the model's actual text — every one held up. One unrelated wrinkle logged along the way: `phi4:14b`'s summarization answer ran three sentences instead of the requested two and passed anyway, because the rubric never checked sentence count — a small assertion-design gap, not a grading error, and not worth re-running over.
 
 **The meta-lesson.** Most of these findings aren't really about the models — they're about how easily a benchmark can lie to you. A substring check can pass a wrong answer because it happens to contain the right words. A judge can confidently grade a correct answer as wrong. A JSON extractor can fail a model that gave the right answer and then kept talking. The rule I've landed on: a uniform failure across every model is almost always your harness, not their capability — models fail in different, idiosyncratic ways, a scoring bug fails everyone identically — and any single surprising result is worth pulling the raw output and checking by hand before it goes in a table.
-
-### Config tuning that actually mattered
-
-A few settings mattered more than expected, mostly around context size. `num_ctx` is the big one: the default context window (32K–128K depending on the model) eats 2–6GB of VRAM in KV cache before generating a single token, and for anything in the 14B range on a 12GB card, dropping it to 8192–16384 keeps that cache from silently pushing model layers out of VRAM. `OLLAMA_MAX_LOADED_MODELS=1` stops VRAM from splitting across simultaneously-loaded models if you're running more than one local tool at once. Quantization's default `Q4_K_M` is right for most things — Q8_0 is there if you want to test whether it changes output quality for your use case, and it rarely changes enough to justify the size. Repeat penalty is worth turning on if your client has it off (Qwen models loop at 1/disabled; 1.05–1.1 fixes it without hurting output), and temperature around 0.8 for general chat, 0.2–0.3 for coding, is a reasonable default.
-
-### Calling Ollama directly (bypassing the GUI)
-
-Ollama exposes a REST API on `localhost:11434` by default, which is handy for testing or building your own front end. A one-shot request from a browser console or Node script:
-
-```javascript
-async function chat(promptText) {
-  const response = await fetch('http://localhost:11434/api/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: "qwen3.5:9b", prompt: promptText, stream: false })
-  });
-  const data = await response.json();
-  console.log(data.response);
-}
-```
-
-Set `stream: true` and read the response body with `response.body.getReader()` if you want tokens streaming in as they're generated instead of waiting for the whole thing.
-
-**The gotcha:** modern Chromium browsers block a page from fetching `localhost` under Private Network Access (PNA) rules, treating your local Ollama server as a more-private address space untrusted origins shouldn't reach. The fix is server-side, not a browser flag: start Ollama with `OLLAMA_ORIGINS="*"` and `OLLAMA_ALLOW_PRIVATE_NETWORKS="true"` set, or just run your test script in Node instead of a browser console and skip the CORS/PNA fight entirely.
-
-### Ollama Cloud: the option for models too big for your hardware
-
-Some of the largest model tags in Ollama's library — `gemma4:31b`, `gpt-oss:120b`, and similar — are meant to run on Ollama's cloud compute instead of local hardware, once you've authenticated with `ollama login`; your prompt routes to a remote GPU and tokens stream back, using almost none of your local VRAM. It's a legitimate way to try a model too big for your rig, but it gives up the two biggest reasons to run local at all — privacy and zero ongoing dependency — on top of needing a stable connection and adding real round-trip latency. Worth treating as "try before you buy more GPU," not a default.
 
 ### Building my own voice assistant: three gotchas that ate an afternoon
 
@@ -304,13 +278,11 @@ The practical upshot for anything I build on this board: active cooling is neces
 
 ## Lessons learned & what's next
 
-On the PC, the fast path is clear: get the GPU env vars right, stay under ~13B params at Q4_K_M unless you've specifically tested a bigger model's split-mode performance, and tune `num_ctx` down before you conclude a model is "slow" when it's actually just spilling out of VRAM. `qwen3.5:9b` is my current daily-driver candidate — good balance of speed and capability, comfortably inside the 12GB budget, and the most consistently reliable model across every real eval-harness suite I ran it through — as long as I keep `think: false` on for anything latency-sensitive and keep an eye on how long the conversation has gotten.
+On the PC, the fast path is clear: get the GPU env vars right, stay under ~13B params at Q4_K_M unless you've specifically tested a bigger model's split-mode performance, and tune `num_ctx` down before you conclude a model is "slow" when it's actually just spilling out of VRAM. `qwen3.5:9b` was the most consistently reliable model across every eval suite I ran it through, comfortably inside the 12GB budget — as long as `think: false` is on for anything latency-sensitive and the conversation doesn't get long.
 
 On the Pi, both halves of the picture are in now — real speed measurements across the sub-4B tier, and real quality scores across four separate workloads. The two don't point the same direction: the fastest model on the shortlist is also the weakest one, and `llama3.2:3b`/`qwen2.5:3b` are the actual recommendation despite running at less than half the speed.
 
-If you want to run any of this yourself rather than take my numbers on faith, the repo has everything: the promptfoo suites for both machines, the receipt images and encoder script behind the vision tests, the voice assistant script, and a `FINDINGS.md` with the full data behind every table above — the README covers PC and Pi setup separately since the env vars and model lists differ. [github.com/dwooods/local-llm-benchmark](https://github.com/dwooods/local-llm-benchmark)
-
-The bigger lesson threading through both machines is the one from the eval harness section — none of this shows up until you actually run the test and check the raw output by hand:
+The lesson threading through both machines is the one from the eval-harness section — none of this shows up until you run the test and check the raw output by hand:
 
 - The PC's shortlisted best agentic-coding model doesn't reliably call tools at all.
 - The judge grading my own benchmark suite got a right answer wrong.
@@ -319,4 +291,8 @@ The bigger lesson threading through both machines is the one from the eval harne
 - The fastest TTFT I measured anywhere in this project came from the model that also got two of five answers wrong.
 - The model whose spec sheet promises 256K tokens of context becomes unusably slow — 40x worse TTFT, 5x worse throughput — at an eighth of that number, with VRAM sitting nearly flat the entire time, so it can't even be blamed on running out of memory.
 
-A fast wrong answer isn't a win on either machine, a big context window isn't the same thing as a usable one, and neither is a plausible-sounding number from a model, a judge, or a spec sheet you haven't verified yourself.
+A fast wrong answer isn't a win on either machine, and neither is a plausible-sounding number from a model, a judge, or a spec sheet you haven't verified yourself.
+
+If you want to run any of this yourself rather than take my numbers on faith, the repo has everything: the promptfoo suites for both machines, the receipt images and encoder script behind the vision tests, the voice assistant script, and a `FINDINGS.md` with the full data behind every table above — the README covers PC and Pi setup separately since the env vars and model lists differ. [github.com/dwooods/local-llm-benchmark](https://github.com/dwooods/local-llm-benchmark)
+
+**So — more than a curiosity?** Not really. Not as a replacement for the closed models I started this post living inside of, and not on the hardware most people have. A 12GB card is a perfectly respectable GPU by any non-AI standard, and it caps you at roughly 13B parameters; a 13B model is a long way from ChatGPT or Claude on anything open-ended, and the price of "free" is a tuning tax — env vars, `num_ctx`, `think: false`, a driver update that can silently undo all of it — plus a model that, asked a simple factual question, invented a Raspberry Pi product tier that doesn't exist. Where local does earn its place is the lightweight, narrow stuff: structured extraction against a fixed schema, a voice assistant that only has to answer short questions, a small fixed set of actions on a Pi — work where "good enough, and no data leaves the building" beats "best possible answer." That's the bar the future Pi project has to clear, and now I know exactly where it is. For everything else, I'm still opening the closed model.
