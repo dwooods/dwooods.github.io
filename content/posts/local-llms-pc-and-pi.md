@@ -32,6 +32,8 @@ The short version: the PC can do real work if you tune it right but doesn't repl
 | OS | Windows 11 Home | Debian GNU/Linux 13 ("trixie") 64-bit |
 | Runtime | Ollama 0.34.1, exposed on `localhost:11434` | Ollama 0.34.1 |
 
+Before the details: the shape of what follows is the same story about a dozen times. I'd have an obvious answer — fix the GPU, use the bigger model, trust the benchmark, use the OCR model for OCR, put a fan on it — and the next test would find the variable I hadn't been looking at. The GPU wasn't the whole story. Model size wasn't the whole story. The benchmark wasn't necessarily telling the truth. If you only read one section, read the one about the judge grading a right answer wrong, because that's the one that changed how I read every other number in this post.
+
 ## The PC
 
 Everything in this section runs on the Windows desktop, the i7-13700K and the RX 6700 XT.
@@ -313,14 +315,20 @@ On the PC, the fast path is clear: get the GPU env vars right, stay under ~13B p
 
 On the Pi, both halves of the picture are in now: real speed measurements across the sub-4B tier, and real quality scores across four separate workloads. The two don't point the same direction: the fastest model on the shortlist is also the weakest one, and `llama3.2:3b`/`qwen2.5:3b` are the actual recommendation despite running at less than half the speed.
 
-The lesson threading through both machines is the one from the eval-harness section: none of this shows up until you run the test and check the raw output by hand:
+The lesson threading through both machines is the one from the eval-harness section: none of this shows up until you run the test and check the raw output by hand. Here's the whole post as the table it turned out to be:
 
-- The PC's shortlisted best agentic-coding model doesn't reliably call tools at all.
-- The judge grading my own benchmark suite got a right answer wrong.
-- The purpose-built OCR model lost to a generalist because it can't stop repeating itself.
-- The fastest model on the Pi is the one I'd trust least.
-- The fastest TTFT I measured anywhere in this project came from the model that also got two of five answers wrong.
-- The model whose spec sheet promises 256K tokens of context becomes unusably slow (40x worse TTFT, 5x worse throughput) at an eighth of that number, with VRAM sitting nearly flat the entire time, so it can't even be blamed on running out of memory.
+| What I assumed | What the test found |
+|---|---|
+| The GPU just needs the right env var | Three vars and a restart fixed it; which one did the work is still unknown |
+| Bigger model, better answers | Past 12GB, a 31B model ran slower than no GPU at all |
+| The coding model is the agent model | It never populates `tool_calls`; the "chat" models went 4 for 4 |
+| An automated judge is objective | It failed a correct function, and nothing about the score gave it away |
+| The OCR model wins at OCR | It can't stop talking; the generalist won |
+| Smaller model, faster and good enough | Fastest TTFT in the project, two wrong answers out of five |
+| 256K context means 256K usable | 40x worse TTFT and 5x worse throughput at an eighth of that, with VRAM flat |
+| The fastest Pi model is the pick | It was the weakest on every quality suite |
+| Active cooler, problem solved | It holds 7 W indefinitely and not 12 W, and which model draws 12 W isn't on the model card |
+| The watchdog works, so it's fixed | It works; it kills this model's normal cases before they finish |
 
 If you want to run any of this yourself rather than take my numbers on faith, the repo has everything: the promptfoo suites for both machines, the receipt images and encoder script behind the vision tests, the voice assistant script, and a `FINDINGS.md` with the full data behind every table above; the README covers PC and Pi setup separately since the env vars and model lists differ. The one-second thermal/power logger and the actual crash data behind the postscript above live in `benchmarks/pi-crash-capture/`. [github.com/dwooods/local-llm-benchmark](https://github.com/dwooods/local-llm-benchmark)
 
