@@ -29,7 +29,7 @@ The short version: the PC can do real work if you tune it right but doesn't repl
 | RAM | 128GB DDR | 8GB (7.87GB usable) |
 | GPU | AMD Radeon RX 6700 XT, 12GB VRAM | None — CPU-only |
 | Storage | NVMe SSD | NVMe |
-| OS | Windows 11 Home | Debian GNU/Linux 13 ("trixie") 64-bit |
+| OS | Windows 11 Home | Raspberry Pi OS (Debian 13 "trixie"), 64-bit |
 | Runtime | Ollama 0.34.1, exposed on `localhost:11434` | Ollama 0.34.1 |
 
 Before the details: the shape of what follows is the same story about a dozen times. I'd have an obvious answer — fix the GPU, use the bigger model, trust the benchmark, use the OCR model for OCR, put a fan on it — and the next test would find the variable I hadn't been looking at. The GPU wasn't the whole story. Model size wasn't the whole story. The benchmark wasn't necessarily telling the truth. If you only read one section, read the one about the judge grading a right answer wrong, because that's the one that changed how I read every other number in this post.
