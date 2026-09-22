@@ -40,7 +40,7 @@ Everything in this section runs on the Windows desktop — the i7-13700K and the
 
 Ollama's default behavior on my machine was to quietly fall back to the CPU. That's easy to miss — it still generates text, just slowly — and it took a real benchmark run to notice: **6.88 tokens/sec** on `phi4:14b`, which is CPU-bound and painfully slow for anything interactive.
 
-The fix, since the RX 6700 XT is an AMD card and Ollama's GPU detection can be finicky with AMD's ROCm/HIP stack, was three environment variables:
+The fix, since Ollama's GPU detection on AMD cards can be finicky, was three environment variables, set together:
 
 ```powershell
 [System.Environment]::SetEnvironmentVariable("HSA_OVERRIDE_GFX_VERSION", "10.3.0", "User")
@@ -48,9 +48,18 @@ The fix, since the RX 6700 XT is an AMD card and Ollama's GPU detection can be f
 [System.Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS", "*", "User")
 ```
 
-`HSA_OVERRIDE_GFX_VERSION` tells the ROCm/HIP runtime to target the RX 6700 XT's actual architecture (RDNA2 / Navi 22) instead of guessing wrong and falling back to CPU. `OLLAMA_NUM_PARALLEL=1` stops Ollama from fragmenting the 12GB VRAM buffer across multiple parallel request slots you probably don't need for single-user use. `OLLAMA_ORIGINS=*` opens up CORS so local tools and a browser console can talk to the Ollama server. Set as User-scope variables, these survive a reboot with no startup script needed. One caveat: a Windows or AMD driver update can silently knock GPU acceleration back to CPU-only, so after any driver update it's worth a quick `ollama run qwen2.5:3b --verbose "hi"` to confirm `library=Vulkan` still shows up in the output.
+`OLLAMA_NUM_PARALLEL=1` stops Ollama from fragmenting the 12GB VRAM buffer across multiple parallel request slots you probably don't need for single-user use. `OLLAMA_ORIGINS=*` opens up CORS so local tools and a browser console can talk to the Ollama server. Set as User-scope variables, these survive a reboot with no startup script needed. One caveat: a Windows or AMD driver update can silently knock GPU acceleration back to CPU-only, so after any driver update it's worth a quick `ollama run qwen2.5:3b --verbose "hi"` to confirm `library=Vulkan` still shows up in the output.
 
-**The one that went wrong.** Once those three were confirmed working, Cowork — Claude's agent mode, which wrote the configs and scripts on this project; full credits at the end — suggested two more as further "optimizations": `OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0`, aimed at trimming VRAM usage for the KV cache. Neither had been checked against AMD/Vulkan first — they're more mature on NVIDIA/CUDA — and the very next verbose run showed why that matters: eval rate dropped from 150.39 tok/s to 52.07 tok/s, prompt-eval from 464.14 to 108.60 tok/s. Roughly a 3x regression, not noise. Unsetting both and restarting Ollama brought it straight back to 150.07 tok/s. **Verdict: don't set either one on this card.** Worth remembering next time an "optimization" gets suggested without a "have we actually confirmed this on your specific hardware" attached to it — including, apparently, when the suggestion comes from the thing doing the suggesting.
+**Correction, caught in review before this went up.** The first draft of this section said `HSA_OVERRIDE_GFX_VERSION` "tells the ROCm/HIP runtime to target the RX 6700 XT's actual architecture," and then, one paragraph later, told you to verify the fix by looking for `library=Vulkan`. Those can't both be right. `HSA_OVERRIDE_GFX_VERSION` is a ROCm/HSA runtime variable; Ollama's Vulkan backend talks to the GPU through the Vulkan driver and never reads it. Cowork (Claude's agent mode, which wrote the configs and scripts on this project; full credits at the end) flagged the contradiction in a review pass, so I went back to the actual Ollama server log from this machine instead of guessing:
+
+```
+msg="dropping integrated GPU; to enable, set OLLAMA_IGPU_ENABLE=1" library=Vulkan compute=0.0 name=Vulkan1 description="Intel(R) UHD Graphics 770"
+msg="inference compute" library=Vulkan compute=0.0 name=Vulkan0 description="AMD Radeon RX 6700 XT" type=discrete total="12.0 GiB" available="11.2 GiB"
+```
+
+Vulkan, not ROCm. So the verify step was right and the explanation above it was wrong. (That `available="11.2 GiB"` is also exactly where the next section's VRAM cliff sits, which is not a coincidence.) The explanation wasn't mine, strictly: the GPU fix predates this project, it came out of a Gemini session, and Gemini's account of *why* it worked got carried into this draft unchecked. Its own small lesson about where a confident-sounding paragraph comes from. What I can't tell you is which of the three variables, or the Ollama restart that came bundled with setting them, actually flipped the model from CPU to GPU. I set all three at once and confirmed the fix by the before/after tok/s jump, never one variable at a time, and there's no "before" server log to compare against. If I had to bet: `OLLAMA_NUM_PARALLEL=1`, because Ollama's scheduler decides GPU-versus-CPU placement from predicted memory need (its logs elsewhere in this project say things like `model predicted to exceed available memory, evicting`), and cutting the parallel slots to one shrinks that prediction. `OLLAMA_ORIGINS` is pure CORS and can't be it. That's a hypothesis, not a result. If you hit the same silent fallback, check `library=` in your own server log before deciding which variable gets the credit.
+
+**The one that went wrong.** Once those three were confirmed working, Cowork suggested two more as further "optimizations": `OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0`, aimed at trimming VRAM usage for the KV cache. Neither had been checked against AMD/Vulkan first — they're more mature on NVIDIA/CUDA — and the very next verbose run showed why that matters: eval rate dropped from 150.39 tok/s to 52.07 tok/s, prompt-eval from 464.14 to 108.60 tok/s. Roughly a 3x regression, not noise. Unsetting both and restarting Ollama brought it straight back to 150.07 tok/s. **Verdict: don't set either one on this card.** Worth remembering next time an "optimization" gets suggested without a "have we actually confirmed this on your specific hardware" attached to it — including, apparently, when the suggestion comes from the thing doing the suggesting.
 
 ### The 12GB VRAM cliff
 
@@ -297,7 +306,9 @@ The whole project ran inside a Claude Project ("Run Local LLM") using **Claude C
 
 Cowork wrote every promptfoo config, the voice-assistant pipeline, the Pi thermal watchdog script, and the one-second crash logger in the postscript. I ran the actual hardware, watched the thermals, and made the calls on what to try next and when to stop — including a couple of times I overruled where the investigation was headed, like the Pi crash section above.
 
-It also got things wrong, more than once. The GPU env vars earlier in this post are one example: Cowork's first pass at "optimizing" them cost me a 3x speed regression before we caught it. The Pi thermal watchdog's first version silently didn't work at all. Both are covered in place, where they happened, rather than saved up for a highlight reel here.
+Gemini ran the original GPU env-var session, before this project existed; its explanation of why that fix worked is the one corrected in place in the GPU section above, after Cowork caught the contradiction in review.
+
+Cowork also got things wrong, more than once. The GPU env vars earlier in this post are one example: its first pass at "optimizing" them cost me a 3x speed regression before we caught it. The Pi thermal watchdog's first version silently didn't work at all. Both are covered in place, where they happened, rather than saved up for a highlight reel here.
 
 ## Lessons learned & what's next
 
