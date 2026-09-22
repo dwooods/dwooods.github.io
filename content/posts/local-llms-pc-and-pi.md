@@ -82,22 +82,6 @@ The other half of staying inside that budget is configuration, mostly around con
 
 One more data point on `deepseek-r1:14b` worth calling out: I ran it against four different prompts to check consistency, and generation speed held steady between 8.05 and 8.58 tok/s the whole time, with prompt-processing (how fast it chews through your input before generating) running much faster, 38–75 tok/s depending on prompt length. No sign of throttling or slowdown across runs — reassuring, since a model that's fast on the first prompt and degrades on the fourth is a much worse product experience than one that's consistently modest.
 
-### Which installed model for which job
-
-Once you've got a handful of models pulled, the "fastest" one isn't always the right default — it's worth matching the model to the task instead of always reaching for whichever benchmarks best. Here's how mine shook out in practice:
-
-| Model | Role | What it's actually good for |
-|---|---|---|
-| `qwen2.5:3b` | Speed / utility | Terminal scripts, fast completions, basic JSON parsing — near-instant at ~139 tok/s |
-| `llama3:latest` | Light general | Quick formatting, light back-and-forth where depth doesn't matter |
-| `qwen2.5:latest` | Structured output | Structured JSON generation, general daily coding, multi-language tasks |
-| `qwen3.5:9b` | Daily driver | Complex coding, multi-turn reasoning, image/vision tasks — my default for most things |
-| `deepseek-r1:14b` | Deep reasoning | Complex algorithm design, step-by-step debugging — worth the ~8.3 tok/s tax when you actually need chain-of-thought |
-| `phi4:14b` | Analytical writing | Formal documentation, structured writing, analytical reasoning |
-| `gpt-oss:20b` | Heavy analysis | Multi-step agentic execution across a large codebase — usable at ~11 tok/s even split across VRAM and system RAM |
-
-This is informal usage-pattern guidance, not a rigorous quality score for each task — but it's a reasonable starting hypothesis before you burn time benchmarking every model against every workload. I eventually did burn that time, and the results below are a reminder that this table is a hypothesis, not a verdict.
-
 ### Testing it properly: what an automated eval harness found
 
 Raw tok/s is the easy number, and it's what most of this post is built on so far. It also tells you nothing about whether a model is actually *right*. To get real pass/fail data instead of vibes, I set up `promptfoo` — a Node-based eval tool — to score models against four workloads (coding, agentic/tool use, structured extraction, chat) plus a fifth I added later for vision, using a fixed judge model (`deepseek-r1:14b`) kept separate from the models under test so nothing could grade its own homework.
