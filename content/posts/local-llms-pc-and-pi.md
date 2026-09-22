@@ -26,7 +26,7 @@ Here's what I found, with real numbers.
 | CPU | Intel Core i7-13700K | — |
 | RAM | 128GB DDR | 8GB (7.87GB usable) |
 | GPU | AMD Radeon RX 6700 XT, 12GB VRAM | None — CPU-only |
-| Storage | NVMe SSD | — |
+| Storage | NVMe SSD | NVMe |
 | OS | Windows 11 Home | Debian GNU/Linux 13 ("trixie") 64-bit |
 | Runtime | Ollama 0.34.1, exposed on `localhost:11434` | Ollama 0.34.1 |
 
