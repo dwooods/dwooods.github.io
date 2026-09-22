@@ -22,11 +22,30 @@ git submodule update --init --recursive
 
 ## Adding a post
 
+Posts live in `content/posts/<slug>.md`. Either scaffold one with Hugo:
+
 ```bash
 hugo new content posts/my-post-title.md
 ```
 
-New posts are created with `draft: true` — flip it to `false` (or drop the line) when ready to publish. Anything pushed to `main` with `draft: false` deploys automatically via the `Deploy Hugo site to GitHub Pages` workflow.
+or just create the file directly with this site's front matter (which is how every post here has been written so far):
+
+```yaml
+---
+title: "Post title"
+date: 2026-09-21
+draft: true
+tags: ["ai", "raspberry-pi"]
+description: "One or two sentences for the meta description — keep it under ~160 characters."
+summary: "The hook LoveIt shows on the homepage and list pages in place of the auto-excerpt. Make it sell the story."
+featuredImage: "/images/hero.png"
+featuredImagePreview: "/images/hero.png"
+---
+```
+
+Images go in `static/images/` and are referenced as `/images/<filename>`.
+
+New posts start as `draft: true`. Preview locally with `hugo server --buildDrafts` (the `-D` flag is required or drafts are hidden) and check the post at `http://localhost:1313/posts/<slug>/` before flipping `draft` to `false`. Anything pushed to `main` with `draft: false` deploys automatically via the `Deploy Hugo site to GitHub Pages` workflow.
 
 ## Comments
 
