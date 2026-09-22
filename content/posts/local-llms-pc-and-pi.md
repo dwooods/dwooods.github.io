@@ -3,8 +3,8 @@ title: "Local LLMs on a PC and a Pi: Almost Every Obvious Answer Was Wrong"
 date: 2026-09-21
 draft: true
 tags: ["ai", "llm", "ollama", "raspberry-pi", "self-hosted", "benchmarking"]
-description: "Benchmarking open-weight LLMs locally on a Windows PC with a 12GB AMD GPU and a Raspberry Pi 5 — a silent GPU fallback, a VRAM cliff that runs slower than no GPU at all, an eval harness that caught its own judge grading a right answer wrong, six Pi hard crashes, and the one hidden flag that fixed latency more than the hardware ever did."
-summary: "I benchmarked open-weight LLMs on a Windows PC and a Raspberry Pi 5, and nearly every obvious answer turned out wrong — a GPU silently running on CPU, a 'bigger' model slower than no GPU at all, a judge model that graded a correct answer wrong. The biggest latency fix wasn't the hardware — it was one hidden flag."
+description: "Benchmarking open-weight LLMs locally on a Windows PC with a 12GB AMD GPU and a Raspberry Pi 5 — a silent GPU fallback, a VRAM cliff that runs slower than no GPU at all, an eval harness that caught its own judge grading a right answer wrong, six Pi hard crashes and a watchdog, and the honest verdict on whether local can replace a closed model."
+summary: "I benchmarked open-weight LLMs on a Windows PC and a Raspberry Pi 5, and nearly every obvious answer turned out wrong — a GPU silently running on CPU, a 'bigger' model slower than no GPU at all, a judge model that graded a correct answer wrong. The verdict: local earns its place for narrow, lightweight work, not as a stand-in for the closed models I've used for two years."
 featuredImage: "/images/hero-pc-vs-pi.png"
 featuredImagePreview: "/images/hero-pc-vs-pi.png"
 ---
@@ -14,8 +14,6 @@ I've spent the past two years living entirely inside closed models — ChatGPT, 
 I tested that on two very different machines, and they weren't really answering the same question. On a high-end Windows desktop with a discrete AMD GPU, the question was whether local inference could get close enough to a closed model to be useful for daily work. On a Raspberry Pi 5, it wasn't a bake-off against the PC at all — I just wanted to know whether that hardware can run an open-weight model well enough to build anything useful on top of it.
 
 The short version: the PC can do real work if you tune it right but doesn't replace a closed model, the Pi can handle narrow, patient tasks but isn't a chat replacement, and the honest answer to "more than a curiosity?" turned out to be: only for the lightweight stuff. I'll come back to that at the end. There are also a handful of gotchas on both sides that cost more time than the actual setup did.
-
-Here's what I found, with real numbers.
 
 *Repo: [github.com/dwooods/local-llm-benchmark](https://github.com/dwooods/local-llm-benchmark) — every promptfoo config, the voice assistant script, and the full `FINDINGS.md` this post distills.*
 
@@ -29,14 +27,6 @@ Here's what I found, with real numbers.
 | Storage | NVMe SSD | NVMe |
 | OS | Windows 11 Home | Debian GNU/Linux 13 ("trixie") 64-bit |
 | Runtime | Ollama 0.34.1, exposed on `localhost:11434` | Ollama 0.34.1 |
-
-## Tools & AI assist
-
-The whole project ran inside a Claude Project ("Run Local LLM") using **Claude Cowork**. Three standing docs (Project Instructions, a Session Log, a Benchmark Log) got maintained as we went, so nothing had to get reconstructed from memory later — this post is largely a distillation of that log.
-
-Cowork wrote every promptfoo config, the voice-assistant pipeline later in this post, and the Pi thermal watchdog script. I ran the actual hardware, watched the thermals, and made the calls on what to try next and when to stop — including a couple of times I overruled where the investigation was headed (more on that in the Pi crash section below).
-
-It also got things wrong, more than once. The GPU env vars below are one example: Cowork's first pass at "optimizing" them cost me a 3x speed regression before we caught it. The Pi thermal watchdog's first version silently didn't work at all. Both are covered in place, where they happened, rather than saved up for a highlight reel here.
 
 ## The PC
 
@@ -89,7 +79,7 @@ One more data point on `deepseek-r1:14b`: I ran it against four different prompt
 
 Raw tok/s is the easy number, and it's what most of this post is built on so far. It also tells you nothing about whether a model is actually *right*. To get real pass/fail data instead of vibes, I set up `promptfoo` — a Node-based eval tool — to score models against four workloads (coding, agentic/tool use, structured extraction, chat) plus a fifth I added later for vision, using a fixed judge model (`deepseek-r1:14b`) kept separate from the models under test so nothing could grade its own homework.
 
-One caveat that applies to every score below: these suites are small — three to sixteen cases each. That's enough to catch a model that can't do something at all, or a harness that's grading wrong, and it's what the findings here are about. It is not enough to rank models against each other, and a "4 out of 4" should be read as "didn't fail the smoke test," not "the best."
+One caveat that applies to every score below: these suites are small — three to sixteen cases each. That's enough to catch a model that can't do something at all, or a harness that's grading wrong, and it's what the findings here are about. It is not enough to rank models against each other, and a "4 out of 4" should be read as "didn't fail the smoke test," not "the best." (Every suite mentioned in this post — configs and cases both — is in the repo linked at the end, if you want to check any of this yourself.)
 
 ![Terminal running npx promptfoo eval on the vision suite, 8 of 12 test cases complete](/images/promptfoo-cli-running.png)
 *`npx promptfoo@latest eval -c promptfoo-vision-pc.yaml -j 1 --no-cache` mid-run — `-j 1` so results are directly comparable, `--no-cache` so every case re-queries the model instead of replaying a cached response.*
@@ -275,6 +265,14 @@ With that, I closed the Pi vision suite: `qwen3-vl:2b` at 4 out of 6, 66.67% wei
 
 The practical upshot for anything I build on this board: active cooling is necessary, but treating it as sufficient was the mistake that cost the week. Any real product running sustained inference on a Pi 5 needs an application-level watchdog and auto-restart designed in from the start — and tuned per-workload, not borrowed from this one. The kill-window mismatch that sidelined the watchdog for `qwen3-vl:2b` is the reminder: "the watchdog works" and "the watchdog works for this model's timing" are two different claims, and only one matters in production.
 
+## Tools & AI assist
+
+The whole project ran inside a Claude Project ("Run Local LLM") using **Claude Cowork**. Three standing docs (Project Instructions, a Session Log, a Benchmark Log) got maintained as we went, so nothing had to get reconstructed from memory later — this post is largely a distillation of that log.
+
+Cowork wrote every promptfoo config, the voice-assistant pipeline, and the Pi thermal watchdog script. I ran the actual hardware, watched the thermals, and made the calls on what to try next and when to stop — including a couple of times I overruled where the investigation was headed, like the Pi crash section above.
+
+It also got things wrong, more than once. The GPU env vars earlier in this post are one example: Cowork's first pass at "optimizing" them cost me a 3x speed regression before we caught it. The Pi thermal watchdog's first version silently didn't work at all. Both are covered in place, where they happened, rather than saved up for a highlight reel here.
+
 ## Lessons learned & what's next
 
 On the PC, the fast path is clear: get the GPU env vars right, stay under ~13B params at Q4_K_M unless you've specifically tested a bigger model's split-mode performance, and tune `num_ctx` down before you conclude a model is "slow" when it's actually just spilling out of VRAM. `qwen3.5:9b` was the most consistently reliable model across every eval suite I ran it through, comfortably inside the 12GB budget — as long as `think: false` is on for anything latency-sensitive and the conversation doesn't get long.
@@ -290,8 +288,6 @@ The lesson threading through both machines is the one from the eval-harness sect
 - The fastest TTFT I measured anywhere in this project came from the model that also got two of five answers wrong.
 - The model whose spec sheet promises 256K tokens of context becomes unusably slow — 40x worse TTFT, 5x worse throughput — at an eighth of that number, with VRAM sitting nearly flat the entire time, so it can't even be blamed on running out of memory.
 
-A fast wrong answer isn't a win on either machine, and neither is a plausible-sounding number from a model, a judge, or a spec sheet you haven't verified yourself.
-
 If you want to run any of this yourself rather than take my numbers on faith, the repo has everything: the promptfoo suites for both machines, the receipt images and encoder script behind the vision tests, the voice assistant script, and a `FINDINGS.md` with the full data behind every table above — the README covers PC and Pi setup separately since the env vars and model lists differ. [github.com/dwooods/local-llm-benchmark](https://github.com/dwooods/local-llm-benchmark)
 
-**So — more than a curiosity?** Not really. Not as a replacement for the closed models I started this post living inside of, and not on the hardware most people have. A 12GB card is a perfectly respectable GPU by any non-AI standard, and it caps you at roughly 13B parameters; a 13B model is a long way from ChatGPT or Claude on anything open-ended — that's two years of daily use talking, not a suite I ran — and the price of "free" is a tuning tax — env vars, `num_ctx`, `think: false`, a driver update that can silently undo all of it — plus a model that, asked a simple factual question, invented a Raspberry Pi product tier that doesn't exist. Where local does earn its place is the lightweight, narrow stuff: structured extraction against a fixed schema, a voice assistant that only has to answer short questions, a small fixed set of actions on a Pi — work where "good enough, and no data leaves the building" beats "best possible answer." There's no Pi project waiting on this — I wanted to know what the board could do, and now I do. I didn't put the closed models through the same suites, and that's the obvious next test: the one comparison this post talks about and doesn't measure. And I haven't found a job for an open model yet: I'm still paying for Claude, because it's the best fit for what I do right now, and that stays true until something I can run locally can compete with it.
+**So — more than a curiosity?** Not really. Not as a replacement for the closed models I started this post living inside of, and not on the hardware most people have. A 12GB card is a perfectly respectable GPU by any non-AI standard, and it caps you at roughly 13B parameters; a 13B model is a long way from ChatGPT or Claude on anything open-ended (that's two years of daily use talking, not a suite I ran), and the price of "free" is a tuning tax — env vars, `num_ctx`, `think: false`, a driver update that can silently undo all of it — plus a model that, asked a simple factual question, invented a Raspberry Pi product tier that doesn't exist. Where local does earn its place is the lightweight, narrow stuff: the receipt-extraction pipeline from this post, pointed at a folder of scanned invoices instead of six test photos, running on a Pi with no API bill and no data leaving the house — or a voice assistant that only has to answer short questions, or a small fixed set of actions on a Pi. Work where "good enough, and no data leaves the building" beats "best possible answer." There's no Pi project waiting on this — I wanted to know what the board could do, and now I do. I didn't put the closed models through the same suites, and that's the obvious next test: the one comparison this post talks about and doesn't measure. And I haven't found a job for an open model yet: I'm still paying for Claude, because it's the best fit for what I do right now, and that stays true until something I can run locally can compete with it.
