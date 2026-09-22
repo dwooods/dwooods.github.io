@@ -177,15 +177,16 @@ So the honest takeaway isn't "use the smallest model for the fastest chat experi
 
 ### How far can you actually push context? A needle in a 32,000-token haystack
 
-The `qwen3.5:9b` tag on Ollama's library advertises a 256K token context window. That number is doing a lot of marketing work, and I wanted an actual measurement instead of taking it on faith — especially after just watching `num_ctx` bite the voice assistant twice above. So I built the standard test for this: bury a single, distinctive fact somewhere inside a much longer block of unrelated filler text, then ask the model to find it. I used an invented "generator override code" (`ZULU-FOXTROT-8841`) that couldn't possibly appear anywhere in the model's training data, planted it at five different positions within the text (right at the start, a quarter of the way through, dead center, three-quarters through, right at the end), and swept the haystack size from roughly 1,000 tokens up to 32,000. Scoring was a simple exact-string check rather than another LLM grading the answer — after already catching my own judge model grading a correct answer wrong earlier in this post, I wasn't about to trust a second model to tell me whether the first one found an exact string.
+The `qwen3.5:9b` tag on Ollama's library advertises a 256K token context window. That number is doing a lot of marketing work, and I wanted an actual measurement instead of taking it on faith — especially after just watching `num_ctx` bite the voice assistant twice above. So I built the standard test for this: bury a single, distinctive fact somewhere inside a much longer block of unrelated filler text, then ask the model to find it. I used an invented "generator override code" (`ZULU-FOXTROT-8841`) that couldn't possibly appear anywhere in the model's training data, planted it at five different positions within the text (right at the start, a quarter of the way through, dead center, three-quarters through, right at the end), and swept the haystack size through six doublings, from roughly 1,000 tokens up to 32,000. Scoring was a simple exact-string check rather than another LLM grading the answer — after already catching my own judge model grading a correct answer wrong earlier in this post, I wasn't about to trust a second model to tell me whether the first one found an exact string.
 
-The headline is almost anticlimactic: **every single test passed.** All 30 combinations of size and position, from 1K tokens to 32K tokens, found the needle every time. If the goal was "prove the 256K claim is fake," this test didn't get there — 32K is still an eighth of the advertised ceiling, and I have no evidence recall would fail anywhere I actually tested.
+The headline is almost anticlimactic: **every single test passed.** All 30 combinations of size and position (six sizes, five positions), from 1K tokens to 32K tokens, found the needle every time, and so did the 12 cells from a shorter first pass over the four smaller sizes. Forty-two runs, zero misses. If the goal was "prove the 256K claim is fake," this test didn't get there — 32K is still an eighth of the advertised ceiling, and I have no evidence recall would fail anywhere I actually tested.
 
 But recall was never really the interesting number, once I looked at what else moved.
 
 | Context size | Prefill speed | Generation speed | Time to first token (warm) |
 |---|---|---|---|
 | 1,024 tokens | ~655 tok/s | ~62 tok/s | ~3.7s |
+| 2,048 tokens | ~656 tok/s | ~61 tok/s | ~5.2s |
 | 4,096 tokens | ~628 tok/s | ~60 tok/s | ~8.4s |
 | 8,192 tokens | ~400–470 tok/s | ~33–40 tok/s | ~19–22s |
 | 16,384 tokens | ~277 tok/s | ~17.8 tok/s | ~58s |
