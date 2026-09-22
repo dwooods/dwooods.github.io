@@ -301,11 +301,11 @@ There's no Pi project waiting on any of this, for what it's worth — I wanted t
 
 The whole project ran inside a Claude Project ("Run Local LLM") using **Claude Cowork**. Three standing docs (Project Instructions, a Session Log, a Benchmark Log) got maintained as we went, so nothing had to get reconstructed from memory later — this post is largely a distillation of that log.
 
-Cowork wrote every promptfoo config, the voice-assistant pipeline, the Pi thermal watchdog script, and the one-second crash logger in the postscript. I ran the actual hardware, watched the thermals, and made the calls on what to try next and when to stop — including a couple of times I overruled where the investigation was headed, like the Pi crash section above.
+Cowork wrote every promptfoo config, the voice-assistant pipeline, the Pi thermal watchdog script, and the one-second crash logger in the postscript. It also made every chart in this post from the run data, the LAN-judge diagram, and the hero image, and it did the pre-publication review pass that compared this post against the repo's raw files. I ran the actual hardware, watched the thermals, and made the calls on what to try next and when to stop — including a couple of times I overruled where the investigation was headed, like the Pi crash section above.
 
-Gemini ran the original GPU env-var session, before this project existed; its explanation of why that fix worked is the one corrected in place in the GPU section above, after Cowork caught the contradiction in review.
+Gemini ran the original GPU env-var session, before this project existed. Two things from that session made it into early drafts of this post unchecked: the explanation of why the fix worked, corrected in place in the GPU section above, and a VRAM-bandwidth figure that didn't match the card's spec sheet. That's the whole list; no other AI tool touched the project.
 
-Cowork also got things wrong, more than once. The GPU env vars earlier in this post are one example: its first pass at "optimizing" them cost me a 3x speed regression before we caught it. The Pi thermal watchdog's first version silently didn't work at all. Both are covered in place, where they happened, rather than saved up for a highlight reel here.
+Cowork also got things wrong, more than once. The GPU env vars earlier in this post are one example: its first pass at "optimizing" them cost me a 3x speed regression before we caught it. The Pi thermal watchdog's first version silently didn't work at all. And three summary numbers in early drafts of this post and the repo's `FINDINGS.md` didn't match the CSV they were summarizing, which nobody noticed until the review pass opened the CSV instead of comparing one paragraph to another. All of it is covered in place, where it happened, rather than saved up for a highlight reel here.
 
 ## Lessons learned & what's next
 
