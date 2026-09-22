@@ -4,7 +4,7 @@ date: 2026-09-21
 draft: false
 tags: ["ai", "llm", "ollama", "raspberry-pi", "self-hosted", "benchmarking"]
 description: "Open-weight LLMs on a 12GB AMD PC and a Raspberry Pi 5: a silent GPU fallback, a VRAM cliff, a judge that graded a right answer wrong, six Pi crashes, and the verdict."
-summary: "I benchmarked open-weight LLMs on a Windows PC and a Raspberry Pi 5, and nearly every obvious answer turned out wrong: a GPU silently running on CPU, a 'bigger' model slower than no GPU at all, a judge model that graded a correct answer wrong. The verdict: local earns its place for narrow, lightweight work, not as a stand-in for the closed models I've used for two years."
+summary: "I benchmarked open-weight LLMs on a Windows PC and a Raspberry Pi 5, and nearly every obvious answer turned out wrong: a GPU silently running on CPU, a 'bigger' model slower than no GPU at all, a judge model that graded a correct answer wrong. Local earned its place for narrow, lightweight work. It isn't yet a replacement for the closed models I use every day, and I didn't put them through the same tests."
 featuredImage: "/images/hero-pc-vs-pi.png"
 featuredImagePreview: "/images/hero-pc-vs-pi.png"
 ---
