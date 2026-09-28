@@ -104,6 +104,33 @@ Along the way this turned into an accidental audit of Synology's internal `@` fo
 - Package data isn't in one place. The six folders backing Container Manager and other installed packages exist on **both** volumes independently — 46MB worth on `/volume2`, and 3.6GB on `/volume1`, almost all of it `@appstore` holding full installed-package binaries (including, memorably, a bundled Node.js runtime for one of my installed packages).
 - `@eaDir`, Synology's per-folder thumbnail cache and famous for being inode-heavy, was tiny in my case — 33 files, 232KB. Size isn't a reliable predictor of how expensive a folder is to scan; file *count* is, which is exactly what made `@appstore` the slow part later.
 
+## Keeping it running: signatures update themselves, software doesn't
+
+A weekly scan is only as good as the signatures it's scanning with. Once the production job was stable, I asked the question I should have asked on day one: what actually keeps this thing current? The answer is two different answers, and the difference matters.
+
+**The signatures update on their own.** The official `clamav/clamav` image starts a `freshclam` daemon inside the container, and `clamscan` reads the signature database fresh from disk on every run, so Friday's scan always uses whatever freshclam last downloaded. I didn't want to just trust the docs, so I checked from the container console:
+
+```sh
+clamscan --version                       # version + signature DB number and date
+ps | grep freshclam                      # is the daemon actually running?
+ls -la /var/lib/clamav                   # timestamps on the database files
+tail -20 /var/log/clamav/freshclam.log   # look for "OUTDATED" or errors
+```
+
+The version line came back `ClamAV 1.5.4/28137/Mon Sep 28 06:24:12 2026`: current software, and a signature database built that same morning. The process list showed the daemon running with `--checks=1`, which means one update check per day. That sounds too slow until you remember the 16-hour NAS. It boots at 7AM, freshclam checks a few minutes later, and the 11AM scan runs on signatures that are at most four hours old. The nightly shutdown accidentally lines up with the update schedule, which is the closest thing to good luck this project has had.
+
+**The software does not update itself.** The image refreshes signatures only, never the ClamAV binary. The `latest` tag isn't a subscription, it's a snapshot of whatever was current the day I pulled. Upgrading means pulling a newer image and recreating the container. ClamAV's own docs recommend pinning a feature-release tag like `clamav/clamav:1.5` instead of `latest`, so a re-pull gives you patches without silently jumping you to a new feature release.
+
+Neglecting this isn't free, either. ClamAV eventually blocks signature downloads for end-of-life versions (it did exactly that to 0.103), so a container nobody ever touches will one day just stop getting updates. My upkeep plan is a quarterly check, or any time this comes back with a hit:
+
+```sh
+grep -i outdated /var/log/clamav/freshclam.log
+```
+
+Two things in that output looked alarming and weren't. The freshclam log ends every update with `WARNING: Clamd was NOT notified`, which only means freshclam couldn't find the clamd daemon to tell it to reload. `clamscan` doesn't use clamd, so it's irrelevant here (and if clamd isn't running at all, that's over a gigabyte of RAM a small NAS never has to spend). And the signature files turned out to live in the container's own writable layer, not a volume: only `daily.cld` was rewritten that morning, while `main.cvd` and `bytecode.cvd` still carried the date of the image pull.
+
+That last detail has a practical consequence. Recreating the container wipes the writable layer, so the next recreate should add a named volume at `/var/lib/clamav`, and it's worth confirming the scheduled command doesn't reference any file *inside* the container (like the `/tmp` lists I generated while troubleshooting) before pulling the trigger.
+
 ## Lessons learned & what's next
 
 The generalizable version of this, for anyone who's never heard of ClamAV and never will: **when you retire a broad safety net, you have to replace it with a verified, complete list — not a remembered one.** The blanket `--exclude-dir=/@` pattern was doing its job by accident; it caught everything, including folders nobody had specifically thought about. The moment I replaced "everything" with "everything I can remember," the gap between those two things became an hour-long hang on a production job. That's not really a ClamAV lesson. It's true of firewall rules, permission allow-lists, feature flags — anywhere a blanket rule gets replaced with an enumerated one, the enumeration has to come from the system itself, not from anyone's memory of the system.
@@ -119,5 +146,7 @@ One more thing worth admitting, since undercutting my own competence seems to be
 ---
 
 No GitHub repo to link here — like the Plex/Tailscale project, this was NAS configuration, not code, and the exclude list and Task Scheduler command above are the whole artifact. If you're fighting the same fight: check `clamconf` for your actual running defaults before you trust anything the docs say, and if you ever retire a blanket exclude pattern for a narrower one, generate the replacement list with `find`, not with whatever you remember scrolling past.
+
+A footnote: this project ended up dragging me into a second one. While I was poking around the NAS's security settings, Synology emailed me about a failed admin login from Russia, and that turned into its own adventure. That one has its own post: [Someone in Russia Tried My NAS Password](/posts/hardening-synology-nas/).
 
 Every Friday at 11 in the morning, while nobody in the house knows or cares, the NAS spends 54 minutes checking that years of family photos aren't quietly carrying something they shouldn't. That's not a very exciting sentence to end a blog post on. It's kind of the point — boring is what it's supposed to feel like when it's actually working.
