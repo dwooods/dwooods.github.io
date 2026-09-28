@@ -4,7 +4,7 @@ date: 2026-09-24
 draft: true
 tags: ["synology", "clamav", "docker", "self-hosted", "nas", "antivirus", "dsm"]
 description: "Building a weekly ClamAV scan for a Synology DS918+ that has to finish before the NAS's nightly shutdown — a silent 100MB scan cap, an hour-long runaway scan killed mid-run, and 29 undocumented internal folders nobody warns you about."
-summary: "My NAS goes to sleep at 11PM to save power, which meant my weekly virus scan had a hard deadline. Getting there meant discovering that ClamAV silently skips anything over 100MB, that Synology's own antivirus package doesn't reliably work, and that deleting one blanket exclude rule can turn a 3-minute scan into an hour-long hang nobody notices until it's too late."
+summary: "My NAS goes to sleep at 11PM to save power, which meant my weekly virus scan had a hard deadline. Getting there meant discovering that ClamAV silently skips anything over 100MB, that Synology's own antivirus package doesn't reliably work, and that deleting one blanket exclude rule can turn a few-minute scan into an hour-long hang nobody notices until it's too late."
 ---
 
 <!-- TODO: add a featured image before publishing — a Portainer console screenshot showing the SCAN SUMMARY output, or a simple diagram of DSM Task Scheduler → docker exec → the clamav-scanner container's read-only volume mounts, would both work well here. -->
@@ -58,10 +58,11 @@ Claude also got a few things wrong along the way, worth being honest about rathe
 
 ### The job that kept getting killed at bedtime
 
-The NAS powers off at 11PM, and an early version of the job was still running when it did. The shutdown stopped it. Every day. Nothing told me: the task didn't fail loudly, there just wasn't a finished result, and I only found out by digging into why it kept stopping.
-<!-- TODO (David): how long did the early full scan run, how many days before you noticed, and where did you find the cause? A real number here is what makes the 16-hour window feel earned. -->
+My first version scanned everything. It ran all day, the NAS went down for the night, and the scan never finished. Nothing told me: the task didn't fail loudly, there just wasn't a finished result, and I only found out by digging into why the job had stopped each day.
 
-That's when the 16-hour window stopped being trivia and became a design constraint: the scan has to *finish*, not just start. It's also why I set up email notifications in Task Scheduler. A silent failure is the one thing a security job can't afford, and checking a container's logs by hand every week was never going to happen.
+Scanning literally everything, I assume, isn't how a virus scanner is normally used. Real antivirus tools skip what doesn't matter, and I hadn't told mine what didn't matter. It also wasn't only about the shutdown. A scan grinding through the whole NAS all day would have been dragging it down right when the rest of us use it in the evening.
+
+So the target changed. It wasn't "scan everything," it was "finish inside a window that ends before the NAS goes to bed and doesn't get in the household's way later in the day." That's when the 16-hour window stopped being trivia and became a design constraint: the scan has to *finish*, not just start. It's also why I set up email notifications in Task Scheduler. A silent failure is the one thing a security job can't afford, and checking a container's logs by hand every week was never going to happen.
 
 ### The 100MB cap nobody tells you about
 
@@ -89,7 +90,7 @@ And there's **no way to un-exclude a subdirectory**. Once a broad pattern like `
 
 I wanted to add DSM's own package-data folders to the scan scope — the folders behind Docker and everything else installed through Package Center — which meant retiring the blanket `--exclude-dir=/@` pattern that had been quietly catching every Synology-internal folder up to that point. I replaced it with a hand-typed list of the "obvious" `@`-prefixed folders, based on what I remembered seeing in earlier `ls` output.
 
-A test run that should have taken about 200 seconds instead ran for **over an hour**, stuck in disk-sleep (`D`) state with no end in sight.
+A test run that should have taken a few minutes instead ran for **over an hour**, stuck in disk-sleep (`D`) state with no end in sight.
 
 Claude diagnosed it by reading the stuck process's open file descriptors directly — `ls -la /proc/<pid>/fd` shows exactly which file a process has open right now, which is a much more honest answer than anything in a log file:
 
@@ -118,6 +119,8 @@ done
 ```
 
 Six package folders stay in scope on each volume; everything else with an `@` gets excluded, generated from a real listing instead of a remembered one. The corrected scan finished clean in 53 minutes 55 seconds — 0 infected files, 58,775 files scanned across 8,800 directories. Two days later, the real DSM Task Scheduler job ran the same command unattended, on its actual Friday-11AM schedule, and matched it almost exactly: 53m54s, 0 infected, 58,778 files. First real confirmation the fix holds up without anyone watching it.
+
+Fifty-four minutes is also well past the roughly 21 I'd estimated from raw megabytes. My best explanation is that scan time follows file count, not size, and the package folders are a huge pile of small files. (More on that in the open items at the end.)
 
 ### A folder structure that's apparently a secret
 
@@ -158,10 +161,11 @@ That last detail has a practical consequence. Recreating the container wipes the
 
 The generalizable version of this, for anyone who's never heard of ClamAV and never will: **when you retire a broad safety net, you have to replace it with a verified, complete list — not a remembered one.** The blanket `--exclude-dir=/@` pattern was doing its job by accident; it caught everything, including folders nobody had specifically thought about. The moment I replaced "everything" with "everything I can remember," the gap between those two things became an hour-long hang on a production job. That's not really a ClamAV lesson. It's true of firewall rules, permission allow-lists, feature flags — anywhere a blanket rule gets replaced with an enumerated one, the enumeration has to come from the system itself, not from anyone's memory of the system.
 
-The other lesson is about where the effort actually went. Getting ClamAV to run was the easy half. The hard half was deciding **what to scan**, and it took repeated rounds of run, measure, and adjust to land on a folder set that balanced coverage against run time. Scan everything and the multi-terabyte media and backup folders blow straight through the 16-hour window; scan too little and the weekly job is theater. Where I ended up follows the rule from the top of this post: the Synology package folders, documents, and Drive data are in, while the video folders, the backup folder, and the full home directories are out. Some of that is a judgment call about risk (photos only arrive through Synology's own apps, and movies and music get played, not executed) and some of it is simply that they don't fit. That combination finishes in about 54 minutes, and it got there through actual full runs rather than guesswork (a per-folder breakdown is still on the to-do list below). If you build this, expect the folder list to be the real project.
+The other lesson is about where the effort actually went. Getting ClamAV to run was the easy half. The hard half was deciding **what to scan**, and it took repeated rounds of run, measure, and adjust to land on a folder set that balanced coverage against run time. Scan everything and the multi-terabyte media and backup folders blow straight through the 16-hour window; scan too little and the weekly job is theater. Where I ended up follows the rule from the top of this post: the Synology package folders, Drive documents, and general content are in, while photos, music, Plex, the video and backup folders, and most of the home directories are out. Some of that is a judgment call about risk (photos only arrive through Synology's own apps, and movies and music get played, not executed) and some of it is simply that they don't fit. That combination finishes in about 54 minutes, and it got there through actual full runs rather than guesswork (a per-folder breakdown is still on the to-do list below). If you build this, expect the folder list to be the real project.
 
 It's also a choice, not a guarantee. Nothing scans the folders I left out, so anything that lands there by another route (a PC saving over SMB, a download) goes unchecked. I'm comfortable with that trade for now, but it's worth saying out loud.
-<!-- TODO (David): confirm the Docker image/container storage folder (@docker on Synology, I believe) is actually in scope. It's where the software you installed via containers runs, and my exclude loop only keeps the six @app* folders. Check in the Portainer console: ls -d /scandir/@docker* /scandir/docker* -->
+
+One exclusion deserves a flag because it cuts against my own rule: `@docker`, where Docker keeps container image layers, is out on purpose. I judged it impractical to scan and a poor fit for signature scanning, since it's binary layers. But it's also where the software I installed via containers (Portainer, ClamAV itself) actually lives, so "scan where software runs" has a hole in it, and I'd rather say so than pretend otherwise.
 
 Two things are still genuinely open, not wrapped up neatly for this post:
 
