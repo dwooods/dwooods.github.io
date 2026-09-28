@@ -15,9 +15,13 @@ This is the story of getting a ClamAV scan, running in Docker, to actually compl
 
 ## Why I built this
 
-The NAS holds our family's photos and movies — the actual "if this dies we lose it" stuff, not test data. So "eventually get around to scanning it" was never really on the table; I wanted a weekly scan that just runs, on its own, and tells me if something's wrong.
+The NAS holds our music, photos, backups, videos, movies and TV shows. It's the household's everything-drive, so keeping it locked down, limited-access and free of anything nasty matters more to me than it would on a throwaway hobby server. I hadn't run a virus scan on it in a long while, and that had been bugging me.
+
+Not because I was worried. That's exactly how you end up not scanning for a year. The realistic threat isn't a stranger; it's me installing something I thought was trustworthy and finding out otherwise, on the one box the whole house depends on.
 
 Synology ships two of its own antivirus options in Package Center, and I tried the obvious one first: **Antivirus Essential**, the free package. It stopped updating its virus definitions, with no way to force a manual refresh — which, it turns out, is a documented, known issue, not something specific to my setup. Synology has [its own knowledge-base article](https://kb.synology.com/en-us/DSM/tutorial/I_cannot_update_virus_definitions_in_Antivirus_Essential) titled almost exactly "I cannot update virus definitions in Antivirus Essential," and there's a [community thread](https://community.synology.com/enu/forum/1/post/189641) of other people hitting the same wall. A virus scanner that can't update its own signatures is a smoke detector with the battery pulled.
+
+I assumed the fix would be trivial: update the virus dictionary. I couldn't even do that by hand.
 
 I didn't give up on it quickly, either. Here's what the troubleshooting looked like, in case you're staring at the same error:
 
@@ -27,26 +31,35 @@ I didn't give up on it quickly, either. Here's what the troubleshooting looked l
 
 The other option, **Antivirus by McAfee**, is a genuinely different, separately-licensed product — full subscription, not the free one — and I wasn't going to pay an annual fee to scan a NAS I already own. (These two share enough branding that I spent longer than I'd like to admit being confused about which one was actually free. If you're evaluating this yourself: Essential is the free one, and it's also the one that stopped working for me.)
 
-That left fighting a bundled scanner I couldn't see inside of, or running a current ClamAV myself. So: ClamAV, in Docker, driven by DSM's own Task Scheduler. Free, open-source, and — critically — something I could actually see inside of when it went wrong, instead of a GUI toggle that either works or doesn't tell you why.
+What stuck with me is that ClamAV, the engine underneath, is free and runs on Windows, macOS and Linux. Getting current signatures onto a Synology shouldn't be harder than getting them onto a Raspberry Pi. I don't know why Essential stopped updating and I haven't heard Synology's side, so that's a question I still need to send them.
 
-Now the part that surprised me, and the reason I'm writing any of this down: **I had never installed or run Docker before this project.** Not "rusty." Never. And I went in expecting the free route to be *less* technical than the paid one: pick a tool, point it at my folders, set a schedule, done. What I got was a crash course in containers, read-only mounts, and a management UI I had to install just to see what was going on inside the thing, followed by a long stretch of installing, testing, and validating before any scan result meant anything. If you're picturing "set up a virus scan" as an afternoon of clicking through a wizard, budget for a lot more than that. The free version costs you in knowledge instead of dollars.
+In the meantime, my options were fighting a bundled scanner I couldn't see inside of, or running a current ClamAV myself. So: ClamAV, in Docker, driven by DSM's own Task Scheduler. Free, open-source, and — critically — something I could actually see inside of when it went wrong, instead of a GUI toggle that either works or doesn't tell you why.
+
+Now the part that surprised me, and the reason I'm writing any of this down: **I had never installed or run Docker before this project.** Not "rusty." Never. And I went in expecting the free route to be *less* technical than the paid one: pick a tool, point it at my folders, set a schedule, done. What I got was a crash course in containers, read-only mounts, and a management UI I had to install just to see what was going on inside the thing, followed by a long stretch of installing, testing, and validating before any scan result meant anything. I also had no idea how to set up a recurring job, what to scan, how to check whether it ran, or how to keep it updated, because none of that is a normal non-engineer way to run software. If you're picturing "set up a virus scan" as an afternoon of clicking through a wizard, budget for a lot more than that. The free version costs you in knowledge instead of dollars.
 
 ## Architecture & tech stack
 
 - **NAS**: Synology DS918+ — Celeron J3455, no GPU, DSM 7.x. Two volumes, `/volume1` and `/volume2`.
 - **Scanner**: the official `clamav/clamav:latest` Docker image, running as a container named `clamav-scanner`, with both volumes mounted in **read-only** — the container can see everything, and can't write or delete anything, on purpose.
-- **Management**: Portainer CE, installed alongside Synology's own Docker package, because the Synology Docker GUI kept getting in my way. The folder picker for volume mounts drills into subfolders and wouldn't let me select a top-level shared folder to mount, and my version had no Project (compose) tab to define the container as a file. I got as far as a workaround, a root Task Scheduler entry running a raw `docker run ... -v /volume1:/scandir:ro`, before deciding that typing mounts into a scheduler box wasn't a plan. Portainer let me type the host paths directly, define the container as a Stack, read its logs, and open a console inside it. That last one turned out to be the backbone of the whole project. It mattered for a reason that's really about the next section: I never let Claude touch DSM directly, and Portainer's web console gives a shell *inside the container*, scoped to those read-only mounts, without either of us ever holding actual DSM credentials.
+- **Management**: Portainer CE, installed alongside Synology's own Docker package because the Synology Docker GUI kept getting in my way. (Gemini suggested it. Yes, that's yet another container just to manage the first container.) The folder picker for volume mounts drills into subfolders and wouldn't let me select a top-level shared folder to mount, and my version had no Project (compose) tab to define the container as a file. I got as far as a workaround, a root Task Scheduler entry running a raw `docker run ... -v /volume1:/scandir:ro`, before deciding that typing mounts into a scheduler box wasn't a plan. Portainer let me type the host paths directly, define the container as a Stack, read its logs, and open a console inside it. That last one turned out to be the backbone of the whole project. It mattered for a reason that's really about the next section: I never let Claude touch DSM directly, and Portainer's web console gives a shell *inside the container*, scoped to those read-only mounts, without either of us ever holding actual DSM credentials.
 - **Scheduling**: DSM's own Task Scheduler, running the `docker exec` command as a User-defined script every Friday at 11:00 AM Pacific — early enough in the ~16-hour window that even a slow run has room to finish before the 11PM shutdown.
 
 ### Tools & AI assist
 
-The whole thing ran through **Claude Cowork**, in a single long-running conversation, the same pattern as the [Plex/Tailscale project](/posts/wagging-the-dog-tailscale-plex-vacation/) before it: no local repo, no code files, just a chat window and a browser session into the NAS. Since Docker was brand new to me, that conversation doubled as the tutorial.
+Two AI tools were involved. **Gemini** came first: it walked me through the Antivirus Essential dead end and is the one that suggested Portainer when Synology's Docker UI ran out of road. Then most of the build ran through **Claude Cowork**, in a single long-running conversation, the same pattern as the [Plex/Tailscale project](/posts/wagging-the-dog-tailscale-plex-vacation/) before it: no local repo, no code files, just a chat window and a browser session into the NAS. Since Docker was brand new to me, that conversation doubled as the tutorial.
 
 Claude did the actual investigation work: building the exclude-list logic, diagnosing a stuck process by reading its open file descriptors, and driving the Portainer console to test commands. What Claude explicitly does **not** do, by a hard rule I set going in: log into DSM itself, under any circumstance. Every DSM Task Scheduler change — including the final production command this whole project was building toward — had to be typed in by me, by hand, in DSM's own UI, with Claude only ever verifying the result afterward through the container's read-only mount. That's not a minor detail; it's the actual shape of the division of labor on this project. Claude investigated, proposed, and verified. I held the one set of credentials that could actually change something.
 
-Claude also got a few things wrong along the way, worth being honest about rather than editing out. Early on, I told it to skip the `video` and `video2` folders from the scan, and had to explicitly confirm that decision more than once before it stuck. When the browser session into Portainer dropped mid-verification (more on that below), Claude's first instinct was to just retry quietly — which is a reasonable instinct in general and the wrong one here, since a silently-retried browser session is exactly the kind of thing that should surface to a human, not get smoothed over. I told it so directly, and it changed behavior for the rest of the project.
+Claude also got a few things wrong along the way, worth being honest about rather than editing out. Early on, I told it to skip the `video` and `video2` folders from the scan, and had to explicitly confirm that decision more than once before it stuck. When the browser session into Portainer dropped mid-verification, Claude's first instinct was to just retry quietly — which is a reasonable instinct in general and the wrong one here, since a silently-retried browser session is exactly the kind of thing that should surface to a human, not get smoothed over. I told it so directly, and it changed behavior for the rest of the project.
 
 ## Key technical challenges
+
+### The job that kept getting killed at bedtime
+
+The NAS powers off at 11PM, and an early version of the job was still running when it did. The shutdown stopped it. Every day. Nothing told me: the task didn't fail loudly, there just wasn't a finished result, and I only found out by digging into why it kept stopping.
+<!-- TODO (David): how long did the early full scan run, how many days before you noticed, and where did you find the cause? A real number here is what makes the 16-hour window feel earned. -->
+
+That's when the 16-hour window stopped being trivia and became a design constraint: the scan has to *finish*, not just start. It's also why I set up email notifications in Task Scheduler. A silent failure is the one thing a security job can't afford, and checking a container's logs by hand every week was never going to happen.
 
 ### The 100MB cap nobody tells you about
 
@@ -102,7 +115,7 @@ for d in $(cat /tmp/v1all.txt) $(cat /tmp/v2all.txt); do
 done
 ```
 
-Six package folders stay in scope; the other 26 get excluded, generated from a real listing instead of a remembered one. The corrected scan finished clean in 53 minutes 55 seconds — 0 infected files, 58,775 files scanned across 8,800 directories. Two days later, the real DSM Task Scheduler job ran the same command unattended, on its actual Friday-11AM schedule, and matched it almost exactly: 53m54s, 0 infected, 58,778 files. First real confirmation the fix holds up without anyone watching it.
+Six package folders stay in scope on each volume; everything else with an `@` gets excluded, generated from a real listing instead of a remembered one. The corrected scan finished clean in 53 minutes 55 seconds — 0 infected files, 58,775 files scanned across 8,800 directories. Two days later, the real DSM Task Scheduler job ran the same command unattended, on its actual Friday-11AM schedule, and matched it almost exactly: 53m54s, 0 infected, 58,778 files. First real confirmation the fix holds up without anyone watching it.
 
 ### A folder structure that's apparently a secret
 
