@@ -19,9 +19,15 @@ The NAS holds our family's photos and movies — the actual "if this dies we los
 
 Synology ships two of its own antivirus options in Package Center, and I tried the obvious one first: **Antivirus Essential**, the free package. It stopped updating its virus definitions, with no way to force a manual refresh — which, it turns out, is a documented, known issue, not something specific to my setup. Synology has [its own knowledge-base article](https://kb.synology.com/en-us/DSM/tutorial/I_cannot_update_virus_definitions_in_Antivirus_Essential) titled almost exactly "I cannot update virus definitions in Antivirus Essential," and there's a [community thread](https://community.synology.com/enu/forum/1/post/189641) of other people hitting the same wall. A virus scanner that can't update its own signatures is a smoke detector with the battery pulled.
 
+I didn't give up on it quickly, either. Here's what the troubleshooting looked like, in case you're staring at the same error:
+
+- The package bundles **ClamAV 0.103.8**, a version the ClamAV project has long since retired. As far as I can tell, that's the root of the problem: when I enabled SSH and ran `freshclam` by hand, the signature servers answered with HTTP 429 and 403 errors and a cool-down period, rather than a database.
+- Downloading the `.cvd` signature files manually and uploading them through DSM didn't work either. The download links sit behind Cloudflare, and what I ended up with was presumably an HTML page rather than a database, which DSM rejects with "Incorrect file format." Which is fair. It isn't a signature file.
+- Fixing DNS and NTP on the NAS, the usual suspects for update failures, changed nothing.
+
 The other option, **Antivirus by McAfee**, is a genuinely different, separately-licensed product — full subscription, not the free one — and I wasn't going to pay an annual fee to scan a NAS I already own. (These two share enough branding that I spent longer than I'd like to admit being confused about which one was actually free. If you're evaluating this yourself: Essential is the free one, and it's also the one that stopped working for me.)
 
-So: ClamAV, in Docker, driven by DSM's own Task Scheduler. Free, open-source, and — critically — something I could actually see inside of when it went wrong, instead of a GUI toggle that either works or doesn't tell you why.
+That left fighting a bundled scanner I couldn't see inside of, or running a current ClamAV myself. So: ClamAV, in Docker, driven by DSM's own Task Scheduler. Free, open-source, and — critically — something I could actually see inside of when it went wrong, instead of a GUI toggle that either works or doesn't tell you why.
 
 Now the part that surprised me, and the reason I'm writing any of this down: **I had never installed or run Docker before this project.** Not "rusty." Never. And I went in expecting the free route to be *less* technical than the paid one: pick a tool, point it at my folders, set a schedule, done. What I got was a crash course in containers, read-only mounts, and a management UI I had to install just to see what was going on inside the thing, followed by a long stretch of installing, testing, and validating before any scan result meant anything. If you're picturing "set up a virus scan" as an afternoon of clicking through a wizard, budget for a lot more than that. The free version costs you in knowledge instead of dollars.
 
@@ -29,7 +35,7 @@ Now the part that surprised me, and the reason I'm writing any of this down: **I
 
 - **NAS**: Synology DS918+ — Celeron J3455, no GPU, DSM 7.x. Two volumes, `/volume1` and `/volume2`.
 - **Scanner**: the official `clamav/clamav:latest` Docker image, running as a container named `clamav-scanner`, with both volumes mounted in **read-only** — the container can see everything, and can't write or delete anything, on purpose.
-- **Management**: Portainer CE, installed alongside Synology's own Docker package. Between the way the Synology Docker app was set up and its built-in limitations, it wasn't a good fit for this job, and Portainer offered more functionality and flexibility. The biggest win was a browser-based console *inside* the container, which turned out to be the backbone of the whole project. This mattered for a reason that's really about the next section: I never SSH into the NAS myself for this project, and I never let Claude touch DSM directly either. Portainer's web console gives a shell *inside the container*, scoped to those read-only mounts, without either of us ever holding actual DSM credentials.
+- **Management**: Portainer CE, installed alongside Synology's own Docker package, because the Synology Docker GUI kept getting in my way. The folder picker for volume mounts drills into subfolders and wouldn't let me select a top-level shared folder to mount, and my version had no Project (compose) tab to define the container as a file. I got as far as a workaround, a root Task Scheduler entry running a raw `docker run ... -v /volume1:/scandir:ro`, before deciding that typing mounts into a scheduler box wasn't a plan. Portainer let me type the host paths directly, define the container as a Stack, read its logs, and open a console inside it. That last one turned out to be the backbone of the whole project. It mattered for a reason that's really about the next section: I never let Claude touch DSM directly, and Portainer's web console gives a shell *inside the container*, scoped to those read-only mounts, without either of us ever holding actual DSM credentials.
 - **Scheduling**: DSM's own Task Scheduler, running the `docker exec` command as a User-defined script every Friday at 11:00 AM Pacific — early enough in the ~16-hour window that even a slow run has room to finish before the 11PM shutdown.
 
 ### Tools & AI assist
@@ -66,7 +72,7 @@ And there's **no way to un-exclude a subdirectory**. Once a broad pattern like `
 
 ### The scan that wouldn't die
 
-I wanted to add DSM's own package-data folders to the scan scope — the folders behind Container Manager and everything else installed through Package Center — which meant retiring the blanket `--exclude-dir=/@` pattern that had been quietly catching every Synology-internal folder up to that point. I replaced it with a hand-typed list of the "obvious" `@`-prefixed folders, based on what I remembered seeing in earlier `ls` output.
+I wanted to add DSM's own package-data folders to the scan scope — the folders behind Docker and everything else installed through Package Center — which meant retiring the blanket `--exclude-dir=/@` pattern that had been quietly catching every Synology-internal folder up to that point. I replaced it with a hand-typed list of the "obvious" `@`-prefixed folders, based on what I remembered seeing in earlier `ls` output.
 
 A test run that should have taken about 200 seconds instead ran for **over an hour**, stuck in disk-sleep (`D`) state with no end in sight.
 
@@ -103,7 +109,7 @@ Six package folders stay in scope; the other 26 get excluded, generated from a r
 Along the way this turned into an accidental audit of Synology's internal `@` folder taxonomy, which — as far as I could find — isn't documented anywhere public in this kind of detail. A few of the more interesting finds:
 
 - `@synologydrive` (lowercase) and `@SynoDrive` (capitalized) are two **completely different** folders — Synology Drive's live sync data versus something else entirely. Case-sensitivity matters on the underlying filesystem, and it's very easy to assume you've seen a folder before when you've actually seen its differently-capitalized sibling.
-- Package data isn't in one place. The six folders backing Container Manager and other installed packages exist on **both** volumes independently — 46MB worth on `/volume2`, and 3.6GB on `/volume1`, almost all of it `@appstore` holding full installed-package binaries (including, memorably, a bundled Node.js runtime for one of my installed packages).
+- Package data isn't in one place. The six folders backing Docker and other installed packages exist on **both** volumes independently — 46MB worth on `/volume2`, and 3.6GB on `/volume1`, almost all of it `@appstore` holding full installed-package binaries (including, memorably, a bundled Node.js runtime for one of my installed packages).
 - `@eaDir`, Synology's per-folder thumbnail cache and famous for being inode-heavy, was tiny in my case — 33 files, 232KB. Size isn't a reliable predictor of how expensive a folder is to scan; file *count* is, which is exactly what made `@appstore` the slow part later.
 
 ## Keeping it running: signatures update themselves, software doesn't
