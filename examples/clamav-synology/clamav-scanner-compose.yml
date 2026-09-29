@@ -1,0 +1,19 @@
+# clamav-scanner — equivalent Compose definition
+# Reconstructed from the live container on the Synology (Portainer env "local", 2026-09-28).
+# The container was created via Portainer > Containers > Add container, NOT as a Stack,
+# so there is no Stack Editor YAML. This file reproduces the current config 1:1.
+
+services:
+  clamav-scanner:
+    image: clamav/clamav:latest
+    container_name: clamav-scanner
+    restart: always
+    network_mode: bridge
+    environment:
+      - TZ=Etc/UTC
+    volumes:
+      - /volume1:/scandir:ro
+      - /volume2:/scandir2:ro
+    healthcheck:
+      test: ["CMD-SHELL", "clamdcheck.sh"]
+      start_period: 6m
