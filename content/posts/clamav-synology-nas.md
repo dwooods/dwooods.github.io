@@ -1,7 +1,7 @@
 ---
 title: "The Scan That Wouldn't Die: ClamAV on a NAS That Only Stays Awake 16 Hours a Day"
 date: 2026-09-24
-draft: true
+draft: false
 tags: ["synology", "clamav", "docker", "self-hosted", "nas", "antivirus", "dsm"]
 description: "I had never used Docker. With AI help I built a scheduled ClamAV virus scan on a Synology NAS that has to finish before its nightly shutdown, and learned Docker, ClamAV, and where the AI needed checking along the way."
 summary: "I had never used Docker. This is how I used AI to learn it well enough to run a ClamAV virus scan on my Synology NAS, which goes to sleep at 11PM and gives every scan a hard deadline. Along the way: a silent 100MB scan cap, a scan that hung for an hour, and a few places where the AI needed checking."
