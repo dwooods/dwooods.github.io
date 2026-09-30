@@ -45,13 +45,13 @@ Here's the scale of what I actually set up, so it looks less intimidating: one o
 
 ## ClamAV, for people who think antivirus is an app
 
-I didn't know ClamAV existed until Synology's own scanner stopped updating, I couldn't get it to refresh manually, and I wasn't going to pay for McAfee. That's when I pivoted. I went in expecting a GitHub repo from some stranger. It isn't. The [ClamAV docs](https://docs.clamav.net/) say it's brought to you by Cisco Systems, and there's real documentation, a [community project ecosystem](https://docs.clamav.net/manual/Installing/Community-projects.html), an updated signature database, and versions for Windows, macOS and Linux. It was also easy to install and run. The container image is about 240 MB and there's no big service to babysit. (It does hold its virus signatures in memory, so it isn't light on RAM. When I looked, the NAS showed a little over 2 GB in use.)
+I didn't know ClamAV existed until Synology's own scanner stopped updating, I couldn't get it to refresh manually, and I wasn't going to pay for McAfee. That's when I pivoted. I went in expecting a GitHub repo from some stranger. It isn't. The [ClamAV docs](https://docs.clamav.net/) say it's brought to you by Cisco Systems, and there's real documentation, a [community project ecosystem](https://docs.clamav.net/manual/Installing/Community-projects.html), an updated signature database, and versions for Windows, macOS and Linux. It was also easy to install and run.
 
 What I didn't expect is that it isn't an app. The docs call it an open-source anti-virus toolkit, and in practice that's a small set of separate command-line pieces. `clamscan` scans on demand and exits, `clamd` is a background daemon that keeps the signatures loaded in memory, and `freshclam` handles signature updates. In my container `freshclam` runs as a daemon that checks once a day, `clamd` is running (I confirmed it with `ps`), and my scheduled job calls `clamscan`. There's no green checkmark. There's an exit code.
 
 Installing it was the easy part. The hard part was the setup around it: the scripts, what to run, what to exclude, and when. I leaned on Claude for most of that. The docs say it was designed especially for scanning email on mail gateways, which explains why it has plenty of users doing things I haven't thought of. I'm still not sure how else I'd use it.
 
-Two limits worth knowing before you trust it. The docs themselves say ClamAV isn't a traditional anti-virus or endpoint security suite. It only recognizes known malware, so a clean scan means "nothing matched," not "nothing's there." And as I read the docs, its real-time scanning (a component called ClamOnAcc) is a Linux feature that needs clamd, and I don't use it. Mine is a scheduled scan, twice a week, nothing more.
+Two limits worth knowing before you trust it. The docs themselves say ClamAV isn't a traditional anti-virus or endpoint security suite. It only recognizes known malware, so a clean scan means "nothing matched," not "nothing's there." And mine is a scheduled scan, twice a week, not real-time protection.
 
 ## Architecture & tech stack
 
@@ -66,7 +66,7 @@ Two AI tools were involved. **Gemini** came first: it walked me through the Anti
 
 Claude did the investigation: building the exclude-list logic, diagnosing a stuck process by reading its open file descriptors, and driving the Portainer console to test commands. What it does **not** do, by a hard rule I set going in, is log into DSM. Every Task Scheduler change, including the final production command, I typed in myself in DSM's own UI, and Claude only verified the result afterward through the container's read-only mount. Claude investigated, proposed and verified. I held the one set of credentials that could change something.
 
-Claude also got things wrong, and I'd rather say so than edit it out. Early on I told it to skip the `video` and `video2` folders and had to confirm that more than once before it stuck. When the browser session into Portainer dropped mid-verification, its first instinct was to retry quietly, which is exactly the kind of thing that should surface to a human. I told it so, and it changed behavior for the rest of the project. And I'd assumed a security job would email me after every run, when Task Scheduler was set to email only on failure. That one wasn't really Claude's miss or mine so much as a misunderstanding: I ticked the box thinking it was what Claude wanted, without checking what it meant for a scan that runs fine. Same pattern: an assumption nobody had verified against the real system.
+Claude also got things wrong, and I'd rather say so than edit it out. Early on I told it to skip the `video` and `video2` folders and had to confirm that more than once before it stuck. When the browser session into Portainer dropped mid-verification, its first instinct was to retry quietly, which is exactly the kind of thing that should surface to a human. I told it so, and it changed behavior for the rest of the project. And I'd assumed a security job would email me after every run, when Task Scheduler was set to email only on failure. That one wasn't really Claude's miss or mine so much as a misunderstanding: I ticked the box thinking it was what Claude wanted, without checking what it meant for a scan that runs fine.
 
 ## Key technical challenges
 
@@ -94,33 +94,33 @@ One gotcha inside the gotcha: `--max-filesize` has a hard internal ClamAV ceilin
 
 Three surprises, each one bites if you don't see it coming:
 
-It's a **directory-recursion filter, not a file filter** — a pattern that matches `@syslog-ng` as a directory does nothing to a loose file sitting at the volume root named `@syslog-ng.core.gz`. Synology drops a handful of crash-dump files exactly like that at the root of each volume, and every one of them gets scanned regardless of what you've excluded, because they're files, not directories.
+It's a **directory filter, not a file filter**. A pattern for `@syslog-ng` does nothing to a loose file named `@syslog-ng.core.gz` at the volume root, and Synology leaves several crash dumps like that, so they get scanned whatever you exclude.
 
-It's also a **prefix match, not an exact match** — `--exclude-dir=^/scandir/Plex` matches both `/scandir/Plex` and `/scandir/PlexMediaServer`. Convenient when you want that; a real trap if you assume it only matches the literal name.
+It's a **prefix match, not an exact match**. `--exclude-dir=^/scandir/Plex` also catches `/scandir/PlexMediaServer`.
 
-And there's **no way to un-exclude a subdirectory**. Once a broad pattern like `--exclude-dir=/@` matches a folder, there's no mechanism to carve out one subdirectory beneath it and scan just that — not even by passing that subdirectory as its own explicit target on the command line. The only fix is dropping the broad pattern entirely and enumerating every single folder you actually want excluded, one at a time. Which is exactly what caused the next problem.
+And there's **no way to un-exclude a subdirectory**. Once a broad pattern like `--exclude-dir=/@` matches a folder, you can't carve one subfolder back in, not even by naming it as a scan target. The only fix is to drop the broad pattern and list every folder you want excluded, one at a time. Which is exactly what caused the next problem.
 
 ### The scan that wouldn't die
 
-I wanted to add DSM's own package-data folders to the scan scope — the folders behind Docker and everything else installed through Package Center — which meant retiring the blanket `--exclude-dir=/@` pattern that had been quietly catching every Synology-internal folder up to that point. I replaced it with a hand-typed list of the "obvious" `@`-prefixed folders, based on what I remembered seeing in earlier `ls` output.
+I wanted to add DSM's package folders, where everything from Package Center lives, to the scan. That meant retiring the blanket `--exclude-dir=/@` pattern, and I replaced it with a hand-typed list of the "obvious" `@` folders, based on what I remembered from earlier `ls` output.
 
 A test run that should have taken a few minutes instead ran for **over an hour**, stuck in disk-sleep (`D`) state with no end in sight.
 
-Claude diagnosed it by reading the stuck process's open file descriptors directly — `ls -la /proc/<pid>/fd` shows exactly which file a process has open right now, which is a much more honest answer than anything in a log file:
+Claude diagnosed it by checking which file the stuck process had open (`ls -la /proc/<pid>/fd`), a more honest answer than any log file:
 
 ```
 /proc/7192/fd/4 -> /scandir/@synologydrive/@sync/repo/4/...
 ```
 
-`@synologydrive`, Synology Drive's internal sync chunk-store, had never made it onto my hand-typed list. I'd never actually seen it: it had scrolled off-screen during an earlier terminal review, along with a few other capitalized folders (`@AntiVirus`, `@SynoDrive`, `@S2S`) that sorted below the lowercase ones I remembered.
+`@synologydrive`, Synology Drive's internal sync store, wasn't on my list. It had scrolled off-screen during an earlier terminal review, along with a few capitalized folders (`@AntiVirus`, `@SynoDrive`, `@S2S`) I'd never noticed.
 
-I killed the process (`kill -9`) and had Claude run a full, unfiltered directory listing instead of trusting anyone's memory of one:
+I killed the process and had Claude stop guessing and ask the NAS itself what folders existed:
 
 ```bash
 find /scandir -maxdepth 1 -type d -iname '@*' > /tmp/v1all.txt
 ```
 
-That turned up **29** distinct `@`-prefixed folders on `/volume1` alone — not the roughly 15 either of us had assumed. The fix wasn't a smarter exclude pattern. It was refusing to hand-type a list a second time, and generating it programmatically instead:
+That turned up **29** `@` folders on `/volume1` alone, not the roughly 15 either of us had assumed. So the exclude list stopped being typed by hand and got generated from that listing instead:
 
 ```bash
 EXCL=""
@@ -132,7 +132,7 @@ for d in $(cat /tmp/v1all.txt) $(cat /tmp/v2all.txt); do
 done
 ```
 
-Six package folders stay in scope on each volume; everything else with an `@` gets excluded, generated from a real listing instead of a remembered one. The corrected scan finished clean in 53 minutes 55 seconds — 0 infected files, 58,775 files scanned across 8,800 directories. Two days later, the real DSM Task Scheduler job ran the same command unattended, on its actual Friday-11AM schedule, and matched it almost exactly: 53m54s, 0 infected, 58,778 files. First real confirmation the fix holds up without anyone watching it.
+Six package folders stay in scope on each volume, and every other `@` folder is excluded. The corrected scan finished clean in 53 minutes 55 seconds: 0 infected, 58,775 files. Two days later the real Task Scheduler job ran it unattended in its Friday 11AM slot and matched almost exactly (53m54s, 0 infected, 58,778 files), the first confirmation that the fix holds without anyone watching.
 
 Fifty-four minutes is also well past the roughly 21 I'd estimated from raw megabytes. My best explanation is that scan time follows file count, not size, and the package folders are a huge pile of small files. (More on that in the open items at the end.)
 
