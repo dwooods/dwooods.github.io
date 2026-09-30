@@ -45,13 +45,11 @@ Here's the scale of what I actually set up, so it looks less intimidating: one o
 
 ## ClamAV, for people who think antivirus is an app
 
-I didn't know ClamAV existed until Synology's own scanner stopped updating, I couldn't get it to refresh manually, and I wasn't going to pay for McAfee. That's when we pivoted. I went in expecting a GitHub repo from some stranger. It isn't. The [ClamAV docs](https://docs.clamav.net/) say it's brought to you by Cisco Systems, and there's real documentation, a [community project ecosystem](https://docs.clamav.net/manual/Installing/Community-projects.html), an updated signature database, and versions for Windows, macOS and Linux. It was also easy to install and run. The container image is about 240 MB and there's no big service to babysit. (It does hold its virus signatures in memory, so it isn't light on RAM. When I looked, the NAS showed a little over 2 GB in use.)
+I didn't know ClamAV existed until Synology's own scanner stopped updating, I couldn't get it to refresh manually, and I wasn't going to pay for McAfee. That's when I pivoted. I went in expecting a GitHub repo from some stranger. It isn't. The [ClamAV docs](https://docs.clamav.net/) say it's brought to you by Cisco Systems, and there's real documentation, a [community project ecosystem](https://docs.clamav.net/manual/Installing/Community-projects.html), an updated signature database, and versions for Windows, macOS and Linux. It was also easy to install and run. The container image is about 240 MB and there's no big service to babysit. (It does hold its virus signatures in memory, so it isn't light on RAM. When I looked, the NAS showed a little over 2 GB in use.)
 
 What I didn't expect is that it isn't an app. The docs call it an open-source anti-virus toolkit, and in practice that's a small set of separate command-line pieces. `clamscan` scans on demand and exits, `clamd` is a background daemon that keeps the signatures loaded in memory, and `freshclam` handles signature updates. In my container `freshclam` runs as a daemon that checks once a day, `clamd` is running (I confirmed it with `ps`), and my scheduled job calls `clamscan`. There's no green checkmark. There's an exit code.
 
 Installing it was the easy part. The hard part was the setup around it: the scripts, what to run, what to exclude, and when. I leaned on Claude for most of that. The docs say it was designed especially for scanning email on mail gateways, which explains why it has plenty of users doing things I haven't thought of. I'm still not sure how else I'd use it.
-
-My PC already has Windows Defender, which should cover most of what I need there. Yet when I tried ClamAV on the PC, it flagged a file in my Downloads folder that Defender never did. I still don't know whether that's a real problem or a false positive, which is its own lesson about getting a second opinion.
 
 Two limits worth knowing before you trust it. The docs themselves say ClamAV isn't a traditional anti-virus or endpoint security suite. It only recognizes known malware, so a clean scan means "nothing matched," not "nothing's there." And as I read the docs, its real-time scanning (a component called ClamOnAcc) is a Linux feature that needs clamd, and I don't use it. Mine is a scheduled scan, twice a week, nothing more.
 
@@ -64,13 +62,11 @@ Two limits worth knowing before you trust it. The docs themselves say ClamAV isn
 
 ### Tools & AI assist
 
-Two AI tools were involved. **Gemini** came first: it walked me through the Antivirus Essential dead end and suggested Portainer when Synology's Docker UI ran out of road. Most of the build then ran through **Claude Cowork**, in a single long-running conversation, the same pattern as the [Plex/Tailscale project](/posts/wagging-the-dog-tailscale-plex-vacation/) before it: no local repo, no code files, just a chat window and a browser session into the NAS. Since Docker was brand new to me, that conversation doubled as the tutorial.
+Two AI tools were involved. **Gemini** came first: it walked me through the Antivirus Essential dead end and suggested Portainer when Synology's Docker UI ran out of road, and its Nano Banana model drew the hero image from a prompt Claude wrote. Most of the build then ran through **Claude Cowork**, in a single long-running conversation, the same pattern as the [Plex/Tailscale project](/posts/wagging-the-dog-tailscale-plex-vacation/) before it: no local repo, no code files, just a chat window and a browser session into the NAS. Since Docker was brand new to me, that conversation doubled as the tutorial.
 
 Claude did the investigation: building the exclude-list logic, diagnosing a stuck process by reading its open file descriptors, and driving the Portainer console to test commands. What it does **not** do, by a hard rule I set going in, is log into DSM. Every Task Scheduler change, including the final production command, I typed in myself in DSM's own UI, and Claude only verified the result afterward through the container's read-only mount. Claude investigated, proposed and verified. I held the one set of credentials that could change something.
 
-Claude also got things wrong, and I'd rather say so than edit it out. Early on I told it to skip the `video` and `video2` folders and had to confirm that more than once before it stuck. When the browser session into Portainer dropped mid-verification, its first instinct was to retry quietly, which is exactly the kind of thing that should surface to a human. I told it so, and it changed behavior for the rest of the project. And I'd assumed a security job would email me after every run, when Task Scheduler was set to email only on failure. That one was on me, not Claude, but it's the same pattern: an assumption nobody had checked against the real system yet.
-
-The hero image is AI-made too. I asked Claude for an image prompt, ran it in Gemini's Nano Banana image model, and needed a second round because the first version cut the "SOS" off the edge of the monitor. The fluffy plush viruses are the only part of this project that turned out exactly as planned.
+Claude also got things wrong, and I'd rather say so than edit it out. Early on I told it to skip the `video` and `video2` folders and had to confirm that more than once before it stuck. When the browser session into Portainer dropped mid-verification, its first instinct was to retry quietly, which is exactly the kind of thing that should surface to a human. I told it so, and it changed behavior for the rest of the project. And I'd assumed a security job would email me after every run, when Task Scheduler was set to email only on failure. That one wasn't really Claude's miss or mine so much as a misunderstanding: I ticked the box thinking it was what Claude wanted, without checking what it meant for a scan that runs fine. Same pattern: an assumption nobody had verified against the real system.
 
 ## Key technical challenges
 
@@ -96,7 +92,7 @@ One gotcha inside the gotcha: `--max-filesize` has a hard internal ClamAV ceilin
 
 ### `--exclude-dir` doesn't mean what it sounds like it means
 
-Three surprises, each a footgun if you don't see it coming:
+Three surprises, each one bites if you don't see it coming:
 
 It's a **directory-recursion filter, not a file filter** — a pattern that matches `@syslog-ng` as a directory does nothing to a loose file sitting at the volume root named `@syslog-ng.core.gz`. Synology drops a handful of crash-dump files exactly like that at the root of each volume, and every one of them gets scanned regardless of what you've excluded, because they're files, not directories.
 
@@ -162,7 +158,7 @@ exit $rc
 
 ### The alert that had nothing to say
 
-I'd assumed a security job that runs twice a week would tell me how it went. It didn't. Task Scheduler had "send notification only when the script terminates abnormally" ticked (I believe that's the default), and a clean scan isn't abnormal, so a scan that finished fine sent nothing. I found out by waiting for an email after a run and getting silence, which is also exactly what a job that never ran looks like.
+I'd assumed a security job that runs twice a week would tell me how it went. It didn't. I had ticked "send notification only when the script terminates abnormally" myself, thinking that's what the job needed, and I misunderstood what it meant for a scan that runs fine: a clean scan isn't abnormal, so a scan that finished fine sent nothing. I found out by waiting for an email after a run and getting silence, which is also exactly what a job that never ran looks like.
 
 Did a *hit* count as abnormal? I dropped an EICAR file (a harmless, universally recognized antivirus test string, not real malware) into a scanned folder and ran a test task. `clamscan` exits with code `1` when it finds something, DSM emailed me, and the status read "1 (Interrupted)". So the failure path works. The body was empty, though, because the scan's output goes to a file and not to the terminal, so the email said *something* was found and nothing about what.
 
