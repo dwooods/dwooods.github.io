@@ -45,7 +45,7 @@ Here's the scale of what I actually set up, so it looks less intimidating: one o
 
 ## ClamAV, for people who think antivirus is an app
 
-I didn't know ClamAV existed until Synology's own scanner stopped updating, I couldn't get it to refresh manually, and I wasn't going to pay for McAfee. That's when I pivoted. I went in expecting a GitHub repo from some stranger. It isn't. The [ClamAV docs](https://docs.clamav.net/) say it's brought to you by Cisco Systems, and there's real documentation, a [community project ecosystem](https://docs.clamav.net/manual/Installing/Community-projects.html), an updated signature database, and versions for Windows, macOS and Linux. It was also easy to install and run.
+I didn't know ClamAV existed until Synology's own scanner stopped updating, I couldn't get it to refresh manually, and I wasn't going to pay for McAfee. That's when I pivoted. I went in expecting a GitHub repo from some stranger. It isn't. The [ClamAV docs](https://docs.clamav.net/) say it's brought to you by Cisco Systems, and there's real documentation, a [community project ecosystem](https://docs.clamav.net/manual/Installing/Community-projects.html), an updated signature database, and versions for Windows, macOS and Linux.
 
 What I didn't expect is that it isn't an app. The docs call it an open-source anti-virus toolkit, and in practice that's a small set of separate command-line pieces. `clamscan` scans on demand and exits, `clamd` is a background daemon that keeps the signatures loaded in memory, and `freshclam` handles signature updates. In my container `freshclam` runs as a daemon that checks once a day, `clamd` is running (I confirmed it with `ps`), and my scheduled job calls `clamscan`. There's no green checkmark. There's an exit code.
 
