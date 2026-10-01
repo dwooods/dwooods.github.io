@@ -179,8 +179,10 @@ Then ask it something. Three questions to start with:
 
 There's no repo for this one — it's a single artifact and a long conversation, not a code project. To see it working, the [sample-data version](https://claude.ai/artifact/PBQkes53zewq1pNiPGYxZY) is fully clickable — hover the charts, sort the columns, open a row. If you want to build something similar, start with the announcement that [Claude artifacts can call MCP connectors](https://x.com/ClaudeDevs/status/2077489907350856038), and Robinhood's [dividend tracker help article](https://robinhood.com/us/en/support/articles/dividends/) for what the app itself now offers. From there, the fastest spec I found was a screenshot of the app I was trying to improve on. If you've found a clean way to get dividend history or account-value history out of Robinhood's MCP server, I'd like to hear about it.
 
----
+## The Short Version
 
-The point of all this was one page that answers the questions I kept asking about this account: what is it paying me, and when. It does that now, in one glance, and when the question changes, the page can too.
-
-And the most sophisticated piece of engineering in the whole project is a rule that keeps my curiosity from hitting Robinhood's servers more than once an hour.
+{{< admonition type="abstract" title="TL;DR" open=true >}}
+- **The question:** what is this account paying me, and when? One page now answers it at a glance, and changes when my question does.
+- **Lines of code I wrote:** zero. **Versions I asked for:** sixteen. **Times I said "that's not what I meant":** more than sixteen.
+- **The most sophisticated engineering in the whole project:** a rule that stops me from checking my portfolio more than once an hour.
+{{< /admonition >}}
