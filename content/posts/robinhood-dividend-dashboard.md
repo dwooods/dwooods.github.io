@@ -85,15 +85,11 @@ There's a cartoon every product manager knows, and it's older than most of us: i
 
 The one-day chart is the best example. I asked for "the last 24 hours," and that's exactly what Claude built, with the points spread evenly across the width. It's also not what a one-day stock chart means. Next to Robinhood's 1D view the difference was obvious: Robinhood pins the chart to the trading day, 6:30am to 1pm Pacific, and the line stops at now, leaving the rest of the day blank. The rebuild did the same and measured the day's change from yesterday's close, the way Robinhood does. No test would have caught it, because the code did exactly what I asked.
 
-<p align="center"><img src="/images/income-book-evolution-05.png" alt="Version 9: the one-day portfolio chart covers only the morning so far, with the rest of the trading day left blank." style="max-width:100%;"></p>
+The same side-by-side caught a smaller one later: pick a range like 3M and the header should say "Past 3 months," not "Today." (It's measured on the reconstructed line, so it won't match the app's figure exactly.)
 
-*Version 9: the one-day view pinned to market hours. The line stops at “now,” the rest of the session stays empty, and the dotted line is yesterday’s close.*
+<p align="center"><img src="/images/dividend-dashboard-1d-iterations.png" alt="Three versions of the account chart. Version 7: the last 24 hours stretched across the full width. Version 9: the chart pinned to the trading day, with the line stopping at now and a dotted line at yesterday's close. Version 15: 3M selected, with the header reading the change over the past 3 months. Sample data." style="max-width:100%;"></p>
 
-Later the same side-by-side caught a smaller one: pick a range like 3M and the headline change should say "Past 3 months," not "Today," just as the app does. It's measured on the reconstructed line, so it won't match the app's figure exactly.
-
-<p align="center"><img src="/images/income-book-evolution-08.png" alt="Version 15: the account-value header with 3M selected, reading a gain over the past 3 months, with the green accent following the range's direction. Sample data." style="max-width:100%;"></p>
-
-*Version 15: pick a range and the header's change follows it, and the accent color follows that direction.*
+*One chart, three swings: what I asked for, what I pictured, and what I noticed once I had it.*
 
 ### A rule to protect Robinhood from me
 
