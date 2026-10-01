@@ -43,7 +43,9 @@ Except for the two Robinhood app screenshots in the dividend tracker section, ev
 
 ### Tools & AI Assist
 
-Claude wrote every line of HTML and JavaScript, made the Robinhood tool calls, and published each version of the page: sixteen of them over about two weeks, plus a shareable copy that runs on sample data. Every version is still recoverable, so the screenshots below are labeled by version and rendered on the same sample portfolio. At the end it also wrote up a decision journal from the build history, which is where most of the detail in this post came from. My part was deciding what the page should do, handing over Robinhood screenshots as the spec, and comparing each version against the real app. That last part matters more than it sounds, and it's where the best bugs got caught.
+Claude wrote every line of code, made every call to Robinhood and published all sixteen versions over about two weeks. Every version is still recoverable, which is why the screenshots below are labeled by version, and at the end Claude wrote up a decision journal that most of this post comes from.
+
+My part was deciding what I wanted to see and how I wanted to see it. I held the Robinhood app up next to each version, kept what I liked, and worked out what should be different. When the data had a gap, I proposed a way around it. I didn't want to build anything myself; I just knew what I wanted, which any product manager will tell you is the hard part. (Engineers may disagree.)
 
 ## The Product Decisions
 
