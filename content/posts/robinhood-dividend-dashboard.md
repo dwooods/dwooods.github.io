@@ -51,9 +51,9 @@ My part was deciding what I wanted to see and how I wanted to see it. I held the
 
 The interesting part of this project wasn't the engineering. It was a string of product calls (what to show, what to be honest about, what to copy) and a few roadblocks that needed a way around. The best example: at the time, neither Robinhood's app nor its MCP server showed what I'd been paid month by month, and Claude's first version didn't either. But the history was sitting in an export of my account activity, so I told Claude to use it and build the view Robinhood didn't have.
 
-### What the data gives you, and what it doesn't
+### What the MCP server gives you, and what it doesn't
 
-The core data is solid. Positions, cash, live quotes and each holding's dividend schedule (yield, payout frequency, next ex-dividend and pay dates) all came back reliably, and the price history is flexible enough to draw every chart on the page. The gaps showed up the moment I asked for the two things an income investor wants. Nothing says "you were paid this much, on this date, from this holding," and nothing gives account value over time, even though Robinhood's own app draws exactly that chart.
+Robinhood's MCP server handles the basics well. Positions, cash, live quotes, each holding's dividend schedule and price history all came back reliably, which was enough to draw every chart on the page. The gaps showed up the moment I asked for the two things an income investor wants most: what I've actually been paid, and what my account was worth over time. The MCP server has neither, even though Robinhood's own app draws that account-value chart.
 
 The export fix had its own twist. For a week the page carried a footnote warning that the export looked incomplete. The real explanation is further down, and it's a better story.
 
