@@ -2,7 +2,7 @@
 title: "Spec by Screenshot: Building a Dividend Dashboard on Robinhood's MCP Server"
 date: 2026-09-30
 draft: true
-tags: ["robinhood", "mcp", "claude", "cowork", "artifacts", "dividends", "personal-finance", "dataviz"]
+tags: ["robinhood", "mcp", "claude", "artifacts", "dividends", "personal-finance", "dataviz"]
 description: "How I built a live income dashboard for my Robinhood account with Claude, and the product decisions along the way: copying the real app, being honest about what the data can't show, and a rule that protects Robinhood from me."
 summary: "Robinhood's app is built for watching prices move. I wanted a page that answers a different question: what does this account pay me, and when? Most of the spec for that page turned out to be screenshots of Robinhood's own app."
 featuredImage: "/images/hero-income-book.jpeg"
@@ -15,7 +15,7 @@ I open Robinhood's app often. But a company's app can only show me how the compa
 
 None of my questions were about prices. The account that raises them is full of mortgage REITs, business development companies, a pipeline MLP and a covered-call ETF, and it exists to throw off income, not to be watched by the minute.
 
-So I built a page for those questions. I call it the Income Book. I didn't write any of the code; Claude did, inside Cowork. My job turned out to be something I'd do at work without thinking: product management, mostly by holding up a screenshot of Robinhood's app and saying "like this, but for income."
+So I built a page for those questions. I call it the Dividend Dashboard. I didn't write any of the code; Claude did. My job turned out to be something I'd do at work without thinking: product management, mostly by holding up a screenshot of Robinhood's app and saying "like this, but for income."
 
 Most of what's been written about Robinhood's MCP server is about letting AI trade for you. This post is about the other half: using it to see your account the way you actually think about it.
 
@@ -45,7 +45,7 @@ What's on the page, styled to look like it belongs inside Robinhood's app: a big
 
 ### Tools & AI Assist
 
-Claude, working in Cowork, wrote every line of HTML and JavaScript, made the Robinhood tool calls, and published each version of the page: sixteen of them over about two weeks, plus a shareable copy that runs on sample data. Every version is still recoverable, so the screenshots below are labeled by version and rendered on the same sample portfolio. At the end it also wrote up a decision journal from the build history, which is where most of the detail in this post came from. My part was deciding what the page should do, handing over Robinhood screenshots as the spec, and comparing each version against the real app. That last part matters more than it sounds, and it's where the best bugs got caught.
+Claude wrote every line of HTML and JavaScript, made the Robinhood tool calls, and published each version of the page: sixteen of them over about two weeks, plus a shareable copy that runs on sample data. Every version is still recoverable, so the screenshots below are labeled by version and rendered on the same sample portfolio. At the end it also wrote up a decision journal from the build history, which is where most of the detail in this post came from. My part was deciding what the page should do, handing over Robinhood screenshots as the spec, and comparing each version against the real app. That last part matters more than it sounds, and it's where the best bugs got caught.
 
 ## The Product Decisions
 
@@ -103,7 +103,7 @@ Another change was about how often the page talks to Robinhood. Every Refresh we
 
 ### Making it look like it belongs in the app
 
-Once the page did what I wanted, I asked for it to look like it belonged inside Robinhood. Partly that was so it would feel native to me, something I'd actually want to open next to the app. Partly it was so that a page I'd show people on LinkedIn would look finished, with real thought put into the experience, instead of a backend with a chart bolted on. Claude pulled the exact green and orange out of my screenshots and rebuilt the page flat, with no cards, hairline dividers and plain-text range tabs. Then I opened Chrome's inspector on robinhood.com and sent Claude screenshots of the styles panel, which turned out to be the real thing: Robinhood's colors, grays and type sizes are all sitting on the page as named variables, and the page now uses those values directly. My favorite detail: the site's primary color appears to follow the account's direction, orange on a down day and green on an up day. The Income Book does the same now, with one exception I asked for: the Refresh button stays Robinhood green no matter what the market is doing. Optimism is a design choice.
+Once the page did what I wanted, I asked for it to look like it belonged inside Robinhood. Partly that was so it would feel native to me, something I'd actually want to open next to the app. Partly it was so that a page I'd show people on LinkedIn would look finished, with real thought put into the experience, instead of a backend with a chart bolted on. Claude pulled the exact green and orange out of my screenshots and rebuilt the page flat, with no cards, hairline dividers and plain-text range tabs. Then I opened Chrome's inspector on robinhood.com and sent Claude screenshots of the styles panel, which turned out to be the real thing: Robinhood's colors, grays and type sizes are all sitting on the page as named variables, and the page now uses those values directly. My favorite detail: the site's primary color appears to follow the account's direction, orange on a down day and green on an up day. The Dividend Dashboard does the same now, with one exception I asked for: the Refresh button stays Robinhood green no matter what the market is doing. Optimism is a design choice.
 
 <p align="center"><img src="/images/income-book-evolution-07.png" alt="Version 13: Robinhood's design tokens and a green Refresh button." style="max-width:100%;"></p>
 
@@ -126,15 +126,15 @@ Per Robinhood's [help article](https://robinhood.com/us/en/support/articles/divi
 
 So of course I asked Claude to rebuild it. The forward-looking half is completely available through the MCP server: Robinhood's data includes each holding's dividend per share, how often it pays, and its next ex-dividend and pay dates. Projecting the rest of the year is just shares owned times the dividend, for every payment still due before December 31. Using nothing else, Claude's projection landed within about one percent of Robinhood's; NLY's annual projection matched to the cent; and the monthly bars came out in the same proportions. Fed the same per-holding received amounts Robinhood shows, the yielding-positions list matched line for line.
 
-<p align="center"><img src="/images/income-book-dividend-tracker.png" alt="The Income Book's version of the dividend tracker: year-to-date received, an annual projection, green actual and gray projected monthly bars, and a list of yielding positions with one expanded to show yield, dividend per share, received, annual projected and next dates. Sample data." style="max-width:100%;"></p>
+<p align="center"><img src="/images/income-book-dividend-tracker.png" alt="The Dividend Dashboard's version of the dividend tracker: year-to-date received, an annual projection, green actual and gray projected monthly bars, and a list of yielding positions with one expanded to show yield, dividend per share, received, annual projected and next dates. Sample data." style="max-width:100%;"></p>
 
-*The Income Book's copy of the tracker (version 14, with dollar amounts over each bar added in version 16), on the sample portfolio. Green is paid, gray is projected — same convention as Robinhood's.*
+*The Dividend Dashboard's copy of the tracker (version 14, with dollar amounts over each bar added in version 16), on the sample portfolio. Green is paid, gray is projected — same convention as Robinhood's.*
 
 The humbling part came from comparing the two. Robinhood's tracker said my Agentic account had received less than a sixth of what my dividends panel had been claiming for a week. The reason was sitting in the CSV the whole time: it was my *individual* account's export, not the Agentic account's. Its transfer rows show my positions moving into Agentic in July and August, so most of those dividends were paid before the move, in a different account. The TRIN dividend I thought was "missing" was paid after TRIN moved; the sale that wasn't in the file happened in Agentic. The export wasn't incomplete. It was faithfully reporting one account, and neither Claude nor I noticed until Robinhood's own feature showed a number that disagreed. What settled it was lining up my monthly statements: the export matched the individual account's statements to the cent, and the Agentic payments showed up in that account's own records.
 
 Side by side, the app's tracker is better than mine in one way that matters: it shows what the account has actually been paid, because it's Robinhood's app reading Robinhood's own data. Mine is only as good as what I feed it. That's a data gap, not a design gap.
 
-I'm not claiming mine is better than Robinhood's. It's a view that works for what I want. The app shows one stock's dividend card at a time, and the tracker's projected bars aren't something I can click into. The Income Book puts the same fields for every holding on one sortable page, next to price, cost and yield on cost. The app has the data, and mine has the shape I wanted.
+I'm not claiming mine is better than Robinhood's. It's a view that works for what I want. The app shows one stock's dividend card at a time, and the tracker's projected bars aren't something I can click into. The Dividend Dashboard puts the same fields for every holding on one sortable page, next to price, cost and yield on cost. The app has the data, and mine has the shape I wanted.
 
 Building it also taught me something about my own holdings: the yield on my purchases didn't match the yield Robinhood listed. The listed yield is a trailing figure, the last year of payouts against today's price. What I earn depends on what I paid and when, and if you keep buying through the year you only collect the dividends paid after each purchase. Claude explained that, and it's why the page shows yield on cost next to the listed yield.
 
