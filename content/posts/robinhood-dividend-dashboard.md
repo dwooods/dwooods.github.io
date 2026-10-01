@@ -37,7 +37,7 @@ Except for the two Robinhood app screenshots in the dividend tracker section, ev
 
 ### Tools & AI Assist
 
-Claude wrote every line of code, made every call to Robinhood and published all sixteen versions over about two weeks. Every version is still recoverable, which is why the screenshots below are labeled by version, and at the end Claude wrote up a decision journal that most of this post comes from.
+Claude wrote every line of code, made every call to Robinhood and published all sixteen versions over about two weeks. Every version is still recoverable, which is why the screenshots below are labeled by version. Claude also kept a decision journal as we went: what we changed, what we tried and dropped, and why. I now ask for one at the start of every project, because I never know which ones will turn into a blog post, and the conversation that built it may be three chats back by the time I write. Most of this post comes from that journal.
 
 My part was deciding what I wanted to see and how I wanted to see it. I held the Robinhood app up next to each version, kept what I liked, and worked out what should be different. When the data had a gap, I proposed a way around it. I didn't want to build anything myself; I just knew what I wanted, which any product manager will tell you is the hard part. (Engineers may disagree.)
 
