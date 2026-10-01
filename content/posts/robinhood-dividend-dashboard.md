@@ -99,13 +99,15 @@ That's caching: keep a copy of an answer so you don't have to ask for it every t
 
 ### Making it look like it belongs in the app
 
-Once the page did what I wanted, I asked for it to look like it belonged inside Robinhood. I wanted it to look finished, with real thought put into the experience, not a backend with a chart bolted on. And since the data came from Robinhood's MCP server, and Robinhood already had a whole design system sitting right there, borrowing it made sense. Claude pulled the exact green and orange out of my screenshots and rebuilt the page flat, with no cards, hairline dividers and plain-text range tabs. Then I opened Chrome's inspector on robinhood.com and sent Claude screenshots of the styles panel, which turned out to be the real thing: Robinhood's colors, grays and type sizes are all sitting on the page as named variables, and the page now uses those values directly. My favorite detail: the site's primary color appears to follow the account's direction, orange on a down day and green on an up day. The Dividend Dashboard does the same now, with one exception I asked for: the Refresh button stays Robinhood green no matter what the market is doing. Optimism is a design choice.
+Once the page did what I wanted, I wanted it to look finished, not like a backend with a chart bolted on. The data came from Robinhood, and Robinhood already has a design system, so why not borrow it? I opened Chrome's inspector on robinhood.com and found the real thing: Robinhood's colors and type sizes, sitting right there as named variables. The page uses them now.
+
+My favorite detail: Robinhood's accent color turns orange on a down day and green on an up day. Mine does too, with one exception. The Refresh button stays green no matter what the market does. Optimism is a design choice.
 
 <p align="center"><img src="/images/income-book-evolution-07.png" alt="Version 13: Robinhood's design tokens and a green Refresh button." style="max-width:100%;"></p>
 
-*Version 13: Robinhood's own color and type values from the browser inspector, an accent that follows the day's direction, and a Refresh button that stays green regardless.*
+*Version 13: Robinhood's colors and type, and a Refresh button that stays green regardless.*
 
-The one thing I couldn't copy is the font. Robinhood's typeface is licensed, so the page asks for it first and falls back to Inter, which is what almost everyone will actually see.
+The one thing I couldn't copy is the font. Robinhood's is licensed, so mine falls back to Inter.
 
 ## Then Robinhood Shipped a Dividend Tracker
 
