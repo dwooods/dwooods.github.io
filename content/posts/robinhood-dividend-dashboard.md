@@ -59,15 +59,15 @@ The export fix had its own twist. For a week the page carried a footnote warning
 
 ### Designing by screenshot
 
-Most of the design happened one request at a time, and most requests were a screenshot.
+The page started with the details: a table of every holding and what it pays. The longer I looked at it, the more I wanted the big picture first, with the numbers rolled up at the top and the details a click away. That's the same drill-down Robinhood's app already uses, so most of the redesign was me sending Claude a screenshot of the app and saying "that."
 
 <p align="center"><img src="/images/income-book-evolution-01.png" alt="Version 4: serif headline font, four stat cards, a holdings bar chart, and sort buttons above the Positions table." style="max-width:100%;"></p>
 
 *Version 4, where this story starts: rounded cards, a serif headline, a bar chart of holdings, and three buttons for sorting the table.*
 
-Sortable columns came first. The only real decision was to rip out the three "sort by" buttons the page already had and make every column header clickable, since two ways to sort the same table is one too many. For the per-stock chart I asked Claude for a design opinion: a drop-down under the row, or a separate chart section? Claude argued for the drop-down and I agreed. The chart stays next to the numbers you were just reading, only one opens at a time, and it keeps your chosen range when you open the next stock, so comparing two holdings is one click.
+Inside the table, I swapped the three "sort by" buttons for clickable column headers, since two ways to sort one table is one too many. I asked Claude whether a stock's chart should drop open under its row or live in its own section. Claude argued for the drop-down, and it was right: the chart sits next to the numbers you were just reading.
 
-Then I sent a screenshot of Robinhood's stock list with its little inline charts, and a screenshot of its account chart, and asked for both. The little charts became a "Today" column. The big chart became the headline of the page, and the most interesting problem in the project.
+Then came the roll-up. I sent screenshots of Robinhood's account chart and its stock list with little inline charts, and asked for both. The big chart became the top of the page, and the most interesting problem in the project. The little charts became a "Today" column.
 
 <p align="center"><img src="/images/income-book-evolution-03.png" alt="Version 7: a portfolio-value chart across the top with range buttons, and three stat cards below it." style="max-width:100%;"></p>
 
