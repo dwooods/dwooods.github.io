@@ -79,19 +79,17 @@ Robinhood draws an account-value chart. The MCP server doesn't expose one. So th
 
 That produces a line that looks exactly like Robinhood's chart and doesn't mean the same thing. It's what my current portfolio *would have been worth* over that period, not what my account actually was worth, so any time I bought or sold during the range, the line is wrong. It looks authoritative, it's reconstructed, and nothing about the picture tells you which. Claude flagged this before I did, and we shipped it with a footnote directly under the chart saying exactly that. I'd rather have an honest approximation than a convincing one.
 
-### Where the real app caught what testing couldn't
+### What I asked for vs. what I pictured
 
-Two problems came from holding the real app next to ours, and both are the kind that pass every test you think to write.
+There's an old cartoon every product manager knows: a tree swing drawn the way the customer explained it, the way the project lead understood it, the way the programmer built it, and so on, until the last panel shows what the customer actually needed, which is a tire on a rope. I was the customer this time, and I still got a few wrong swings. What I asked for kept turning out to be not quite what I'd pictured, which is why there are sixteen versions.
 
-The first was small, and Claude caught it on its own: a date mix-up that would have put every chart label a day off. The second was mine to catch. The one-day chart had been built as "the last 24 hours," with points spaced evenly across the width. That's literally what I'd asked for, and it's not what a one-day stock chart means. I put a screenshot of Robinhood's 1D view next to ours: Robinhood pins the chart to the trading day, 6:30am to 1pm Pacific, and the line only runs as far as *now*, leaving the rest of the day blank. Ours stretched whatever data existed across the whole width.
-
-The rebuild pinned every one-day view to the trading session and changed the dotted reference line from "the first price on the chart" to "yesterday's close," so the day's change means what it means in Robinhood.
+The one-day chart is the best example. I asked for "the last 24 hours," and that's exactly what Claude built, with the points spread evenly across the width. It's also not what a one-day stock chart means. Next to Robinhood's 1D view the difference was obvious: Robinhood pins the chart to the trading day, 6:30am to 1pm Pacific, and the line stops at now, leaving the rest of the day blank. The rebuild did the same and measured the day's change from yesterday's close, the way Robinhood does. No test would have caught it, because the code did exactly what I asked.
 
 <p align="center"><img src="/images/income-book-evolution-05.png" alt="Version 9: the one-day portfolio chart covers only the morning so far, with the rest of the trading day left blank." style="max-width:100%;"></p>
 
 *Version 9: the one-day view pinned to market hours. The line stops at “now,” the rest of the session stays empty, and the dotted line is yesterday’s close.*
 
-Later the same side-by-side caught something smaller: pick a range like 3M and the headline change should say "Past 3 months," not "Today," just as the app does. It's measured on the reconstructed line, so it won't match the app's figure exactly.
+Later the same side-by-side caught a smaller one: pick a range like 3M and the headline change should say "Past 3 months," not "Today," just as the app does. It's measured on the reconstructed line, so it won't match the app's figure exactly.
 
 <p align="center"><img src="/images/income-book-evolution-08.png" alt="Version 15: the account-value header with 3M selected, reading a gain over the past 3 months, with the green accent following the range's direction. Sample data." style="max-width:100%;"></p>
 
