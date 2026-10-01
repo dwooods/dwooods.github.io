@@ -27,7 +27,7 @@ The whole thing is one web page that lives in my Claude account. Click Refresh a
 
 I expected to lose a weekend to hosting, a database and somewhere safe to keep a password. I lost none. Claude built the page, published it and gave it a small database, all inside Claude.
 
-What's on it: an account-value chart, today's change, unrealized gain, estimated annual income, holdings ranked by size, a Positions table with a tiny chart in every row, and a dividend tracker. Click a row and that stock's chart drops open. Hover over any chart and it reads out the date and value, just like Robinhood's.
+What's on it: account value, today's change, estimated income, a Positions table with a tiny chart in every row, and a dividend tracker. Click a row and that stock's chart drops open. Hover over any chart and it reads out the date and value, just like Robinhood's.
 
 {{< admonition type="info" title="Sample data, not my account" open=true >}}
 Except for the two Robinhood app screenshots in the dividend tracker section, every screenshot in this post runs on the same made-up sample portfolio, not my account. The tickers are real; the share counts, prices and dollar amounts are not.
@@ -164,7 +164,7 @@ Then ask it something. Three questions to start with:
 If you want to go further:
 
 - **See it working:** the [sample-data version](https://claude.ai/artifact/PBQkes53zewq1pNiPGYxZY) is fully clickable.
-- **Build your own:** start with [Claude artifacts calling MCP connectors](https://x.com/ClaudeDevs/status/2077489907350856038), then hold up a screenshot of the app you're trying to improve on. There's no repo; this was one artifact and a long conversation.
+- **Build your own:** start with [Claude's announcement](https://x.com/ClaudeDevs/status/2077489907350856038) that its pages can pull live data from connected services, then hold up a screenshot of the app you're trying to improve on. There's no repo; this was one artifact and a long conversation.
 - **Found a clean way** to get dividend history or account-value history out of Robinhood's MCP server? I'd like to hear about it.
 
 ## TL;DR
