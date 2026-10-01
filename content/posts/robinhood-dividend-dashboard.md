@@ -114,15 +114,13 @@ I'm not claiming mine is better. The app has an edge that matters: it reads Robi
 
 That last one taught me something about my own holdings. The yield Robinhood lists is the last year of payouts against today's price. What I actually earn depends on what I paid, so the page shows both.
 
-### If you compare your numbers with the app's
-
-Three things will make your numbers and the app's disagree, even when both are right.
-
-**Everything is per account.** The tracker, the export and the MCP data are all scoped to one account. If you've moved positions between accounts — say, into an Agentic account — your dividend history is split across them, and it's very easy to pull the wrong one (ask me how I know).
-
-**Payment dates can move.** Robinhood's [Early Dividends](https://finance.yahoo.com/news/robinhood-breaking-wall-street-paying-222238237.html) program can release eligible dividends about 17 days early, according to Robinhood, so a projection keyed to official pay dates, like mine, can put a payment in a different month than the tracker does.
-
-**"Annual income" means different things.** Robinhood's annual projection is what you've received this year plus what's still scheduled; my stat tile's market value times yield is a run rate. The two won't match.
+{{< admonition type="tip" title="Why my numbers and the app's don't match (and both are right)" open=true >}}
+| | Robinhood's tracker | My page |
+|---|---|---|
+| **Accounts** | One at a time | Both, combined |
+| **Pay dates** | Can pay up to ~17 days early ([Early Dividends](https://finance.yahoo.com/news/robinhood-breaking-wall-street-paying-222238237.html)) | Official pay dates |
+| **"Annual income"** | Paid this year + still scheduled | Market value × yield (a run rate) |
+{{< /admonition >}}
 
 ## What I'd Ask Robinhood For
 
