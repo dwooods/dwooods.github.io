@@ -1,7 +1,7 @@
 ---
 title: "Spec by Screenshot: Building a Dividend Dashboard on Robinhood's MCP Server"
-date: 2026-09-30
-draft: true
+date: 2026-10-01
+draft: false
 tags: ["robinhood", "mcp", "claude", "artifacts", "dividends", "personal-finance", "dataviz"]
 description: "How I built a live income dashboard for my Robinhood account with Claude, and the product decisions along the way: copying the real app, being honest about what the data can't show, and a rule that protects Robinhood from me."
 summary: "Robinhood's app is built for watching prices move. I wanted a page that answers a different question: what does this account pay me, and when? Most of the spec for that page turned out to be screenshots of Robinhood's own app."
@@ -9,15 +9,15 @@ featuredImage: "/images/hero-income-book.jpeg"
 featuredImagePreview: "/images/hero-income-book.jpeg"
 ---
 
-I kept asking Claude the same questions about one Robinhood account. When does each dividend pay? What is each one paying? How much have I made this year? The answers were right, and a week later I'd ask again. None of the questions were about prices. The account is full of mortgage REITs, business development companies, a pipeline MLP and a covered-call ETF, and it exists to throw off income, not to be watched by the minute. Robinhood's app is built for watching.
-
-Most of what's been written about Robinhood's MCP server is about letting AI trade for you. This post is about the other half: using it to see your account the way you actually think about it.
+I kept asking Claude the same questions about one Robinhood account. When does each dividend pay? What is each one paying? How much have I made this year? The answers were right, and a week later I'd ask again. None of the questions were about prices. The account is full of mortgage REITs, business development companies, a pipeline MLP and a covered-call ETF, and it exists to throw off income, not to be watched by the minute. Robinhood's app is built for watching, and most of what's been written about its MCP server is about letting AI trade for you. This post is about the other half: using it to see your account the way you actually think about it.
 
 So I built a page for those questions. I call it the Dividend Dashboard. I didn't write any of the code; Claude did. My job turned out to be something I'd do at work without thinking: product management, mostly by holding up a screenshot of Robinhood's app and saying "I like this, but it doesn't show me what I'm getting paid."
 
 ## Why I Built This
 
-This account is money I had to spare, not my retirement. A financial advisor handles that, and for now it isn't changing. I've been a Robinhood customer since 2017, long before AI assistants like Claude, because there are no commissions, so trying something out doesn't come with a fee. When Robinhood launched [Agentic Trading](https://robinhood.com/us/en/support/articles/agentic-trading-overview/), it published an official MCP server, the same open protocol Claude uses to talk to outside tools, and a dedicated Agentic account that AI agents connect to. An agent can read my account data, and any trade it places can only land in that account. That's a low-stakes way to use AI with my own money, and it has made me a little more comfortable. I do wonder: if this works out, could AI help with my retirement too? I'd rather find out first with money that matters less if the AI gets something wrong.
+This account is money I had to spare, not my retirement. A financial advisor handles that, and for now it isn't changing. I've been a Robinhood customer since 2017, long before AI assistants like Claude, because there are no commissions, so trying something out doesn't come with a fee.
+
+When Robinhood launched [Agentic Trading](https://robinhood.com/us/en/support/articles/agentic-trading-overview/), it published an official MCP server, the same open protocol Claude uses to talk to outside tools, and a dedicated Agentic account that AI agents connect to. An agent can read my account data, and any trade it places can only land in that account. That's a low-stakes way to use AI with my own money. I do wonder: if this works out, could AI help with my retirement too? I'd rather find out first with money that matters less if the AI gets something wrong.
 
 Few brokerages offer an MCP server; Fidelity, Schwab and E\*TRADE [don't as of this writing](https://www.stockbrokers.com/guides/ai-agent-brokers). Robinhood has since added a dividend tracker of its own, which I'll get to.
 
@@ -35,15 +35,13 @@ Except for the two Robinhood app screenshots in the dividend tracker section, ev
 
 <p align="center"><img src="/images/income-view-concept-positions.png" alt="The Positions table with AGNC expanded to a three-month chart, cursor reading a single day's value. Sample portfolio, not real numbers." style="max-width:100%;"></p>
 
-### Tools & AI Assist
-
 Claude wrote every line of code, made every call to Robinhood and published all sixteen versions over about two weeks. Every version is still recoverable, which is why the screenshots below are labeled by version. Claude also kept a decision journal as we went: what we changed, what we tried and dropped, and why. I now ask for one at the start of every project, because I never know which ones will turn into a blog post, and the conversation that built it may be three chats back by the time I write. Most of this post comes from that journal.
 
 My part was deciding what I wanted to see and how I wanted to see it. I held the Robinhood app up next to each version, kept what I liked, and worked out what should be different. When the data had a gap, I proposed a way around it. I didn't want to build anything myself; I just knew what I wanted, which any product manager will tell you is the hard part. (Engineers may disagree.)
 
 ## The Product Decisions
 
-The interesting part of this project wasn't the engineering. It was a string of product calls (what to show, what to be honest about, what to copy) and a few roadblocks that needed a way around. The MCP server handled the basics well: positions, cash, live quotes, each holding's dividend schedule and price history, enough to draw every chart on the page. What it didn't have was the two things an income investor wants most, what I've actually been paid and what the account was worth over time. The first I solved with an export of my account activity. The second is a story of its own below.
+The interesting part of this project wasn't the engineering. It was a string of product calls (what to show, what to be honest about, what to copy) and a few roadblocks that needed a way around. The MCP server handled the basics well: positions, cash, live quotes, each holding's dividend schedule and price history, enough to draw every chart on the page. What it didn't have was the two things an income investor wants most, what I've actually been paid and what the account was worth over time. The first I solved with an export of my account activity. The second I had to reconstruct, and the reconstruction is honest about what it is.
 
 ### Designing by screenshot
 
@@ -92,7 +90,7 @@ It's basically the income half of my page. Type "Dividend tracker" into the app'
 
 *Robinhood's app: one stock's Dividends card on the left, the Dividend tracker on the right. These are screenshots from my own account, with the dollar amounts and share counts covered.*
 
-So of course I asked Claude to rebuild it, with the same playbook as before: a screenshot and "that." The forward-looking half is all in the MCP server: each holding's dividend per share, how often it pays, and when. Shares times dividend, for every payment left this year, landed within about one percent of Robinhood's projection, and NLY matched to the cent.
+So of course I asked Claude to rebuild it, with the same playbook as before. The forward-looking half is all in the MCP server: each holding's dividend per share, how often it pays, and when. Shares times dividend, for every payment left this year, landed within about one percent of Robinhood's projection, and NLY matched to the cent.
 
 <p align="center"><img src="/images/income-book-dividend-tracker.png" alt="The Dividend Dashboard's version of the dividend tracker: year-to-date received, an annual projection, green actual and gray projected monthly bars, and a list of yielding positions with one expanded to show yield, dividend per share, received, annual projected and next dates. Sample data." style="max-width:100%;"></p>
 
@@ -129,12 +127,6 @@ I'd rather show than tell, so Claude built a shareable copy of the page on a mad
 
 <p align="center"><strong><a href="https://claude.ai/artifact/PBQkes53zewq1pNiPGYxZY">Open the live concept &rarr;</a></strong><br><em>Hover the charts, sort the columns, open a row. Sample data only.</em></p>
 
-## Beyond Robinhood: Everything Else I Own
-
-Robinhood is one of many places my money lives. There's property, a company 401(k) and other retirement accounts with my financial advisor, a stock plan from a former employer, short-term notes and savings. Getting the full picture used to mean logging into each one and doing the math in my head. My head is not a great spreadsheet. Now Robinhood connects live, and for everything else I hand Claude a screenshot or a statement and it turns them into rows I can ask questions about. It's clumsy: a screenshot is stale the next day, and I'm the integration layer.
-
-Most finance tools seem built for one of two people: someone who wants one reassuring number, or a full-time investor who wants a terminal. I'm neither. I want one view across everything I own that I can reshape when a new question comes up. Live data where there's a server, uploads where there isn't, and a view that changes on request: it's rough, but it's the first time I've seen my money the way I actually think about it.
-
 ## Lessons Learned & What's Next
 
 **The data lesson: know your source of truth.** Three times the page looked right and wasn't. I never asked which account the export covered, the first numbers went stale without looking stale, and the account chart looked like Robinhood's while meaning something else. The fix was always the same: decide what's real, treat everything else as an approximation, and say so on the page. Stale data that looks live is worse than an empty box.
@@ -142,6 +134,10 @@ Most finance tools seem built for one of two people: someone who wants one reass
 **The AI lesson: it builds what you ask, not what you meant.** Claude was fast and careful. It checked real data, flagged the reconstructed chart before I did, and told me what it had and hadn't tested. But it built the one-day chart exactly as I described it, and my description was wrong. Getting to a working version took minutes. Deciding whether it meant what I thought was still my job.
 
 **The product lesson: the loop beats the dashboard.** The best changes came from a simple loop: notice a question, change the view, look again. Most of them started with putting my page next to the real app and asking why the two disagreed. You can't loop with someone else's app, because you can't change it.
+
+**Beyond Robinhood: everything else I own.** Robinhood is one of many places my money lives. There's property, a company 401(k) and other retirement accounts with my financial advisor, a stock plan from a former employer, short-term notes and savings. Getting the full picture used to mean logging into each one and doing the math in my head. My head is not a great spreadsheet. Now Robinhood connects live, and for everything else I hand Claude a screenshot or a statement and it turns them into rows I can ask questions about. It's clumsy: a screenshot is stale the next day, and I'm the integration layer.
+
+Most finance tools seem built for one of two people: someone who wants one reassuring number, or a full-time investor who wants a terminal. I'm neither. I want one view across everything I own that I can reshape when a new question comes up. Live data where there's a server, uploads where there isn't, and a view that changes on request: it's rough, but it's the first time I've seen my money the way I actually think about it.
 
 **What's next: looking vs. acting.** At [HOOD Summit '26](https://robinhood.com/us/en/newsroom/hood-summit-2026/), Robinhood announced built-in agents that research and trade for you, plus "Loops" that turn a strategy into a standing instruction; [Fortune](https://fortune.com/2026/09/29/robinhood-trading-agents-hood-openai-anthropic/) reports more than 150,000 agentic accounts opened since May. Loops is a loop for acting; mine is a loop for looking.
 
@@ -153,7 +149,7 @@ If you use Robinhood, the thing I'd most like you to take from this is to try th
 
 1. **Add the connector.** In the Claude desktop app, go to Settings → Connectors → Add custom connector and paste `https://agent.robinhood.com/mcp/trading`. ChatGPT, Cursor and Claude Code work too; Robinhood's [setup article](https://robinhood.com/us/en/support/articles/agentic-trading-overview/) has the steps for each.
 2. **Sign in through Robinhood.** Connecting sends you to Robinhood to log in, so the assistant never sees your password. You need an individual investing account in good standing.
-3. **Finish the Agentic account setup** that opens after you connect, and know what you're granting: per Robinhood, the assistant can read all your Robinhood accounts, including account numbers, but can only place trades in the Agentic account.
+3. **Finish the Agentic account setup.** Know what you're granting: the assistant can read all your Robinhood accounts but can only trade in the Agentic one.
 
 Then ask it something. Three questions to start with:
 
