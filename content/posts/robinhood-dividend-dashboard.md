@@ -59,27 +59,15 @@ The export fix had its own twist. For a week the page carried a footnote warning
 
 ### Designing by screenshot
 
-The page started with the details: a table of every holding and what it pays. The longer I looked at it, the more I wanted the big picture first, with the numbers rolled up at the top and the details a click away. That's the same drill-down Robinhood's app already uses, so most of the redesign was me sending Claude a screenshot of the app and saying "that."
+The page started with the details (1): a table of every holding and what it pays. The longer I looked at it, the more I wanted the big picture first, with the numbers rolled up at the top and the details a click away. That's the same drill-down Robinhood's app already uses, so most of the redesign was me sending Claude a screenshot of the app and saying "that."
 
-<p align="center"><img src="/images/income-book-evolution-01.png" alt="Version 4: serif headline font, four stat cards, a holdings bar chart, and sort buttons above the Positions table." style="max-width:100%;"></p>
+<p align="center"><img src="/images/dividend-dashboard-design-steps.png" alt="Three versions of the page. Version 4: a serif headline, stat cards and a bar chart of holdings. Version 7: an account-value chart across the top. Version 13: Robinhood's colors and type, with a green Refresh button. Sample data." style="max-width:100%;"></p>
 
-*Version 4, where this story starts: rounded cards, a serif headline, a bar chart of holdings, and three buttons for sorting the table.*
+*From the details, to the big picture, to Robinhood's look. All sample data.*
 
-Inside the table, I swapped the three "sort by" buttons for clickable column headers, since two ways to sort one table is one too many. I asked Claude whether a stock's chart should drop open under its row or live in its own section. Claude argued for the drop-down, and it was right: the chart sits next to the numbers you were just reading.
+Inside the table, I swapped the three "sort by" buttons for clickable column headers, since two ways to sort one table is one too many. Claude argued that a stock's chart should drop open under its row instead of living in its own section, and it was right: the chart sits next to the numbers you were just reading.
 
-Then came the roll-up. I sent screenshots of Robinhood's account chart and its stock list with little inline charts, and asked for both. The big chart became the top of the page, and the most interesting problem in the project. The little charts became a "Today" column.
-
-<p align="center"><img src="/images/income-book-evolution-03.png" alt="Version 7: a portfolio-value chart across the top with range buttons, and three stat cards below it." style="max-width:100%;"></p>
-
-*Version 7: the portfolio chart takes over the top of the page, and every row gains a tiny Today chart.*
-
-### The chart that has to admit it's a reconstruction
-
-Robinhood draws an account-value chart. The MCP server doesn't expose one. So there's only one way to draw it from the outside: take each holding's price history, multiply by how many shares I own *today*, add cash, and add it all up.
-
-That produces a line that looks exactly like Robinhood's chart and doesn't mean the same thing. It's what my current portfolio *would have been worth* over that period, not what my account actually was worth, so any time I bought or sold during the range, the line is wrong. It looks authoritative, it's reconstructed, and nothing about the picture tells you which. Claude flagged this before I did, and we shipped it with a footnote directly under the chart saying exactly that. I'd rather have an honest approximation than a convincing one.
-
-### What I asked for vs. what I pictured
+Then came the roll-up (2): an account chart across the top and a tiny "Today" chart in every row, both copied from screenshots of the app. The big chart came with a catch. The MCP server has no account-value history, so the only way to draw it is to take each holding's price history, multiply by what I own *today*, and add it up. That line looks exactly like Robinhood's chart and means something different: it's what today's portfolio would have been worth, not what my account was. Claude flagged it before I did, so it ships with a footnote saying so. I'd rather have an honest approximation than a convincing one.
 
 There's a cartoon every product manager knows, and it's older than most of us: it first ran in a [1973 University of London Computer Centre newsletter](https://www.businessballs.com/amusement-stress-relief/tree-swing-cartoon-pictures-early-versions/). It shows a tree swing drawn the way the customer explained it, the way the project lead understood it, the way the programmer built it, and so on, until the last panel shows what the customer actually needed, which is a tire on a rope. I was the customer this time, and I still got a few wrong swings. What I asked for kept turning out to be not quite what I'd pictured, which is why there are sixteen versions.
 
@@ -91,23 +79,15 @@ The same side-by-side caught a smaller one later: pick a range like 3M and the h
 
 *One chart, three swings: what I asked for, what I pictured, and what I noticed once I had it.*
 
+Once the page did what I wanted, I wanted it to look finished (3), not like a backend with a chart bolted on. The data came from Robinhood, and Robinhood already has a design system, so why not borrow it? I opened Chrome's inspector on robinhood.com and found the real thing: Robinhood's colors and type sizes, sitting right there as named variables. The page uses them now.
+
+My favorite detail: Robinhood's accent color turns orange on a down day and green on an up day. Mine does too, with one exception. The Refresh button stays green no matter what the market does. Optimism is a design choice. The one thing I couldn't copy is the font. Robinhood's is licensed, so mine falls back to Inter.
+
 ### A rule to protect Robinhood from me
 
 The early versions had a problem I didn't catch right away: Claude had baked the numbers from its first pull into the page itself. For a week the page kept showing those holdings, and they looked just as current as a fresh pull. So I asked Claude to store the data properly and check how old it was.
 
 That's caching: keep a copy of an answer so you don't have to ask for it every time. It makes the page faster and means fewer calls to Robinhood. The trade-off is that the copy can go stale, so you have to decide how old is too old. (Claude's connection to Robinhood keeps a few minutes of its own cache, but the page is mine, so I wanted it handled on my side.) I picked an hour. Under an hour, Refresh says the data is fresh and makes no calls; after that, it pulls again. If a pull fails, the page keeps the last saved data instead of going blank, and an empty page says "click Refresh" instead of passing off week-old numbers as today's. Less pretty, more honest, and a dashboard has no business hitting someone else's servers every time I get curious.
-
-### Making it look like it belongs in the app
-
-Once the page did what I wanted, I wanted it to look finished, not like a backend with a chart bolted on. The data came from Robinhood, and Robinhood already has a design system, so why not borrow it? I opened Chrome's inspector on robinhood.com and found the real thing: Robinhood's colors and type sizes, sitting right there as named variables. The page uses them now.
-
-My favorite detail: Robinhood's accent color turns orange on a down day and green on an up day. Mine does too, with one exception. The Refresh button stays green no matter what the market does. Optimism is a design choice.
-
-<p align="center"><img src="/images/income-book-evolution-07.png" alt="Version 13: Robinhood's design tokens and a green Refresh button." style="max-width:100%;"></p>
-
-*Version 13: Robinhood's colors and type, and a Refresh button that stays green regardless.*
-
-The one thing I couldn't copy is the font. Robinhood's is licensed, so mine falls back to Inter.
 
 ## Then Robinhood Shipped a Dividend Tracker
 
