@@ -167,9 +167,9 @@ If you want to go further:
 - **Build your own:** start with [Claude artifacts calling MCP connectors](https://x.com/ClaudeDevs/status/2077489907350856038), then hold up a screenshot of the app you're trying to improve on. There's no repo; this was one artifact and a long conversation.
 - **Found a clean way** to get dividend history or account-value history out of Robinhood's MCP server? I'd like to hear about it.
 
-## The Short Version
+## TL;DR
 
-{{< admonition type="abstract" title="TL;DR" open=true >}}
+{{< admonition type="abstract" title="The whole post in three lines" open=true >}}
 - **The question:** what is this account paying me, and when? One page now answers it at a glance, and changes when my question does.
 - **Lines of code I wrote:** zero. **Versions I asked for:** sixteen. **Times I said "that's not what I meant":** more than sixteen.
 - **The most sophisticated engineering in the whole project:** a rule that stops me from checking my portfolio more than once an hour.
