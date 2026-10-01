@@ -93,7 +93,9 @@ The same side-by-side caught a smaller one later: pick a range like 3M and the h
 
 ### A rule to protect Robinhood from me
 
-Another change was about how often the page talks to Robinhood. Every Refresh went straight to Robinhood, and a dashboard has no business hitting someone else's servers every time I get curious, so I asked for the page to remember what it last pulled and only go back if that's more than an hour old. Under an hour, Refresh says so and makes no calls. If a pull fails, the page keeps showing the last saved data instead of going blank. That came from a real mistake: for a week, the page's saved copy kept showing old holdings, and it looked just as current as a fresh pull. An empty page now says "click Refresh" instead of showing week-old holdings as if they were today's, which is less pretty and more honest.
+The early versions had a problem I didn't catch right away: Claude had baked the numbers from its first pull into the page itself. For a week the page kept showing those holdings, and they looked just as current as a fresh pull. So I asked Claude to store the data properly and check how old it was.
+
+That's caching: keep a copy of an answer so you don't have to ask for it every time. It makes the page faster and means fewer calls to Robinhood. The trade-off is that the copy can go stale, so you have to decide how old is too old. (Claude's connection to Robinhood keeps a few minutes of its own cache, but the page is mine, so I wanted it handled on my side.) I picked an hour. Under an hour, Refresh says the data is fresh and makes no calls; after that, it pulls again. If a pull fails, the page keeps the last saved data instead of going blank, and an empty page says "click Refresh" instead of passing off week-old numbers as today's. Less pretty, more honest, and a dashboard has no business hitting someone else's servers every time I get curious.
 
 ### Making it look like it belongs in the app
 
@@ -162,7 +164,7 @@ That's what an MCP server plus an AI assistant gives me today, in a rough form. 
 
 ## Lessons Learned & What's Next
 
-The data lesson came three times in one project: my dividend panel was confidently wrong for a week because I never asked which account the export came from, the saved snapshot looked current after it stopped being current, and the account chart looked exactly like Robinhood's while meaning something different. Each time the fix was the same: decide what the real source of truth is, treat everything else as an approximation, and say so on the page. Stale or reconstructed data that looks live is worse than an empty box.
+The data lesson came three times in one project: my dividend panel was confidently wrong for a week because I never asked which account the export came from, the page's first numbers looked current after they stopped being current, and the account chart looked exactly like Robinhood's while meaning something different. Each time the fix was the same: decide what the real source of truth is, treat everything else as an approximation, and say so on the page. Stale or reconstructed data that looks live is worse than an empty box.
 
 The AI lesson is the one this blog keeps relearning. Claude was fast and, honestly, careful. It checked real responses instead of trusting its own guesses about field names, it flagged the reconstructed chart before I asked, and it told me after every publish what it had and hadn't tested against live data. But it built the one-day chart exactly as I'd described it, and my description was wrong. A test can confirm the code does what was asked. It can't tell you that what was asked doesn't match what a one-day chart means to anyone who's ever looked at one. The only check that caught that was me holding the real app next to ours. AI got me from "I want this" to a working version in minutes; deciding whether the working version actually means what I think it means stayed my job.
 
