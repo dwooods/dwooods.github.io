@@ -124,9 +124,20 @@ That last one taught me something about my own holdings. The yield Robinhood lis
 
 ## What I'd Ask Robinhood For
 
-For what I'm building, the MCP server gets more right than wrong. Positions, quotes, dividend schedules and price history are exactly what you need to build a real dashboard. The wishlist is short and specific. First, **account value over time**: Robinhood already draws this chart in its own app, and without it every outside dashboard has to reconstruct it with a disclaimer. Second, **dividend and activity history** as data. The app has a dividend tracker, but as far as I can tell it isn't on Robinhood's website, and the MCP server has no dividend history, so outside the app the only way to know what you've been paid is a CSV export, one account at a time, and an AI agent connected to your account can see the future but not the past. The history appears to exist: community-built tools that use Robinhood's unofficial API list a dividend-history call. Those tools ask for your Robinhood password, though, which is exactly what the official MCP server was designed to avoid. Third, **market hours**, including holidays and early closes, so a one-day chart knows when the trading day actually ends. And fourth, **yesterday's official closing price**, so a day's change matches the app's. None of these is exotic. Each is something Robinhood's own app already shows me.
+The MCP server gets more right than wrong: positions, quotes, dividend schedules and price history are enough to build a real dashboard. Four additions would close the gaps, and Robinhood's own app already shows every one of them.
 
-I'd rather show them than just list it, so Claude built a second copy of the page for sharing, running on a made-up sample portfolio so none of my numbers are in it. It's labeled as a concept, says plainly it isn't affiliated with Robinhood, and ends with a short write-up of the idea and the wishlist above. These are a customer's suggestions, from someone who uses the product. It's [here if you want to click around](https://claude.ai/artifact/PBQkes53zewq1pNiPGYxZY).
+1. **Account value over time.** The app draws this chart. Without it, every outside dashboard has to rebuild one and add a disclaimer.
+2. **Dividend and activity history.** Right now an agent can see what's coming but not what's been paid. The data seems to exist: community-built tools using Robinhood's unofficial API list a dividend-history call. But they ask for your Robinhood password, which is exactly what the official server was built to avoid.
+3. **Market hours,** including holidays and early closes, so a one-day chart knows when the trading day ends.
+4. **Yesterday's official close,** so a day's change matches the app's.
+
+### Try the concept
+
+I'd rather show than tell, so Claude built a shareable copy of the page on a made-up sample portfolio, with the wishlist written into it. It's a customer's suggestion, not affiliated with Robinhood. Click around:
+
+<p align="center"><a href="https://claude.ai/artifact/PBQkes53zewq1pNiPGYxZY"><img src="/images/dividend-dashboard-concept-preview.png" alt="The concept page: an income-first account view with an account-value chart, on a made-up sample portfolio. Click to open it." style="max-width:100%; border:1px solid #e3e9ed; border-radius:12px;"></a></p>
+
+<p align="center"><strong><a href="https://claude.ai/artifact/PBQkes53zewq1pNiPGYxZY">Open the live concept &rarr;</a></strong><br><em>Hover the charts, sort the columns, open a row. Sample data only.</em></p>
 
 ## Beyond Robinhood: Everything Else I Own
 
