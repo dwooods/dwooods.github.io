@@ -61,7 +61,11 @@ My favorite detail: Robinhood's accent color turns orange on a down day and gree
 
 ### The wrong swings
 
-There's a [cartoon](https://www.businessballs.com/amusement-stress-relief/tree-swing-cartoon-pictures-early-versions/) every product manager knows: a tree swing drawn the way the customer described it, the way it was built, and the tire on a rope the customer actually needed. I was the customer this time, and I still got a few wrong swings, which is why there are sixteen versions.
+<p align="center"><img src="/images/tree-swing-cartoon.png" alt="The tree swing cartoon: ten panels showing how the customer explained it, how each role understood or built it, and the tire on a rope the customer really needed." style="max-width:100%;"></p>
+
+*Every product manager knows this one. ([Source](https://www.productftw.com/productftw-2-the-tire-swing-cartoon/))*
+
+I was the customer this time, and I still got a few wrong swings, which is why there are sixteen versions.
 
 The one-day chart is the best example. I asked for "the last 24 hours," and that's exactly what Claude built, with the points spread evenly across the width. It's also not what a one-day stock chart means. Next to Robinhood's 1D view the difference was obvious: Robinhood pins the chart to the trading day, 6:30am to 1pm Pacific, and the line stops at now, leaving the rest of the day blank. The rebuild did the same and measured the day's change from yesterday's close, the way Robinhood does. No test would have caught it, because the code did exactly what I asked.
 
