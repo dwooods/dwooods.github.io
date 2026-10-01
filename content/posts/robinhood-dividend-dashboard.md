@@ -141,15 +141,13 @@ I'd rather show than tell, so Claude built a shareable copy of the page on a mad
 
 ## Beyond Robinhood: Everything Else I Own
 
-Robinhood is one account. The rest of what I own lives in other places, and most of them have nothing like an MCP server. A stock plan from a former employer sits with a separate stock-plan provider, and none of it has a connector I can attach to Claude.
+Robinhood is one of many places my money lives. There's property, a company 401(k) and other retirement accounts with my financial advisor, a stock plan from a former employer, short-term notes and savings. Getting the full picture used to mean logging into each one and doing the math in my head. My head is not a great spreadsheet.
 
-So I feed it in by hand. I take a screenshot of a positions page or download a statement, give it to Claude, and from there I can ask the same kind of questions I ask about the Robinhood account: what do I hold, what did each lot cost, which lots are cheapest to sell. It works better than I expected. Claude reads a screenshot of a stock-plan portal or a PDF statement and turns it into rows, and I can keep refining the answer in conversation.
+Claude turned out to be the best place to pull it together. Robinhood connects live. For everything else, I take a screenshot or download a statement, and Claude turns it into rows I can ask questions about: what I hold, what it cost, what's coming due. It works better than I expected.
 
-It's also the wrong way to do this. A screenshot goes stale the day after I take it, I'm the integration layer, and every refresh is another manual step. For a Robinhood holding I can ask for a live price. For these, I'm working from whatever I last uploaded. I'd much rather have a connector, but I haven't found one for personal use, so uploads are the only way in. My advisor's tools cover my retirement accounts, including anything rolled over from a company 401(k), but not this Robinhood account or the stock plan. Nothing I've found covers all of it.
+It's also clumsy. A screenshot is stale the next day, and I'm the integration layer. My advisor's tools cover the retirement accounts and nothing else, and I haven't found a connector for the rest.
 
-Which leads to the thing I can't find. Most finance tooling seems to be built for one of two people. One doesn't want to think about their finances and wants a simple, reassuring number. The other is a full-time investor who wants everything on a terminal. I'm neither. I have some investments, I check them regularly, and I have questions about them. Where is the tool for that person: one view across what I hold, that I can reshape when a new question comes up?
-
-That's what an MCP server plus an AI assistant gives me today, in a rough form. There's live data where a server exists, uploads where it doesn't, and a view I can change on request. It's clumsy at the edges. It's also the first time I've been able to look at my own money the way I actually think about it.
+Most finance tools seem built for one of two people: someone who wants one reassuring number, or a full-time investor who wants a terminal. I'm neither. I want one view across everything I own that I can reshape when a new question comes up. Live data where there's a server, uploads where there isn't, and a view that changes on request: it's rough, but it's the first time I've seen my money the way I actually think about it.
 
 ## Lessons Learned & What's Next
 
