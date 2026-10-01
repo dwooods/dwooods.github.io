@@ -17,7 +17,7 @@ So I built a page for those questions. I call it the Dividend Dashboard. I didn'
 
 This account is money I had to spare, not my retirement. A financial advisor handles that, and for now it isn't changing. I've been a Robinhood customer since 2017, long before AI assistants like Claude, because there are no commissions, so trying something out doesn't come with a fee.
 
-When Robinhood launched [Agentic Trading](https://robinhood.com/us/en/support/articles/agentic-trading-overview/), it published an official MCP server, the same open protocol Claude uses to talk to outside tools, and a dedicated Agentic account that AI agents connect to. An agent can read my account data, and any trade it places can only land in that account. That's a low-stakes way to use AI with my own money. I do wonder: if this works out, could AI help with my retirement too? I'd rather find out first with money that matters less if the AI gets something wrong.
+When Robinhood launched [Agentic Trading](https://robinhood.com/us/en/support/articles/agentic-trading-overview/), it published an official MCP server, a secure connection that lets an assistant like Claude read your account without ever seeing your password, and a dedicated Agentic account that AI agents connect to. An agent can read my account data, and any trade it places can only land in that account. That's a low-stakes way to use AI with my own money. I do wonder: if this works out, could AI help with my retirement too? I'd rather find out first with money that matters less if the AI gets something wrong.
 
 Few brokerages offer an MCP server; Fidelity, Schwab and E\*TRADE [don't as of this writing](https://www.stockbrokers.com/guides/ai-agent-brokers). Robinhood has since added a dividend tracker of its own, which I'll get to.
 
@@ -41,7 +41,7 @@ My part was deciding what I wanted to see and how I wanted to see it. I held the
 
 ## The Product Decisions
 
-The interesting part of this project wasn't the engineering. It was a string of product calls (what to show, what to be honest about, what to copy) and a few roadblocks that needed a way around. The MCP server handled the basics well: positions, cash, live quotes, each holding's dividend schedule and price history, enough to draw every chart on the page. What it didn't have was the two things an income investor wants most, what I've actually been paid and what the account was worth over time. The first I solved with an export of my account activity. The second I had to reconstruct, and the reconstruction is honest about what it is.
+The interesting part of this project wasn't the engineering. It was a string of product calls (what to show, what to be honest about, what to copy) and a few roadblocks that needed a way around. The MCP server handled the basics well: positions, cash, live quotes, each holding's dividend schedule and price history, enough to draw every chart on the page. What it didn't have was the two things an income investor wants most, what I've actually been paid and what the account was worth over time. The first I solved by hand: I downloaded my account activity as a CSV from Robinhood's Reports page and gave it to Claude, which stored it in the page alongside the live data. The second I had to reconstruct, and the reconstruction is honest about what it is.
 
 ### Designing by screenshot
 
@@ -102,7 +102,7 @@ So of course I asked Claude to rebuild it, with the same playbook as before. The
 
 Comparing the two turned up a surprise. Robinhood's tracker counts one account, and I'd only moved my positions into the Agentic account in July and August, so it showed a fraction of what I'd been paid this year. My export came from my individual account, where most of those dividends landed before the move. That's also why the export had looked incomplete: the rest were in the other account. Put together with the Agentic account's statements, my page shows the whole year across both accounts. Robinhood's tracker can't, because it only sees one account at a time.
 
-I'm not claiming mine is better. The app has an edge that matters: it reads Robinhood's own records, while mine is only as good as what I feed it. But mine has the shape I wanted: every holding on one sortable page, next to price, cost and yield on cost.
+The app has one edge that matters: it reads Robinhood's own records, while mine is only as good as what I feed it. But mine has the shape I wanted: every holding on one sortable page, next to price, cost and yield on cost.
 
 That last one taught me something about my own holdings. The yield Robinhood lists is the last year of payouts against today's price. What I actually earn depends on what I paid, so the page shows both.
 
