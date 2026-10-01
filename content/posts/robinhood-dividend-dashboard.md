@@ -71,9 +71,9 @@ The one-day chart is the best example. I asked for "the last 24 hours," and that
 
 The same side-by-side caught a smaller one later: pick a range like 3M and the header should say "Past 3 months," not "Today." (It's measured on the reconstructed line, so it won't match the app's figure exactly.)
 
-<p align="center"><img src="/images/dividend-dashboard-1d-iterations.png" alt="Three versions of the account chart. Version 7: the last 24 hours stretched across the full width. Version 9: the chart pinned to the trading day, with the line stopping at now and a dotted line at yesterday's close. Version 15: 3M selected, with the header reading the change over the past 3 months. Sample data." style="max-width:100%;"></p>
+<p align="center"><img src="/images/dividend-dashboard-1d-iterations.png" alt="Three versions of the account chart side by side. Version 7: the last 24 hours stretched across the full width. Version 9: the chart pinned to the trading day, with the line stopping at now and a dotted line at yesterday's close. Version 15: 3M selected, with the header reading the change over the past 3 months. Sample data." style="max-width:100%;"></p>
 
-*One chart, three swings: what I asked for, what I pictured, and what I noticed once I had it.*
+*One chart, three swings, left to right: what I asked for, what I pictured, and what I noticed once I had it.*
 
 ### A rule to protect Robinhood from me
 
