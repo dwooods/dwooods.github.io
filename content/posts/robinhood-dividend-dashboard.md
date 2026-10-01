@@ -35,9 +35,11 @@ I'll admit this surprised me. I assumed I'd have to set up the pieces myself: so
 
 What's on the page, styled to look like it belongs inside Robinhood's app: a big account-value chart across the top with 1D through ALL ranges, three stat tiles (today's change, unrealized gain or loss, and estimated annual income with a blended yield), a ranked list of holdings by size, a Positions table with a small "today" chart in every row, and a dividend tracker with received and projected income by month. Click a row and a price chart for that stock drops open underneath it. Move your cursor across any chart and it reads out the date and value at that point, the way Robinhood's charts do.
 
-<p align="center"><img src="/images/income-view-concept-positions.png" alt="The Positions table with AGNC expanded to a three-month chart, cursor reading a single day's value. Sample portfolio, not real numbers." style="max-width:100%;"></p>
+{{< admonition type="info" title="Sample data, not my account" open=true >}}
+Except for the two Robinhood app screenshots in the dividend tracker section, every screenshot in this post runs on the same made-up sample portfolio, not my account. The tickers are real; the share counts, prices and dollar amounts are not.
+{{< /admonition >}}
 
-*Except for the two Robinhood app screenshots in the dividend tracker section, every screenshot in this post runs on the same made-up sample portfolio, not my account. The tickers are real; the share counts, prices and dollar amounts are not.*
+<p align="center"><img src="/images/income-view-concept-positions.png" alt="The Positions table with AGNC expanded to a three-month chart, cursor reading a single day's value. Sample portfolio, not real numbers." style="max-width:100%;"></p>
 
 ### Tools & AI Assist
 
