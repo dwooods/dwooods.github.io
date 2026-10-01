@@ -17,13 +17,13 @@ So I built a page for those questions. I call it the Dividend Dashboard. I didn'
 
 This account is money I had to spare, not my retirement. A financial advisor handles that, and for now it isn't changing. I've been a Robinhood customer since 2017, long before AI assistants like Claude, because there are no commissions, so trying something out doesn't come with a fee.
 
-When Robinhood launched [Agentic Trading](https://robinhood.com/us/en/support/articles/agentic-trading-overview/), it published an official MCP server, a secure connection that lets an assistant like Claude read your account without ever seeing your password, and a dedicated Agentic account that AI agents connect to. An agent can read my account data, and any trade it places can only land in that account. That's a low-stakes way to use AI with my own money. I do wonder: if this works out, could AI help with my retirement too? I'd rather find out first with money that matters less if the AI gets something wrong.
+When Robinhood launched [Agentic Trading](https://robinhood.com/us/en/support/articles/agentic-trading-overview/), it published an official MCP (Model Context Protocol) server, a secure connection that lets an assistant like Claude read your account without ever seeing your password, and a dedicated Agentic account that AI agents connect to. An agent can read my account data, and any trade it places can only land in that account. That's a low-stakes way to use AI with my own money. I do wonder: if this works out, could AI help with my retirement too? I'd rather find out first with money that matters less if the AI gets something wrong.
 
 Few brokerages offer an MCP server; Fidelity, Schwab and E\*TRADE [don't as of this writing](https://www.stockbrokers.com/guides/ai-agent-brokers). Robinhood has since added a dividend tracker of its own, which I'll get to.
 
 ## What I Built
 
-The whole thing is one web page that lives in my Claude account. Click Refresh and the page [calls Robinhood's MCP server itself](https://x.com/ClaudeDevs/status/2077489907350856038), using my own connection. It's only allowed five read-only tools, so the worst it can do is look at my money, which is also my main hobby. (I use the same connection with Claude to research and make trades, but that's a different post.)
+The whole thing is one interactive web page that Claude built and hosts in my Claude account. Click Refresh and the page [calls Robinhood's MCP server itself](https://x.com/ClaudeDevs/status/2077489907350856038), using my own connection. It's only allowed five read-only tools, so the worst it can do is look at my money, which is also my main hobby. (I use the same connection with Claude to research and make trades, but that's a different post.)
 
 I expected to lose a weekend to hosting, a database and somewhere safe to keep a password. I lost none. Claude built the page, published it and gave it a small database, all inside Claude.
 
@@ -35,7 +35,7 @@ Except for the two Robinhood app screenshots in the dividend tracker section, ev
 
 <p align="center"><img src="/images/income-view-concept-positions.png" alt="The Positions table with AGNC expanded to a three-month chart, cursor reading a single day's value. Sample portfolio, not real numbers." style="max-width:100%;"></p>
 
-Claude wrote every line of code, made every call to Robinhood and published all sixteen versions over about two weeks. Every version is still recoverable, which is why the screenshots below are labeled by version. Claude also kept a decision journal as we went: what we changed, what we tried and dropped, and why. I now ask for one at the start of every project, because I never know which ones will turn into a blog post, and the conversation that built it may be three chats back by the time I write. Most of this post comes from that journal.
+Claude built and published all sixteen versions over about two weeks. Every version is still recoverable, which is why the screenshots below are labeled by version. Claude also kept a decision journal as we went: what we changed, what we tried and dropped, and why. I now ask for one at the start of every project, because I never know which ones will turn into a blog post, and the conversation that built it may be three chats back by the time I write. Most of this post comes from that journal.
 
 My part was deciding what I wanted to see and how I wanted to see it. I held the Robinhood app up next to each version, kept what I liked, and worked out what should be different. When the data had a gap, I proposed a way around it. I didn't want to build anything myself; I just knew what I wanted, which any product manager will tell you is the hard part. (Engineers may disagree.)
 
@@ -135,7 +135,7 @@ I'd rather show than tell, so Claude built a shareable copy of the page on a mad
 
 **The data lesson: know your source of truth.** Three times the page looked right and wasn't. I never asked which account the export covered, the first numbers went stale without looking stale, and the account chart looked like Robinhood's while meaning something else. The fix was always the same: decide what's real, treat everything else as an approximation, and say so on the page. Stale data that looks live is worse than an empty box.
 
-**The AI lesson: it builds what you ask, not what you meant.** Claude was fast and careful. It checked real data, flagged the reconstructed chart before I did, and told me what it had and hadn't tested. But it built the one-day chart exactly as I described it, and my description was wrong. Getting to a working version took minutes. Deciding whether it meant what I thought was still my job.
+**The AI lesson: it builds what you ask, not what you meant.** Claude checked real data, flagged the reconstructed chart before I did, and told me what it had and hadn't tested. But it built the one-day chart exactly as I described it, and my description was wrong. Getting to a working version took minutes. Deciding whether it meant what I thought was still my job.
 
 **The product lesson: the loop beats the dashboard.** The best changes came from a simple loop: notice a question, change the view, look again. Most of them started with putting my page next to the real app and asking why the two disagreed. You can't loop with someone else's app, because you can't change it.
 
