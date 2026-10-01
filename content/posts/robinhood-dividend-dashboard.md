@@ -55,7 +55,7 @@ The interesting part of this project wasn't the engineering. It was a string of 
 
 Robinhood's MCP server handles the basics well. Positions, cash, live quotes, each holding's dividend schedule and price history all came back reliably, which was enough to draw every chart on the page. The gaps showed up the moment I asked for the two things an income investor wants most: what I've actually been paid, and what my account was worth over time. The MCP server has neither, even though Robinhood's own app draws that account-value chart.
 
-The export fix had its own twist. For a week the page carried a footnote warning that the export looked incomplete. The real explanation is further down, and it's a better story.
+The export fix had its own twist: for a week the page carried a footnote warning that the export looked incomplete. More on that below.
 
 ### Designing by screenshot
 
@@ -108,13 +108,11 @@ So of course I asked Claude to rebuild it, with the same playbook as before: a s
 
 *My copy of the tracker, on the sample portfolio. Green is paid, gray is projected, same as Robinhood's.*
 
-The humbling part came from comparing the two. Robinhood's tracker said my Agentic account had received less than a sixth of what my dividends panel had been claiming for a week. The reason was sitting in the CSV the whole time: it was my *individual* account's export, not the Agentic account's. Its transfer rows show my positions moving into Agentic in July and August, so most of those dividends were paid before the move, in a different account. The TRIN dividend I thought was "missing" was paid after TRIN moved; the sale that wasn't in the file happened in Agentic. The export wasn't incomplete. It was faithfully reporting one account, and neither Claude nor I noticed until Robinhood's own feature showed a number that disagreed. What settled it was lining up my monthly statements: the export matched the individual account's statements to the cent, and the Agentic payments showed up in that account's own records.
+Comparing the two turned up a surprise. Robinhood's tracker counts one account, and I'd only moved my positions into the Agentic account in July and August, so it showed a fraction of what I'd been paid this year. My export came from my individual account, where most of those dividends landed before the move. That's also why the export had looked incomplete: the rest were in the other account. Put together with the Agentic account's statements, my page shows the whole year across both accounts. Robinhood's tracker can't, because it only sees one account at a time.
 
-Side by side, the app's tracker is better than mine in one way that matters: it shows what the account has actually been paid, because it's Robinhood's app reading Robinhood's own data. Mine is only as good as what I feed it. That's a data gap, not a design gap.
+I'm not claiming mine is better. The app has an edge that matters: it reads Robinhood's own records, while mine is only as good as what I feed it. But mine has the shape I wanted: every holding on one sortable page, next to price, cost and yield on cost.
 
-I'm not claiming mine is better than Robinhood's. It's a view that works for what I want. The app shows one stock's dividend card at a time, and the tracker's projected bars aren't something I can click into. The Dividend Dashboard puts the same fields for every holding on one sortable page, next to price, cost and yield on cost. The app has the data, and mine has the shape I wanted.
-
-Building it also taught me something about my own holdings: the yield on my purchases didn't match the yield Robinhood listed. The listed yield is a trailing figure, the last year of payouts against today's price. What I earn depends on what I paid and when, and if you keep buying through the year you only collect the dividends paid after each purchase. Claude explained that, and it's why the page shows yield on cost next to the listed yield.
+That last one taught me something about my own holdings. The yield Robinhood lists is the last year of payouts against today's price. What I actually earn depends on what I paid, so the page shows both.
 
 ### If you compare your numbers with the app's
 
