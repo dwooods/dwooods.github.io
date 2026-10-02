@@ -9,8 +9,6 @@ featuredImage: "/images/led-strip-full-setup.jpg"
 featuredImagePreview: "/images/led-strip-full-setup.jpg"
 ---
 
-**Repo:** [github.com/dwooods/led-strip](https://github.com/dwooods/led-strip)
-
 I plugged in a strip of addressable LEDs and applied power without connecting the data signal. It immediately started blinking random colors at me. My first thought was "great, it's broken already." Turns out it wasn't broken — that's exactly what an addressable strip (WS2812B/SK6812-family) does when it has power but no data telling it what to display. A plain non-addressable strip would've just lit up one steady color. That random blinking was actually good news, and it's how this project started: not knowing that, and finding out before wiring anything wrong.
 
 The result is eleven effects, a terminal-based menu, and a browser-based simulator. But the LED strip is really just the vehicle for a bigger experiment: what happens when I use AI to handle most of the implementation and spend my time deciding what to build, testing it, and figuring out what to do next?
@@ -130,7 +128,7 @@ I'm still learning what this new way of working looks like. This project was one
 
 ## Try it yourself
 
-1. Clone the repo.
+1. Clone the [repo](https://github.com/dwooods/led-strip).
 2. Connect the strip's data line to GPIO10/MOSI.
 3. Connect the strip's ground to the Pi's ground.
 4. Power the strip from an external 5V supply.
