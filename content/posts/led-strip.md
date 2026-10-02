@@ -5,8 +5,8 @@ draft: false
 tags: ["raspberry-pi", "led", "ws2812", "sk6812", "python", "hardware"]
 description: "A menu-driven controller for an addressable SK6812/WS2812B LED strip on a Raspberry Pi 5, driven over hardware SPI, with eleven animated effects and a browser-based simulator — built by directing Claude through the implementation."
 summary: "What happens when you have an idea for a hardware project but don't want to spend days writing the code? I used Claude to build a Raspberry Pi LED controller and discovered a different way to turn an idea into a working project."
-featuredImage: "/images/led-strip-full-setup.jpg"
-featuredImagePreview: "/images/led-strip-full-setup.jpg"
+featuredImage: "/images/hero-led-strip.jpeg"
+featuredImagePreview: "/images/hero-led-strip.jpeg"
 ---
 
 I plugged in a strip of addressable LEDs and applied power without connecting the data signal. It immediately started blinking random colors at me. My first thought was "great, it's broken already." Turns out it wasn't broken — that's exactly what an addressable strip (WS2812B/SK6812-family) does when it has power but no data telling it what to display. A plain non-addressable strip would've just lit up one steady color. That random blinking was actually good news, and it's how this project started: not knowing that, and finding out before wiring anything wrong.
