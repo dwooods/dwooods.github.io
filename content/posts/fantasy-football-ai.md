@@ -167,7 +167,33 @@ What's next? The injury and lineup check-ins are still one-off scheduled tasks r
 
 ## Want to try it?
 
-The FantasyPros MCP server is [open source on GitHub](https://github.com/dwooods/fantasypros-mcp), and the README walks through the Cloudflare setup, secrets, the KV cache, and connecting it to Claude.
+The part worth copying is the notes file. Here's the skeleton, with my league swapped out for placeholders. Paste it into a Claude Project and fill it in:
+
+```text
+# <League name> — notes
+Last verified: <date>
+
+## Rules (checked against <source>, on <date>)
+- <scoring rule, exact numbers>
+
+## What the rules reward
+- Stream DEF by matchup.
+- Don't over-rank pocket-passer QBs.
+- <one plain-English takeaway per rule that changes a decision>
+
+## Rosters (verified <date>)
+- <team>: <players>
+- Refresh rule: before a trade offer, every few weeks, before the deadline — pull the live rosters, compare, rewrite this section.
+
+## Running log
+- <date>: Traded Waddle for Pitts.
+- <date>: Stribling out ~1 month (ankle).
+
+## Tone
+- <how trade talk should sound in your league>
+```
+
+If you also want the FantasyPros data, the MCP server is [open source on GitHub](https://github.com/dwooods/fantasypros-mcp), and the README walks through the Cloudflare setup, secrets, the KV cache, and connecting it to Claude.
 
 ```bash
 git clone https://github.com/dwooods/fantasypros-mcp.git
