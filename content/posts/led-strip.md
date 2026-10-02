@@ -80,7 +80,7 @@ Now a change was one prompt and a couple of seconds. That made the project more 
 
 **Keeping a journal of the build.** I didn't want the project's history trapped in one chat session or tied to one AI, so I had Claude maintain a `JOURNEY.md` in the repo as we went — decisions, changes in direction, problems, and lessons. That way I can pick the project up from any app, CLI, or AI. The longer version of this story lives there.
 
-**The barrier got pretty low.** My 13-year-old has never written a line of code. He sent Claude a few chat requests of his own and ended up with the Rocket Launch effect in the menu — that's probably the part that stuck with me most: the barrier between having an idea and something actually working had gotten surprisingly low.
+**The barrier got pretty low.** My 13-year-old has never written a line of code. He sent Claude a few chat requests of his own and ended up with the Rocket Launch effect in the menu.
 
 Worth saying plainly: Claude didn't hand me a wrong answer that I had to catch on this project. The Pi 5 diagnosis was right the first time, and the friction was architectural growing pains as the design evolved (more on that below). The real misses came later, on the LED-panel follow-up, which is a story for another post.
 
