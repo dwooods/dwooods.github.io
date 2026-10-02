@@ -5,8 +5,8 @@ draft: false
 tags: ["ai", "llm", "ollama", "raspberry-pi", "self-hosted", "benchmarking"]
 description: "Open-weight LLMs on a 12GB AMD PC and a Raspberry Pi 5: a silent GPU fallback, a VRAM cliff, a judge that graded a right answer wrong, six Pi crashes, and the verdict."
 summary: "I benchmarked open-weight LLMs on a Windows PC and a Raspberry Pi 5, and nearly every obvious answer turned out wrong: a GPU silently running on CPU, a 'bigger' model slower than no GPU at all, a judge model that graded a correct answer wrong. Local earned its place for narrow, lightweight work. It isn't yet a replacement for the closed models I use every day, and I didn't put them through the same tests."
-featuredImage: "/images/hero-pc-vs-pi.png"
-featuredImagePreview: "/images/hero-pc-vs-pi.png"
+featuredImage: "/images/hero-pc-vs-pi.jpeg"
+featuredImagePreview: "/images/hero-pc-vs-pi.jpeg"
 ---
 
 I got laid off this month, and my closed-model subscription suddenly looked less like a convenience and more like a bill. So I tried running open-weight models on my own hardware, a Windows desktop with a 12GB AMD GPU and a Raspberry Pi 5 with no GPU at all, to see whether that's more than a curiosity.
@@ -258,7 +258,7 @@ The Pi's vision suite, the same receipt-extraction workload from the PC showdown
 
 The Pi has had Raspberry Pi's own Active Cooler (heatsink plus fan) installed since before any benchmarking began, confirmed present and spinning every time I checked.
 
-![Raspberry Pi 5 with the official Active Cooler (heatsink and fan) mounted](/images/pi5-active-cooler.png)
+![Raspberry Pi 5 with the official Active Cooler (heatsink and fan) mounted](/images/pi5-active-cooler.jpeg)
 *The Pi 5 with its Active Cooler on, present and spinning through all six crashes below. Necessary, it turned out, but not sufficient.*
 
 Running the six-case, two-model matrix at sustained CPU load anyway produced six confirmed hard, silent reboots, in two signatures: fast, uncaught spikes that reset the board in about a minute with no warning, and slower cycles of visible throttling, recovering, throttling again, before resetting anyway. My first instinct was a power problem, since a board browning out under load looks a lot like this from the outside, so I pulled per-rail voltage with `vcgencmd pmic_read_adc` through several crashes. Every rail held steady, every time. Not the power supply.
