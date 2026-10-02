@@ -61,7 +61,7 @@ So a typical question looks something like this:
 
 ```mermaid
 graph LR
-    Sleeper[(Sleeper API<br/>rosters, owners, trades)] -. screenshot fallback .-> Me
+    Sleeper[(Sleeper API<br/>rosters, owners, trades)] -. fetch tool, screenshots as fallback .-> Me
     Me[Me] -->|asks a question| Claude[Claude]
     Claude <-->|reads/writes league notes| Project[(Claude Project<br/>scoring rules, rosters, trade log)]
     Claude -->|tool call| MCP[fantasypros-mcp<br/>Cloudflare Worker]
