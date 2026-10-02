@@ -68,25 +68,27 @@ graph LR
 
 To be explicit about it, since the rest of this post takes it for granted: I used **Claude** throughout the build — not just to help with a tricky function. I didn't write the code, make the commits, or manage the repo. Instead, I focused on describing what I wanted to build, making design decisions, testing the results, identifying problems, and deciding what to tackle next. Claude handled the implementation — all eleven effects, `led.py`, `led_common.py`, `off.py`, and every `git` operation end-to-end.
 
-**Building without the hardware.** At one point, I wanted an easier way to see what a new LED program would look like without having to plug in the Raspberry Pi and LED strip every time. If I was going to keep building new effects, I wanted a way to experiment with them virtually. I suggested building a visual validation tool that would let me preview effects without the physical hardware, and Claude took that idea and built the browser-based simulator. That ended up changing how I worked on the project — I could build and test new effects virtually, then use the actual LED strip when I wanted to validate the final result on hardware.
+**Building without the hardware.** At one point, I wanted an easier way to see what a new LED program would look like without having to plug in the Raspberry Pi and LED strip every time. If I was going to keep building new effects, I wanted a way to experiment with them virtually. I suggested building a visual validation tool that would let me preview effects without the physical hardware, and Claude took that idea and built the browser-based simulator. That changed how I worked: build and test an effect in the browser, then check the real strip only when I wanted the final answer.
 
 **How fast it was.** The part that got me was the speed. I'd ask for something like a Pac-Man chase, and Claude had the code written in seconds. A few minutes later it was on GitHub and I was testing it on the strip.
 
-Eight years ago, when I first started messing with a Pi and an LED strip, I wrote everything myself. I had a couple of simple examples from the web, and not nearly the skills to build anything like a Pac-Man with four ghosts, pellets and the occasional cherry. The first version took days to get working, and even after it worked, every change was hours of work.
+Pac-Man chasing four ghosts down sixty LEDs is a ridiculous thing to want. It was also a very easy thing to ask for.
+
+Eight years ago, when I first started messing with a Pi and an LED strip, I wrote everything myself. I had a couple of simple examples from the web, and not nearly the skills to build anything like it, pellets and the occasional cherry included. The first version took days to get working, and even after it worked, every change was hours of work.
 
 Now a change was one prompt and a couple of seconds. That made the project more fun, not just faster. I got to spend my time watching the lights do different things and building on the idea.
 
 **Keeping a journal of the build.** I didn't want the project's history trapped in one chat session or tied to one AI, so I had Claude maintain a `JOURNEY.md` in the repo as we went — decisions, changes in direction, problems, and lessons. That way I can pick the project up from any app, CLI, or AI. The longer version of this story lives there.
 
-**The barrier got pretty low.** One of the more interesting demonstrations of this came from my 13-year-old, who has never written a line of code. He sent Claude a few chat requests of his own and ended up with the Rocket Launch effect in the menu — that's probably the part that stuck with me most: the barrier between having an idea and something actually working had gotten surprisingly low.
+**The barrier got pretty low.** My 13-year-old has never written a line of code. He sent Claude a few chat requests of his own and ended up with the Rocket Launch effect in the menu — that's probably the part that stuck with me most: the barrier between having an idea and something actually working had gotten surprisingly low.
 
-Worth saying plainly: Claude didn't hand me a wrong answer that I had to catch on this project. The Pi 5 diagnosis was right the first time, and the friction was architectural growing pains as the design evolved (more on that below). The real misses came later, on the LED-panel follow-up, which is a story for another post. On the strip, my time went to testing on real hardware, deciding what to build next, and pivoting when something didn't work.
+Worth saying plainly: Claude didn't hand me a wrong answer that I had to catch on this project. The Pi 5 diagnosis was right the first time, and the friction was architectural growing pains as the design evolved (more on that below). The real misses came later, on the LED-panel follow-up, which is a story for another post.
 
 ## Key technical insights & challenges
 
 The current structure — one file per effect, a persistent menu, `off`/`quit` as first-class options — is not how this started. Claude wrote all of it, but the design calls were still mine to make and push back on. It's what we turned it into after hitting real friction, in order:
 
-**1. The monolith got painful fast.** Everything started in one file. Every new LED pattern meant editing that same file again, and it got harder to work in with each addition. Rather than live with it, I had Claude pull shared setup into its own module and give every effect its own standalone file:
+**1. The monolith got painful fast.** Everything started in one file — my call, and a mistake. Every new effect meant reopening the same file, which is how a quick script turns into a place you dread visiting. Rather than live with it, I had Claude pull shared setup into its own module and give every effect its own standalone file:
 
 ```python
 from rpi5_ws2812.ws2812 import WS2812SpiDriver
@@ -118,7 +120,7 @@ Past nine effects the menu also ran out of single-digit keys, so new effects pic
 
 If I started over, I'd probably go straight to the one-file-per-effect-plus-menu pattern instead of detouring through the monolith first — though I'm not sure I'd have known to, without hitting the pain of the monolith directly. The pivots came from testing on real hardware and running into real annoyances, not from planning it all upfront.
 
-The bigger lesson is about where my attention went. Not having to write the Python myself meant I spent my time on the actual decisions — what should happen when the lights won't turn off, when do we need letters instead of digits, is a browser simulator worth building — instead of on syntax and library documentation. That's the difference between this project shipping and the earlier version of this project I tried without AI, which didn't. Whatever your version of the LED strip is, the split is the same: figure out which parts of your project are the decisions and which are the typing, and be deliberate about handing off the typing.
+The bigger lesson is about where my attention went. Not having to write the Python myself meant I spent my time on the actual decisions — what should happen when the lights won't turn off, when do we need letters instead of digits, is a browser simulator worth building. The typing was never the hard part. It was just the part that took all the time. Whatever your version of the LED strip is, the split is the same: figure out which parts of your project are the decisions and which are the typing, and be deliberate about handing off the typing.
 
 This project was one experiment, and the `JOURNEY.md` approach has already evolved into something more structured in later projects.
 
