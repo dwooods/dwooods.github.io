@@ -91,7 +91,7 @@ Before a real trade offer, every few weeks, and before the deadline, I say "refr
 
 The notes need all eight rosters, and getting them in did not go according to plan. The original idea was to pull every roster programmatically from Sleeper and cross-reference each player with a FantasyPros ID. Reasonable plan. It just didn't work very well.
 
-The draft-picks endpoint came back empty even though Sleeper showed the draft as complete. The full player database is a 5–10 MB dump that got truncated before reaching the players I actually needed. And Claude told me its direct calls from the sandbox to Sleeper were blocked. So after trying several approaches, I did something that felt almost offensively low-tech.
+The draft-picks endpoint came back empty even though Sleeper showed the draft as complete. The full player database is a 5–10 MB dump that got truncated before reaching the players I actually needed. So after trying several approaches, I did something that felt almost offensively low-tech.
 
 I took a screenshot.
 
@@ -105,13 +105,7 @@ The API is not the product.
 
 The product is getting the job done.
 
-### When AI tries to get too clever
-
-There was another moment that was worth paying attention to. Because of that restriction, Claude told me it had tried to find a workaround using a third-party CORS relay. By its account, it didn't work, and more importantly, a built-in safety check caught and blocked the attempt before it went anywhere. That was the right outcome.
-
-"Find a clever way around a policy or network restriction" isn't necessarily the same thing as solving the problem. I'd much rather have the AI stop and say, "That path isn't appropriate," than become increasingly creative about circumventing a restriction. So we went back to screenshots.
-
-The screenshots won. Since then, Claude has been reading Sleeper's API through a fetch tool, so the screenshots are mostly retired.
+Since then, Claude has been reading Sleeper's API through a fetch tool, so the screenshots are mostly retired.
 
 ## The plumbing: the MCP server
 
