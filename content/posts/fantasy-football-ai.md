@@ -57,14 +57,6 @@ The whole thing ended up being three pieces:
 | **`fantasypros-mcp`** | A Cloudflare Worker I built that turns the FantasyPros API into tools Claude can call |
 | **A Claude Project** | Persistent memory for our scoring rules, rosters, trade history, injury watches, and other league context |
 
-The MCP server exposes five tools:
-
-- `get_injury_news`
-- `get_player_news`
-- `get_player`
-- `get_consensus_rankings`
-- `get_projections`
-
 So a typical question looks something like this:
 
 ```mermaid
@@ -77,15 +69,13 @@ graph LR
     Claude -. scheduled check-ins .-> Me
 ```
 
-I ask Claude a question. Claude has the league context from the Project, and when it needs current player information, it can call my MCP server. The Worker calls FantasyPros, caches the result, and sends the data back. In other words, I built a tiny fantasy football data pipeline so I could ask an AI whether I should pick up a guy who is 0% rostered.
+Net result: I built a tiny fantasy football data pipeline so I could ask an AI whether I should pick up a guy who is 0% rostered.
 
 This is probably what my computer science degree was preparing me for.
 
 ## Building the MCP server
 
 The FantasyPros piece became its own little project. I built a Cloudflare Worker that wraps FantasyPros' v2 API and exposes it as MCP tools, with a Workers KV cache in front of it because FantasyPros' free tier gives me 50 requests per day, and I didn't want every question in a conversation to become another API request.
-
-The flow looks like this:
 
 ```mermaid
 sequenceDiagram
@@ -185,11 +175,11 @@ FantasyPros' injury news flagged my WR5, De'Zhaun Stribling, as out for at least
 
 ![Sleeper's "Trending up" panel, unfiltered — Demarcus Robinson still visible mid-list](/images/fantasy-football-trending-all.png)
 
-I still had to make the add and drop myself in the Sleeper app. Claude didn't click the button. But the part that used to mean opening three tabs, scrolling through waiver articles, checking injury news, and trying to figure out who was actually relevant took one message. That's the kind of automation I like: not "the AI runs my life," but **the AI removes the annoying parts of my life.**
+I still had to make the add and drop myself in the Sleeper app. Claude didn't click the button. But the part that used to mean opening three tabs, scrolling through waiver articles, checking injury news, and trying to figure out who was actually relevant took one message.
 
 ### Getting tapped on the shoulder before kickoff
 
-I also set up a scheduled check to confirm that one of my players was active before Sunday Night Football. It came back active, so no lineup change was needed. Not exactly an exciting result, but that's the point. The AI didn't need to discover a hidden gem or predict a breakout player. It just prevented me from having to remember to check. That is the sort of thing AI is surprisingly good at: not replacing the person, just remembering the thing the person doesn't want to remember.
+I also set up a scheduled check to confirm that one of my players was active before Sunday Night Football.
 
 ## What I actually learned
 
@@ -211,7 +201,7 @@ Before a real trade offer, every few weeks, and before the deadline, I say "refr
 
 FantasyPros has an official, hosted MCP server that does more than mine does, and it was already live when I started: their MCP docs are dated September 1st, and I began the Worker on September 5th. If I'd found it first, I probably would have just used theirs, and I'll likely switch my own workflow over at some point. The wrapper itself is probably redundant now, but what I built it with transfers: the Worker, the MCP mechanics, the auth header, and the caching layer.
 
-If I did this again, I'd assume the low-tech fallback much earlier. And the AI isn't replacing me here.
+If I did this again, I'd assume the low-tech fallback much earlier.
 
 I still decide whether to make a trade.
 
@@ -235,8 +225,6 @@ cd fantasypros-mcp
 npm install
 npx wrangler login
 ```
-
-The MCP server itself is intentionally generic. The interesting part isn't the server — it's the context you give the AI: your scoring rules, rosters, league history, and the weird little things that make your league different. That's what turns a generic fantasy football data source into something that actually feels like a co-manager.
 
 If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues) — I'd genuinely like to compare notes.
 
