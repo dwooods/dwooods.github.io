@@ -141,7 +141,7 @@ The draft-picks endpoint came back empty even though Sleeper showed the draft as
 
 I took a screenshot.
 
-I pasted it into Claude. Claude read the roster, matched the player names against the FantasyPros IDs I had already confirmed, and told me exactly what was still missing. Four complete 15-man rosters came together that way in minutes. Sometimes the most sophisticated API integration is:
+I pasted it into Claude. Claude read the roster, matched the player names against the FantasyPros IDs I had already confirmed, and told me exactly what was still missing. Four complete 15-man rosters came together that way in minutes, and I filled in the remaining gaps the same way later. Sometimes the most sophisticated API integration is:
 
 **Ctrl+C. Ctrl+V.**
 
