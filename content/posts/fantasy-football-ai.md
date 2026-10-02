@@ -73,69 +73,25 @@ Net result: I built a tiny fantasy football data pipeline so I could ask an AI w
 
 This is probably what my computer science degree was preparing me for.
 
-## Building the MCP server
-
-The FantasyPros piece became its own little project. I built a Cloudflare Worker that wraps FantasyPros' v2 API and exposes it as MCP tools, with a Workers KV cache in front of it because FantasyPros' free tier gives me 50 requests per day, and I didn't want every question in a conversation to become another API request.
-
-```mermaid
-sequenceDiagram
-    participant C as Claude
-    participant W as fantasypros-mcp
-    participant KV as Workers KV cache
-    participant FP as FantasyPros API
-
-    C->>W: tool call, x-api-key header
-    W->>KV: get(cacheKey)
-    alt cache HIT
-        KV-->>W: cached JSON
-    else cache MISS
-        W->>FP: GET /public/v2/...
-        FP-->>W: JSON
-        W->>KV: put(cacheKey, JSON, ttl)
-    end
-    W-->>C: tool result
-```
-
-There were a couple of fun little gotchas. FantasyPros' working API path wasn't the obvious one: the endpoint needed `/public/` in the URL (`api.fantasypros.com/public/v2/...`). The authentication header was another surprise. Claude's custom connector setup reserves `Authorization` for its OAuth flow, so I couldn't just stick a bearer token there. Instead, I used `x-api-key`:
-
-```typescript
-const apiKey = request.headers.get("x-api-key");
-
-if (apiKey !== env.MCP_AUTH_TOKEN) {
-  return new Response("Unauthorized", { status: 401 });
-}
-```
-
-That token gates the Worker so it isn't just an open proxy to my FantasyPros API key. My actual FantasyPros key lives as a Cloudflare secret. It never gets typed into a chat, committed to git, or copied into a client configuration. That also means the same MCP endpoint works whether I'm asking from my desktop, my phone, or somewhere completely different — which is nice. Because apparently fantasy football is now a distributed systems problem.
-
-The cache should have been the easy part, but `wrangler kv namespace create` failed with an authentication error despite a properly scoped login token. I ended up creating the namespace from the Cloudflare dashboard instead and copying the ID into `wrangler.jsonc`. To confirm the cache was actually being hit, I added logging directly to the Worker:
-
-```typescript
-const cached = await env.FP_CACHE.get(key, "json");
-
-if (cached !== null) {
-  console.log(`[cache] HIT ${key}`);
-  return cached;
-}
-
-console.log(`[cache] MISS ${key}`);
-```
-
-Then I ran `npx wrangler tail` and triggered a real tool call. When the terminal showed:
-
-```text
-[cache] HIT fp:/news?...
-```
-
-I knew it was working. The Cloudflare dashboard took a while to catch up and show any traffic, but I wasn't relying on it.
-
 ## Building this with Claude
 
 I used Claude for essentially the whole project — from figuring out the architecture to writing the TypeScript, walking through Wrangler and Cloudflare setup, diagnosing bugs, and eventually helping manage the team during the season. I described what I wanted, I tested what it built, and I made the calls about how the league should work. Claude wrote the code, ran diagnostics, helped debug the integration, and kept the league notes current. Fantasy football turned out to be a pretty good test case because there is a real feedback loop: **Ask → try it → see what happened → change the approach → try again.**
 
-### When the API loses to a screenshot
+### The notes file is the real product
 
-The Sleeper integration did not go according to plan. The original idea was to pull every roster programmatically and cross-reference each player with a FantasyPros ID. Reasonable plan. It just didn't work very well.
+The part I'd steal for any project isn't the server. It's the notes file the Claude Project runs on. It's one long document, and every section has a job:
+
+- **Rules, checked against the source.** The exact scoring rules, pulled from Sleeper's own settings. The notes file is the source of truth for scoring, not a synced copy of it.
+- **What the rules reward.** Nine plain-English takeaways, like "stream DEF by matchup" and "don't over-rank pocket-passer QBs." This is what makes Claude advise for our league instead of generic PPR.
+- **Rosters, with a refresh rule.** All eight teams, plus instructions for re-verifying them. The first version came from draft-day memory and was wrong: it said one team lacked a workhorse RB, and it didn't. I caught it by pulling the live roster.
+- **A running log.** Trades and injury watches, so I don't have to remember what already happened. The Waddle-for-Pitts trade is a one-line entry, and so is Stribling's ankle; both show up below.
+- **Tone.** It's a family league, so trade talk stays warm, not cutthroat.
+
+Before a real trade offer, every few weeks, and before the deadline, I say "refresh the team notes" and Claude re-verifies and rewrites that section. Swap in your own project and the structure holds: what are the rules, what do they reward, what's the current state, when was it last checked, and what should the AI never do.
+
+### Getting the rosters in: when the API loses to a screenshot
+
+The notes need all eight rosters, and getting them in did not go according to plan. The original idea was to pull every roster programmatically from Sleeper and cross-reference each player with a FantasyPros ID. Reasonable plan. It just didn't work very well.
 
 The draft-picks endpoint came back empty even though Sleeper showed the draft as complete. The full player database is a 5–10 MB dump that got truncated before reaching the players I actually needed. And direct calls from Claude's sandbox to Sleeper were blocked. So after trying several approaches, I did something that felt almost offensively low-tech.
 
@@ -159,6 +115,24 @@ There was another moment that was worth paying attention to. Because of the netw
 
 The screenshots won. Since then, Claude has been reading Sleeper's API through a fetch tool, so the screenshots are mostly retired.
 
+## The plumbing: the MCP server
+
+The FantasyPros side is a small Cloudflare Worker that wraps FantasyPros' v2 API and exposes it as MCP tools, with a Workers KV cache in front because the free tier gives me 50 requests per day and I didn't want every follow-up question to burn one. The README covers the setup. Two gotchas are worth knowing about.
+
+First, FantasyPros' working API path wasn't the obvious one: the URL needs `/public/` (`api.fantasypros.com/public/v2/...`). Second, Claude's custom connector reserves `Authorization` for its OAuth flow, so I couldn't just stick a bearer token there. I used `x-api-key` instead:
+
+```typescript
+const apiKey = request.headers.get("x-api-key");
+
+if (apiKey !== env.MCP_AUTH_TOKEN) {
+  return new Response("Unauthorized", { status: 401 });
+}
+```
+
+That token gates the Worker so it isn't just an open proxy to my FantasyPros API key. My actual FantasyPros key lives as a Cloudflare secret. It never gets typed into a chat, committed to git, or copied into a client configuration. That also means the same MCP endpoint works whether I'm asking from my desktop, my phone, or somewhere completely different — which is nice. Because apparently fantasy football is now a distributed systems problem.
+
+The cache should have been the easy part, but `wrangler kv namespace create` failed with an authentication error despite a properly scoped login token. I created the namespace from the Cloudflare dashboard instead and copied the ID into `wrangler.jsonc`. The dashboard was slow to show any traffic, so I confirmed the cache was working from the terminal: `npx wrangler tail`, one real tool call, and a `[cache] HIT` line.
+
 ## So... does it actually help manage my team?
 
 The only question left was whether any of this actually made managing my team easier. I built it to spend **less** time on fantasy football, not more, and in practice that mostly means I open the Sleeper app less: Claude reads the league through the APIs, so the research happens before I ever tap anything. And once the season started, some of the little things turned out to be surprisingly useful.
@@ -177,23 +151,11 @@ FantasyPros' injury news flagged my WR5, De'Zhaun Stribling, as out for at least
 
 I still had to make the add and drop myself in the Sleeper app. Claude didn't click the button. But the part that used to mean opening three tabs, scrolling through waiver articles, checking injury news, and trying to figure out who was actually relevant took one message.
 
-## What I actually learned
+## Lessons learned & what's next
 
-The bigger lesson had almost nothing to do with fantasy football. It's about **where I spend my time**.
+The lesson I'd generalize has almost nothing to do with fantasy football. It's about **where I spend my time**.
 
 I could have spent the offseason writing scripts against the Sleeper API, figuring out every endpoint, maintaining them, and then forgetting all the quirks by next August. Instead, I spent more of my time thinking about which trades make sense and which parts of managing the team I actually wanted help with, and about what Claude needed to know to answer either one.
-
-The part I'd steal for any project isn't the server, though. It's the notes file the Claude Project runs on. It's one long document, and every section has a job:
-
-- **Rules, checked against the source.** The exact scoring rules, pulled from Sleeper's own settings. The notes file is the source of truth for scoring, not a synced copy of it.
-- **What the rules reward.** Nine plain-English takeaways, like "stream DEF by matchup" and "don't over-rank pocket-passer QBs." This is what makes Claude advise for our league instead of generic PPR.
-- **Rosters, with a refresh rule.** All eight teams, plus instructions for re-verifying them. The first version came from draft-day memory and was wrong: it said one team lacked a workhorse RB, and it didn't. I caught it by pulling the live roster.
-- **A running log.** Trades and injury watches, so I don't have to remember what already happened. The Waddle-for-Pitts trade is a one-line entry, and so is Stribling's ankle.
-- **Tone.** It's a family league, so trade talk stays warm, not cutthroat.
-
-Before a real trade offer, every few weeks, and before the deadline, I say "refresh the team notes" and Claude re-verifies and rewrites that section. Swap in your own project and the structure holds: what are the rules, what do they reward, what's the current state, when was it last checked, and what should the AI never do.
-
-## Lessons learned & what's next
 
 FantasyPros has an official, hosted MCP server that does more than mine does, and it was already live when I started: their MCP docs are dated September 1st, and I began the Worker on September 5th. If I'd found it first, I probably would have just used theirs, and I'll likely switch my own workflow over at some point. The wrapper itself is probably redundant now, but what I built it with transfers: the Worker, the MCP mechanics, the auth header, and the caching layer.
 
