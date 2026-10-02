@@ -2,3 +2,9 @@ public/
 resources/_gen/
 .hugo_build.lock
 .DS_Store
+
+# Local working screenshots, not for the public repo
+static/images/income-book-evolution-02.png
+static/images/income-book-evolution-04.png
+static/images/income-book-evolution-06.png
+static/images/income-view-concept-summary.png
