@@ -17,13 +17,11 @@ The result is eleven effects, a terminal-based menu, and a browser-based simulat
 
 I've got a CS degree, and my first job out of school was writing code — but coding itself was never the part I loved. What I love is building things and solving problems. For a long time, though, those two things pulled against each other: I'd have an idea, and the implementation would eat up all the time and patience I had for it. I've done LED strip projects before, without AI, and it took days to get something simple working — a lot of web searching, trying to bend someone else's example to fit my wiring, running out of steam before it was actually done. Projects like that tend to die in a "works on my desk, nobody else could reproduce it" state.
 
-This is also the first Pi project I've set up with a real project behind it, documenting decisions as I went instead of accumulating a folder of scripts I'd forget the reasoning for in a month. Part of why I'm writing this blog at all is to get better at that — communicating what I built and why, not just building it.
-
 ## What you'll need
 
 - Raspberry Pi 5
 - SK6812 or WS2812B-compatible addressable LED strip
-- External 5V power supply
+- External 5V/6A power supply (mine is a YS-0506 adapter)
 - Half-size breadboard
 - Adafruit T-Cobbler Plus (optional — that's what I used to break the GPIO header out to the breadboard; you can wire directly into the header instead)
 - Ribbon cable (if using the cobbler)
@@ -33,7 +31,7 @@ This is also the first Pi project I've set up with a real project behind it, doc
 
 Before I'd wired anything, I sent Claude photos of the strip and the power setup I was planning and described what I was trying to build. That's how the blinking-on-power behavior got diagnosed as normal, before I second-guessed the wiring because of it.
 
-**Hardware:** Raspberry Pi 5, SK6812/WS2812B-compatible addressable strip, an external 5V power supply (rather than powering the strip off the Pi's own 5V rail — addressable strips can draw several amps at full brightness, more than the Pi's onboard supply is really there for), a shared ground between the Pi and the strip's power supply, and the data line on GPIO10/MOSI. The GPIO header isn't wired point-to-point, though — it goes Pi → ribbon cable → an Adafruit T-Cobbler Plus mounted on a half-size breadboard, which breaks the 40 pins out to breadboard rows. The strip's data and ground leads land on those rows instead of jumping straight into the Pi's header, which made it a lot easier to move things around while I was still figuring out the wiring.
+**Hardware:** Raspberry Pi 5, SK6812/WS2812B-compatible addressable strip, an external 5V power supply (rather than powering the strip off the Pi's own 5V rail — addressable strips can draw several amps at full brightness, more than the Pi's onboard supply is really there for), a shared ground between the Pi and the strip's power supply, and the data line on GPIO10/MOSI. My strip is 60 LEDs. At roughly 60 mA per pixel at full white, that's an estimated 3.6 A worst case — an estimate, not a measurement — which is why the 6A supply, and why the code defaults brightness to 50% (`get_strip(brightness=0.5)`). The GPIO header isn't wired point-to-point, though — it goes Pi → ribbon cable → an Adafruit T-Cobbler Plus mounted on a half-size breadboard, which breaks the 40 pins out to breadboard rows. The strip's data and ground leads land on those rows instead of jumping straight into the Pi's header, which made it a lot easier to move things around while I was still figuring out the wiring.
 
 ![Wiring diagram: Pi 5 GPIO header → ribbon cable → Adafruit T-Cobbler Plus → breadboard](/images/led-strip-wiring-diagram.png)
 
@@ -70,19 +68,19 @@ graph LR
 
 To be explicit about it, since the rest of this post takes it for granted: I used **Claude** throughout the build — not just to help with a tricky function. I didn't write the code, make the commits, or manage the repo. Instead, I focused on describing what I wanted to build, making design decisions, testing the results, identifying problems, and deciding what to tackle next. Claude handled the implementation — all eleven effects, `led.py`, `led_common.py`, `off.py`, and every `git` operation end-to-end.
 
-But the interesting part wasn't simply having AI write the code. It was learning how to work with AI to turn an idea into a working project.
-
 **Building without the hardware.** At one point, I wanted an easier way to see what a new LED program would look like without having to plug in the Raspberry Pi and LED strip every time. If I was going to keep building new effects, I wanted a way to experiment with them virtually. I suggested building a visual validation tool that would let me preview effects without the physical hardware, and Claude took that idea and built the browser-based simulator. That ended up changing how I worked on the project — I could build and test new effects virtually, then use the actual LED strip when I wanted to validate the final result on hardware.
 
-**Keeping a journal of the build.** I also wanted to capture the project as I built it — not just the final code, but the things we discovered along the way: design decisions, changes in direction, problems, solutions, and lessons learned. I knew I eventually wanted to turn the experience into a blog post, but manually documenting everything would have been another project in itself.
+**How fast it was.** The part that got me was the speed. I'd ask for something like a Pac-Man chase, and Claude had the code written in seconds. A few minutes later it was on GitHub and I was testing it on the strip.
 
-There was another reason: I didn't want the history of the project trapped in a single chat session, or tied to one interface or one AI. I wanted the project context to be something I could pick up from anywhere — whether I was using the Claude app, a CLI, or a different AI entirely.
+Eight years ago, when I first started messing with a Pi and an LED strip, I wrote everything myself. I had a couple of simple examples from the web, and not nearly the skills to build anything like a Pac-Man with four ghosts, pellets and the occasional cherry. The first version took days to get working, and even after it worked, every change was hours of work.
 
-So I asked Claude to create a `JOURNEY.md` file that could serve as a persistent journal for the project. Claude maintained the file as the project evolved, capturing the decisions, discoveries, and changes along the way — instead of relying on the AI to remember everything from previous conversations, I gave it a shared source of project context that could travel with the code.
+Now a change was one prompt and a couple of seconds. That made the project more fun, not just faster. I got to spend my time watching the lights do different things and building on the idea.
+
+**Keeping a journal of the build.** I didn't want the project's history trapped in one chat session or tied to one AI, so I had Claude maintain a `JOURNEY.md` in the repo as we went — decisions, changes in direction, problems, and lessons. That way I can pick the project up from any app, CLI, or AI. The longer version of this story lives there.
 
 **The barrier got pretty low.** One of the more interesting demonstrations of this came from my 13-year-old, who has never written a line of code. He sent Claude a few chat requests of his own and ended up with the Rocket Launch effect in the menu — that's probably the part that stuck with me most: the barrier between having an idea and something actually working had gotten surprisingly low.
 
-I didn't run into a dramatic "confidently wrong" moment worth calling out here — no bug it introduced that I had to catch and fix myself. The real friction was architectural growing pains as the design evolved (more on that below), not AI mistakes. What changed was where my time went: instead of losing days to syntax, library research, and debugging, I spent it testing on real hardware, deciding what to build next, and pivoting when something didn't work. That's a genuinely different way to work than the "days of web searching" version of this project I've attempted before.
+Worth saying plainly: Claude didn't hand me a wrong answer that I had to catch on this project. The Pi 5 diagnosis was right the first time, and the friction was architectural growing pains as the design evolved (more on that below). The real misses came later, on the LED-panel follow-up, which is a story for another post. On the strip, my time went to testing on real hardware, deciding what to build next, and pivoting when something didn't work.
 
 ## Key technical insights & challenges
 
@@ -114,17 +112,15 @@ def stop_process(proc):
 
 Every effect wraps its animation loop the same way — `except KeyboardInterrupt: strip.clear(); strip.show()` — so `led.py` never needs to know anything effect-specific about how to turn one off. That "lights wouldn't turn off" bug is also why `off.py` exists as a dedicated, synchronous one-shot action rather than just another backgrounded effect — turning the strip off shouldn't itself be an animation you have to interrupt.
 
-**3. Ran out of single-digit keys.** Past nine effects, the menu needed a second character set. Rather than jumping to two-digit numbers, we had new effects pick up letters (`a`, `b`, `c`, ...), with keys as explicit key-name-filename tuples in a `PROGRAMS` list rather than derived from list position — so adding a twelfth effect later can't accidentally change what key `5` does.
+Past nine effects the menu also ran out of single-digit keys, so new effects pick up letters (`a`, `b`, `c`, ...), with keys as explicit key-name-filename tuples in a `PROGRAMS` list rather than derived from list position — so adding a twelfth effect later can't accidentally change what key `5` does.
 
 ## Lessons learned & what's next
 
 If I started over, I'd probably go straight to the one-file-per-effect-plus-menu pattern instead of detouring through the monolith first — though I'm not sure I'd have known to, without hitting the pain of the monolith directly. The pivots came from testing on real hardware and running into real annoyances, not from planning it all upfront.
 
-The bigger lesson is about where my attention went. Not having to write the Python myself meant I spent my time on the actual decisions — what should happen when the lights won't turn off, when do we need letters instead of digits, is a browser simulator worth building — instead of on syntax and library documentation. That's the difference between this project shipping and the version of this project from a few years ago that didn't.
+The bigger lesson is about where my attention went. Not having to write the Python myself meant I spent my time on the actual decisions — what should happen when the lights won't turn off, when do we need letters instead of digits, is a browser simulator worth building — instead of on syntax and library documentation. That's the difference between this project shipping and the earlier version of this project I tried without AI, which didn't. Whatever your version of the LED strip is, the split is the same: figure out which parts of your project are the decisions and which are the typing, and be deliberate about handing off the typing.
 
-Stepping back, the LED strip isn't really the point of this project. The interesting part for me was discovering a different way to build. By having AI handle much of the implementation, I could spend more of my time deciding what to build, solving problems, testing ideas, and figuring out what to try next.
-
-I'm still learning what this new way of working looks like. This project was one experiment, and the `JOURNEY.md` approach has already evolved into something more structured in later projects. That's really what I want this blog to document — not just the things I build, but how I'm learning to incorporate AI into the process and make it easier to turn ideas into things that actually work.
+This project was one experiment, and the `JOURNEY.md` approach has already evolved into something more structured in later projects.
 
 ## Try it yourself
 
@@ -148,3 +144,5 @@ No hardware handy? Open `simulator.html` in a browser — it's a self-contained 
 ![The browser simulator running the Rainbow effect on a virtual 60-pixel strip, with the same menu reference alongside it](/images/led-strip-simulator.png)
 
 If you build on this, hit a bug, or want an effect that isn't here yet, [open an issue](https://github.com/dwooods/led-strip/issues) or send a PR. And if you want the longer, AI-written version of this story, `JOURNEY.md` is in the repo.
+
+I wouldn't have shared any of this if I'd had to do the coding myself. I'd have ended up with a script that worked on my desk and nowhere else. Instead there's a repo, a simulator and this post, so someone else can build the same thing.
