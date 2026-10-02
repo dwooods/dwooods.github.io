@@ -157,7 +157,7 @@ There was another moment that was worth paying attention to. Because of the netw
 
 "Find a clever way around a policy or network restriction" isn't necessarily the same thing as solving the problem. I'd much rather have the AI stop and say, "That path isn't appropriate," than become increasingly creative about circumventing a restriction. So we went back to screenshots.
 
-The screenshots won.
+The screenshots won. Since then, Claude has been reading Sleeper's API through a fetch tool, so the screenshots are mostly retired.
 
 ## So... does it actually help manage my team?
 
@@ -177,13 +177,9 @@ FantasyPros' injury news flagged my WR5, De'Zhaun Stribling, as out for at least
 
 I still had to make the add and drop myself in the Sleeper app. Claude didn't click the button. But the part that used to mean opening three tabs, scrolling through waiver articles, checking injury news, and trying to figure out who was actually relevant took one message.
 
-### Getting tapped on the shoulder before kickoff
-
-I also set up a scheduled check to confirm that one of my players was active before Sunday Night Football.
-
 ## What I actually learned
 
-But the bigger lesson had almost nothing to do with fantasy football. It's about **where I spend my time**.
+The bigger lesson had almost nothing to do with fantasy football. It's about **where I spend my time**.
 
 I could have spent the offseason writing scripts against the Sleeper API, figuring out every endpoint, maintaining them, and then forgetting all the quirks by next August. Instead, I spent more of my time thinking about which trades make sense and which parts of managing the team I actually wanted help with, and about what Claude needed to know to answer either one.
 
@@ -201,7 +197,7 @@ Before a real trade offer, every few weeks, and before the deadline, I say "refr
 
 FantasyPros has an official, hosted MCP server that does more than mine does, and it was already live when I started: their MCP docs are dated September 1st, and I began the Worker on September 5th. If I'd found it first, I probably would have just used theirs, and I'll likely switch my own workflow over at some point. The wrapper itself is probably redundant now, but what I built it with transfers: the Worker, the MCP mechanics, the auth header, and the caching layer.
 
-If I did this again, I'd assume the low-tech fallback much earlier.
+If I did this again, I'd assume the low-tech fallback much earlier. What hasn't changed is who makes the calls.
 
 I still decide whether to make a trade.
 
@@ -228,4 +224,4 @@ npx wrangler login
 
 If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues) — I'd genuinely like to compare notes.
 
-The Sunday Night Football check came back active, so there was nothing left for me to do. The lineup was set, the group chat was still talking trash, my son was in it, and I didn't have to remember a thing.
+I'd also set up a scheduled check to make sure one of my players was active before kickoff. The Sunday Night Football check came back active, so there was nothing left for me to do. The lineup was set, the group chat was still talking trash, my son was in it, and I didn't have to remember a thing.
