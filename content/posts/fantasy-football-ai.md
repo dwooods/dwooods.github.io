@@ -13,8 +13,6 @@ featuredImagePreview: "/images/fantasy-football-meme-toilet-store.png"
 .featured-image img, .featured-image img.lazyloaded { max-width: 492px; width: 100% !important; }
 </style>
 
-**Repo:** [github.com/dwooods/fantasypros-mcp](https://github.com/dwooods/fantasypros-mcp)
-
 I'd never played fantasy football before this season, and the first one was with family.
 
 The actual appeal was never the competition — it's the trash talk and the excuse to stay connected with my son, my father-in-law, and the rest of the group. The problem is I have almost no time or patience to track who's playing, who's hurt, or who I should be starting each week. Given a choice between managing my roster and watching the 49ers, my actual favorite team, the 49ers win every time.
@@ -175,7 +173,7 @@ What's next? The injury and lineup check-ins are still one-off scheduled tasks r
 
 ## Want to try it?
 
-The FantasyPros MCP server is open source, and the README walks through the Cloudflare setup, secrets, the KV cache, and connecting it to Claude.
+The FantasyPros MCP server is [open source on GitHub](https://github.com/dwooods/fantasypros-mcp), and the README walks through the Cloudflare setup, secrets, the KV cache, and connecting it to Claude.
 
 ```bash
 git clone https://github.com/dwooods/fantasypros-mcp.git
