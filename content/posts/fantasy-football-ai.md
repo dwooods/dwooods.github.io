@@ -91,7 +91,7 @@ Before a real trade offer, every few weeks, and before the deadline, I say "refr
 
 The notes need all eight rosters, and getting them in did not go according to plan. The original idea was to pull every roster programmatically from Sleeper and cross-reference each player with a FantasyPros ID. Reasonable plan. It just didn't work very well.
 
-The draft-picks endpoint came back empty even though Sleeper showed the draft as complete. The full player database is a 5–10 MB dump that got truncated before reaching the players I actually needed. So after trying several approaches, I did something that felt almost offensively low-tech.
+The full player database is a multi-megabyte dump that got cut off before reaching the players I actually needed. So after trying several approaches, I did something that felt almost offensively low-tech.
 
 I took a screenshot.
 
