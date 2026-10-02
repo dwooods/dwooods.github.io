@@ -309,11 +309,7 @@ Claude also got things wrong, more than once. The GPU env vars earlier in this p
 
 ## Lessons learned & what's next
 
-On the PC, the fast path is clear: get the GPU env vars right, stay under ~13B params at Q4_K_M unless you've specifically tested a bigger model's split-mode performance, and tune `num_ctx` down before you conclude a model is "slow" when it's just spilling out of VRAM. `qwen3.5:9b` was the most consistently reliable model across every eval suite I ran it through, comfortably inside the 12GB budget, as long as `think: false` is on for anything latency-sensitive and the conversation doesn't get long.
-
-On the Pi, both halves of the picture are in now: real speed measurements across the sub-4B tier, and real quality scores across four separate workloads. The two don't point the same direction: the fastest model on the shortlist is also the weakest one, and `llama3.2:3b`/`qwen2.5:3b` are the ones I'd pick despite running at less than half the speed.
-
-The lesson threading through both machines is the one from the eval-harness section: none of this shows up until you run the test and check the raw output by hand. Here's the whole post as the table it turned out to be:
+If you want one pick per machine: `qwen3.5:9b` with `think: false` on the PC, and `llama3.2:3b` or `qwen2.5:3b` on the Pi. The lesson threading through both is the one from the eval-harness section: none of this shows up until you run the test and check the raw output by hand. Here's the whole post as the table it turned out to be:
 
 | What I assumed | What the test found |
 |---|---|
