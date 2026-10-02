@@ -209,48 +209,22 @@ Everything in this section runs on the Pi 5: 8GB RAM, no discrete GPU, CPU-only 
 
 ### CPU-only, and it shows
 
-No GPU means every model lives or dies by CPU throughput and the Pi's ~17GB/s memory bandwidth. The math is straightforward: generation speed is roughly that bandwidth divided by model size, which is why the gap between a 1.5B and an 8B model here is so much larger than the parameter count alone would suggest.
-
-I ran a quick automated pass with the `llm-benchmark` pip package (`pip install llm-benchmark`, then `llm_benchmark run --no-sendinfo`) against its default 7–9B model set, and the results confirmed the Pi is not the machine for mid-size models:
-
-| Model | Tokens/sec |
-|---|---|
-| `llava:7b` | 2.89 |
-| `mistral:7b` | 2.44 |
-| `llama3.1:8b` | 2.32 |
-| `deepseek-r1:8b` | 2.12 |
-| `gemma2:9b` | 2.06 |
-
-All in the same tight 2–2.9 tok/s band: technically it runs, but that's a submit-and-wait experience, not a conversation.
-
-The models actually sized for this hardware are the sub-4B tier, and I initially only had community/vendor estimates for them rather than my own measurements. I've since run all six on the actual hardware, and every single vendor estimate turned out optimistic:
-
-| Model | Size | Estimated speed | Measured speed | Estimate accuracy |
-|---|---|---|---|---|
-| `llama3.2:1b` | ~1.3GB | ~20–22 tok/s | **8.24 tok/s** | ~37–41% of estimate — the biggest miss |
-| `qwen2.5:1.5b` | ~0.99GB | ~15–17 tok/s | **12.08 tok/s — fastest measured** | ~71–80% of estimate |
-| `llama3.2:3b` | ~2.0GB | ~8–9 tok/s | **5.55 tok/s** | ~62–69% of estimate |
-| `qwen2.5:3b` | ~1.9GB | ~8–9 tok/s | **5.49 tok/s** | ~61–69% of estimate |
-| `phi3.5:3.8b` | ~2.4GB | ~6–7 tok/s | **4.87 tok/s — slowest measured** | ~70–81% of estimate |
-| `gemma2:2b` | ~1.6GB | 5–10 tok/s | **6.66 tok/s** | within the estimate band |
-
-One methodology finding fell out of running all six back to back: on-disk GGUF file size, not the nominal parameter count, is what predicts speed here. `tok/s × file-size-in-GB` lands in a tight 10.4–11.9 range across all six models; dividing that by the Pi's ~17GB/s memory-bandwidth ceiling shows every model hit roughly 61–70% of theoretical throughput, consistently. That's why `llama3.2:1b` (1.3GB) beats `gemma2:2b` (1.6GB) despite the "smaller" name, and why `qwen2.5:1.5b` (0.99GB, the smallest file of the six) is the outright speed leader.
-
-One methodology note before the quality numbers: the Pi can't fit `deepseek-r1:14b`, the judge model used for every rubric-graded suite in this post, locally, so the three suites that need a judge (chat, coding, agentic) don't grade themselves on-device. Claude's fix: generation stays on the Pi, and only the `llm-rubric` grading call crosses the LAN to the PC's judge model; the diagram below has the wiring. The one open question it settled: whether `num_ctx` passes through an `openai:chat:` provider the same way it does for a native `ollama:chat:` one. It does, confirmed by checking `ollama ps` on the PC mid-run and seeing `deepseek-r1:14b` loaded at 100% GPU with `CONTEXT 4096`, an exact match to what was configured.
+No GPU means every model lives or dies by the Pi's ~17GB/s memory bandwidth, so speed comes down to how big the model file is. Five 7–9B models all landed at 2–2.9 tok/s: technically running, but submit-and-wait, not a conversation. The usable tier is under 4B, so that's where I measured six models for speed and then ran them through the same quality suites as the PC. One setup note: the Pi can't hold the 14B judge model, so Claude's fix was to keep generation on the Pi and send only the grading call across the LAN to the PC.
 
 ![Architecture diagram: the model, promptfoo, and the llm-rubric grading assertion all run on the Raspberry Pi 5; only the grading call crosses the LAN to the PC's deepseek-r1:14b judge model, whose verdict text returns to the Pi, where llm-rubric turns it into a pass/fail score.](/images/chart-lan-judge-diagram.png)
 *Everything runs on the Pi except the judge model itself. `llm-rubric` is a promptfoo assertion, so it's the Pi that sends the grading prompt across the LAN and the Pi that turns the verdict that comes back into a score.*
 
-Then the quality numbers came in, and speed and quality pulled in opposite directions. I ran all six models through the same four-workload eval harness described above, and `qwen2.5:1.5b`, the fastest model by a wide margin, finished dead last or tied for it on every single suite: 1 out of 3 on extraction, 2 out of 4 on the agentic suite, 2 out of 4 on chat, 1 out of 4 on coding. Meanwhile `llama3.2:3b` and `qwen2.5:3b`, both roughly half its speed, are the only two models on the shortlist that didn't drop a single case on the judge-free tests: 3/3 on extraction, 4/4 on the agentic suite, a clean pass where the faster model kept failing. This wasn't a lucky pair of runs I talked myself into; it held across four independent suites run over three separate days, and the gap only got clearer as more data came in.
-
-So despite `qwen2.5:1.5b` looking like the obvious pick from a speed table alone, **`llama3.2:3b` or `qwen2.5:3b` are the models I'd pick from this shortlist**. If you're picking a model by grabbing whatever's fastest, you're optimizing for exactly the wrong variable. `llama3.2:1b` is a reasonable middle-ground pick if you want something faster than the 3B tier without `qwen2.5:1.5b`'s consistent quality gap. Two other models, `gemma2:2b` and `phi3.5:3.8b`, both bottomed out on the agentic suite specifically, but that turned out to be a Pi-only reliability bug, not a capability problem: running six models through a 6-provider matrix on 8GB of RAM (7.87GB usable) forces repeated load/evict cycles, and under that memory pressure a model can return completely empty output even though it works fine when run alone. It's a real caveat for a Pi product that serves multiple models from shared RAM, but not a mark against either model standalone.
-
 ![Scatter plot: measured generation speed against aggregate pass rate across all four quality suites for the six Pi shortlist models. qwen2.5:1.5b sits far right at 12.08 tok/s and 40%; llama3.2:3b and qwen2.5:3b cluster near 5.5 tok/s at 73–80%, the best on the shortlist.](/images/chart-pi-speed-vs-quality.png)
 *All six shortlist models, one dot each: the fastest model and the two best-scoring models sit in opposite corners. Hatched dots are the two whose agentic score was zeroed by the memory-pressure bug, not by the model. 15 cases per model.*
 
-The run that produced those numbers almost didn't happen. The first attempt at the LAN-judge setup stalled hard: the terminal sat at "0% | 0/24" for several minutes with nothing moving. `ollama ps` showed two models loaded on the Pi at once, and `htop` showed why: two or three `llama-server` processes pinned near 99% CPU across all four cores, swap climbing. `OLLAMA_MAX_LOADED_MODELS=1`, the setting I said would come back to bite me back in the VRAM-cliff section, had only ever been set on the PC; the Pi's Ollama install, freshly reinstalled a few days earlier, never had it set at all, so it was happily trying to hold multiple models in 8GB of RAM at once. Claude walked through the `ollama ps`/`htop` output with me to narrow that down and drafted the fix: `sudo systemctl edit ollama.service` with an `Environment=` line.
+What I'd want someone to know before testing their own Pi:
 
-That did nothing on the first try: the drop-in was missing its `[Service]` header, and systemd doesn't error on a headerless `Environment=` line, it just silently ignores it, which looks a lot like "the fix didn't take" rather than "the fix was malformed." `systemctl show ollama --property=Environment` coming back empty looked at first like pager truncation; `sudo systemctl cat ollama` is what confirmed the header was missing. Once it was in, one model loaded at a time, and the suite ran clean.
+- **Don't trust the published speeds.** Every vendor estimate was optimistic; real speeds landed at 37–81% of the number on the box.
+- **File size predicts speed, not parameter count.** Tokens per second times file size in GB came out at roughly 11 for all six models, so the smallest file (`qwen2.5:1.5b`, 0.99GB) was the fastest, ahead of a "1B" model.
+- **The fastest model was the weakest.** `qwen2.5:1.5b` came last or tied for last on every quality suite. `llama3.2:3b` and `qwen2.5:3b`, at about half its speed (~5.5 tok/s), were the only two that didn't drop a case on the judge-free tests, so they're my picks.
+- **One model at a time.** Six models through 8GB of RAM forced constant load/evict cycles, and under that pressure a model can return completely empty output even though it works fine alone. `OLLAMA_MAX_LOADED_MODELS=1`, the setting I said would come back to bite me, had never been set on the freshly reinstalled Pi, and without it the first run stalled with two models loaded at once. If you set it with `systemctl edit`, include the `[Service]` header, or systemd silently ignores the line.
+
+The full speed tables, the per-suite results and the memory-pressure details are in the repo's `FINDINGS.md`. Run your own models through it rather than taking my six as the answer.
 
 ### Six crashes and a watchdog: closing out the Pi's vision suite
 
