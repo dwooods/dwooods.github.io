@@ -43,6 +43,10 @@ So I wanted three things:
 2. **A memory of our league** — scoring rules, rosters, trades, player situations — so I didn't have to re-explain the league every time I asked a question.
 3. **A co-manager** that could occasionally tap me on the shoulder and say, "Hey, you might want to check your lineup."
 
+<img src="/images/fantasy-football-meme-planning.png" alt="Men will deny being good at planning things until fantasy football comes around" style="max-width: 350px; width: 100%; height: auto; display: block; margin: 0 auto;">
+
+I wasn't trying to learn MCP because I needed another technology to put on my resume. I wanted to make fantasy football easier, and MCP happened to be a pretty good way to do it.
+
 ## Architecture & tech stack
 
 The whole thing ended up being three pieces:
@@ -193,8 +197,6 @@ But the bigger lesson had almost nothing to do with fantasy football. It's about
 
 I could have spent the offseason writing scripts against the Sleeper API, figuring out every endpoint, maintaining them, and then forgetting all the quirks by next August. Instead, I spent more of my time thinking about which trades make sense and which parts of managing the team I actually wanted help with, and about what Claude needed to know to answer either one.
 
-That's a different way to build, and a different way to manage a fantasy team.
-
 The part I'd steal for any project isn't the server, though. It's the notes file the Claude Project runs on. It's one long document, and every section has a job:
 
 - **Rules, checked against the source.** The exact scoring rules, pulled from Sleeper's own settings. The notes file is the source of truth for scoring, not a synced copy of it.
@@ -205,17 +207,11 @@ The part I'd steal for any project isn't the server, though. It's the notes file
 
 Before a real trade offer, every few weeks, and before the deadline, I say "refresh the team notes" and Claude re-verifies and rewrites that section. Swap in your own project and the structure holds: what are the rules, what do they reward, what's the current state, when was it last checked, and what should the AI never do.
 
-## The best part? It's actually fun
-
-<img src="/images/fantasy-football-meme-planning.png" alt="Men will deny being good at planning things until fantasy football comes around" style="max-width: 350px; width: 100%; height: auto; display: block; margin: 0 auto;">
-
-I wasn't trying to learn MCP because I needed another technology to put on my resume. I wanted to make fantasy football easier, and MCP happened to be a pretty good way to do it.
-
 ## Lessons learned & what's next
 
 FantasyPros has an official, hosted MCP server that does more than mine does, and it was already live when I started: their MCP docs are dated September 1st, and I began the Worker on September 5th. If I'd found it first, I probably would have just used theirs, and I'll likely switch my own workflow over at some point. The wrapper itself is probably redundant now, but what I built it with transfers: the Worker, the MCP mechanics, the auth header, and the caching layer.
 
-If I did this again, I'd assume the low-tech fallback much earlier. The other big lesson is that I don't think the value of AI here is "replace me." It's "make me more effective."
+If I did this again, I'd assume the low-tech fallback much earlier. And the AI isn't replacing me here.
 
 I still decide whether to make a trade.
 
@@ -245,5 +241,3 @@ The MCP server itself is intentionally generic. The interesting part isn't the s
 If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues) — I'd genuinely like to compare notes.
 
 The Sunday Night Football check came back active, so there was nothing left for me to do. The lineup was set, the group chat was still talking trash, my son was in it, and I didn't have to remember a thing.
-
-So there's clearly still some work to do — starting with watching more than just the 49ers on Sundays.
