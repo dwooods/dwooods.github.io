@@ -2,9 +2,9 @@
 title: "Building a Raspberry Pi LED Controller with Claude"
 date: 2026-09-10
 draft: false
-tags: ["raspberry-pi", "led", "ws2812", "sk6812", "python", "hardware", "cowork"]
-description: "A menu-driven controller for an addressable SK6812/WS2812B LED strip on a Raspberry Pi 5, driven over hardware SPI, with eleven animated effects and a browser-based simulator — built by directing Claude Cowork through the implementation."
-summary: "What happens when you have an idea for a hardware project but don't want to spend days writing the code? I used Claude Cowork to build a Raspberry Pi LED controller and discovered a different way to turn an idea into a working project."
+tags: ["raspberry-pi", "led", "ws2812", "sk6812", "python", "hardware"]
+description: "A menu-driven controller for an addressable SK6812/WS2812B LED strip on a Raspberry Pi 5, driven over hardware SPI, with eleven animated effects and a browser-based simulator — built by directing Claude through the implementation."
+summary: "What happens when you have an idea for a hardware project but don't want to spend days writing the code? I used Claude to build a Raspberry Pi LED controller and discovered a different way to turn an idea into a working project."
 featuredImage: "/images/led-strip-full-setup.jpg"
 featuredImagePreview: "/images/led-strip-full-setup.jpg"
 ---
@@ -31,7 +31,7 @@ This is also the first Pi project I've set up with a real project behind it, doc
 
 ## Architecture & tech stack
 
-Before I'd wired anything, I sent Cowork photos of the strip and the power setup I was planning and described what I was trying to build. That's how the blinking-on-power behavior got diagnosed as normal, before I second-guessed the wiring because of it.
+Before I'd wired anything, I sent Claude photos of the strip and the power setup I was planning and described what I was trying to build. That's how the blinking-on-power behavior got diagnosed as normal, before I second-guessed the wiring because of it.
 
 **Hardware:** Raspberry Pi 5, SK6812/WS2812B-compatible addressable strip, an external 5V power supply (rather than powering the strip off the Pi's own 5V rail — addressable strips can draw several amps at full brightness, more than the Pi's onboard supply is really there for), a shared ground between the Pi and the strip's power supply, and the data line on GPIO10/MOSI. The GPIO header isn't wired point-to-point, though — it goes Pi → ribbon cable → an Adafruit T-Cobbler Plus mounted on a half-size breadboard, which breaks the 40 pins out to breadboard rows. The strip's data and ground leads land on those rows instead of jumping straight into the Pi's header, which made it a lot easier to move things around while I was still figuring out the wiring.
 
@@ -45,7 +45,7 @@ Before I'd wired anything, I sent Cowork photos of the strip and the power setup
 
 The Pi 5 is the reason this couldn't just follow any of the existing LED-strip tutorials. If you've found an older Raspberry Pi LED-strip tutorial, there's an important catch: many of them point you at `rpi_ws281x` or Adafruit's `neopixel` library, and neither works on a Pi 5. Previous Pi boards let those libraries talk straight to GPIO memory to hit the strip's tight timing requirements; the Pi 5 moved GPIO handling to a separate chip called RP1, and that direct-register trick just doesn't reach the pins anymore. It doesn't error loudly — it just doesn't work, which is worse.
 
-I didn't know any of that going in. Instead of hunting for the one tutorial written for a Pi 5, I described what I was trying to build and what I was actually seeing, and Cowork researched the RP1/GPIO change and worked out the SPI-based fix.
+I didn't know any of that going in. Instead of hunting for the one tutorial written for a Pi 5, I described what I was trying to build and what I was actually seeing, and Claude researched the RP1/GPIO change and worked out the SPI-based fix.
 
 {{< admonition type="note" title="The Pi 5 GPIO gotcha" open=true >}}
 If a Pi 5 GPIO tutorial predates the Pi 5 (most do), assume it needs a translation step. For this project, the fix was routing the LED data line over **hardware SPI** instead of PWM/DMA, using `rpi5-ws2812` — the RP1 chip handles SPI natively.
@@ -68,27 +68,27 @@ graph LR
 
 ## Building the Project with Claude
 
-To be explicit about it, since the rest of this post takes it for granted: I used **Claude Cowork** throughout the build — not just to help with a tricky function. I didn't write the code, make the commits, or manage the repo. Instead, I focused on describing what I wanted to build, making design decisions, testing the results, identifying problems, and deciding what to tackle next. Cowork handled the implementation — all eleven effects, `led.py`, `led_common.py`, `off.py`, and every `git` operation end-to-end.
+To be explicit about it, since the rest of this post takes it for granted: I used **Claude** throughout the build — not just to help with a tricky function. I didn't write the code, make the commits, or manage the repo. Instead, I focused on describing what I wanted to build, making design decisions, testing the results, identifying problems, and deciding what to tackle next. Claude handled the implementation — all eleven effects, `led.py`, `led_common.py`, `off.py`, and every `git` operation end-to-end.
 
 But the interesting part wasn't simply having AI write the code. It was learning how to work with AI to turn an idea into a working project.
 
-**Building without the hardware.** At one point, I wanted an easier way to see what a new LED program would look like without having to plug in the Raspberry Pi and LED strip every time. If I was going to keep building new effects, I wanted a way to experiment with them virtually. I suggested building a visual validation tool that would let me preview effects without the physical hardware, and Cowork took that idea and built the browser-based simulator. That ended up changing how I worked on the project — I could build and test new effects virtually, then use the actual LED strip when I wanted to validate the final result on hardware.
+**Building without the hardware.** At one point, I wanted an easier way to see what a new LED program would look like without having to plug in the Raspberry Pi and LED strip every time. If I was going to keep building new effects, I wanted a way to experiment with them virtually. I suggested building a visual validation tool that would let me preview effects without the physical hardware, and Claude took that idea and built the browser-based simulator. That ended up changing how I worked on the project — I could build and test new effects virtually, then use the actual LED strip when I wanted to validate the final result on hardware.
 
 **Keeping a journal of the build.** I also wanted to capture the project as I built it — not just the final code, but the things we discovered along the way: design decisions, changes in direction, problems, solutions, and lessons learned. I knew I eventually wanted to turn the experience into a blog post, but manually documenting everything would have been another project in itself.
 
 There was another reason: I didn't want the history of the project trapped in a single chat session, or tied to one interface or one AI. I wanted the project context to be something I could pick up from anywhere — whether I was using the Claude app, a CLI, or a different AI entirely.
 
-So I asked Cowork to create a `JOURNEY.md` file that could serve as a persistent journal for the project. Cowork maintained the file as the project evolved, capturing the decisions, discoveries, and changes along the way — instead of relying on the AI to remember everything from previous conversations, I gave it a shared source of project context that could travel with the code.
+So I asked Claude to create a `JOURNEY.md` file that could serve as a persistent journal for the project. Claude maintained the file as the project evolved, capturing the decisions, discoveries, and changes along the way — instead of relying on the AI to remember everything from previous conversations, I gave it a shared source of project context that could travel with the code.
 
-**The barrier got pretty low.** One of the more interesting demonstrations of this came from my 13-year-old, who has never written a line of code. He sent Cowork a few chat requests of his own and ended up with the Rocket Launch effect in the menu — that's probably the part that stuck with me most: the barrier between having an idea and something actually working had gotten surprisingly low.
+**The barrier got pretty low.** One of the more interesting demonstrations of this came from my 13-year-old, who has never written a line of code. He sent Claude a few chat requests of his own and ended up with the Rocket Launch effect in the menu — that's probably the part that stuck with me most: the barrier between having an idea and something actually working had gotten surprisingly low.
 
 I didn't run into a dramatic "confidently wrong" moment worth calling out here — no bug it introduced that I had to catch and fix myself. The real friction was architectural growing pains as the design evolved (more on that below), not AI mistakes. What changed was where my time went: instead of losing days to syntax, library research, and debugging, I spent it testing on real hardware, deciding what to build next, and pivoting when something didn't work. That's a genuinely different way to work than the "days of web searching" version of this project I've attempted before.
 
 ## Key technical insights & challenges
 
-The current structure — one file per effect, a persistent menu, `off`/`quit` as first-class options — is not how this started. Cowork wrote all of it, but the design calls were still mine to make and push back on. It's what we turned it into after hitting real friction, in order:
+The current structure — one file per effect, a persistent menu, `off`/`quit` as first-class options — is not how this started. Claude wrote all of it, but the design calls were still mine to make and push back on. It's what we turned it into after hitting real friction, in order:
 
-**1. The monolith got painful fast.** Everything started in one file. Every new LED pattern meant editing that same file again, and it got harder to work in with each addition. Rather than live with it, I had Cowork pull shared setup into its own module and give every effect its own standalone file:
+**1. The monolith got painful fast.** Everything started in one file. Every new LED pattern meant editing that same file again, and it got harder to work in with each addition. Rather than live with it, I had Claude pull shared setup into its own module and give every effect its own standalone file:
 
 ```python
 from rpi5_ws2812.ws2812 import WS2812SpiDriver
@@ -103,7 +103,7 @@ def get_strip(brightness: float = 0.5):
 
 That's the entirety of `led_common.py`. It exists because every effect needs the same two things — LED count and a configured strip object — and this is one place to change either, instead of eleven copies to keep in sync.
 
-**2. One effect at a time, without the menu blocking or the strip getting stuck.** The project started with a single program you'd run and manually kill to try another. That pivoted to a menu that stays running and lets you pick a different effect while one's already going — but early on, killing an effect could leave the strip frozen mid-pattern, a stray lit pixel glowing until the next run. I had Cowork fix that in `led.py` by sending `SIGINT` to the running effect and waiting for it to exit before starting the next one, so each effect's own cleanup gets a chance to run:
+**2. One effect at a time, without the menu blocking or the strip getting stuck.** The project started with a single program you'd run and manually kill to try another. That pivoted to a menu that stays running and lets you pick a different effect while one's already going — but early on, killing an effect could leave the strip frozen mid-pattern, a stray lit pixel glowing until the next run. I had Claude fix that in `led.py` by sending `SIGINT` to the running effect and waiting for it to exit before starting the next one, so each effect's own cleanup gets a chance to run:
 
 ```python
 def stop_process(proc):
