@@ -178,4 +178,4 @@ npx wrangler login
 
 If you're in a family league fighting the same "generic rankings don't fit our scoring" problem, or you hit a wall with Sleeper's API, [open an issue on the repo](https://github.com/dwooods/fantasypros-mcp/issues) — I'd genuinely like to compare notes.
 
-I'd also set up a scheduled check to make sure one of my players was active before kickoff. The Sunday Night Football check came back active, so there was nothing left for me to do. The lineup was set, the group chat was still talking trash, my son was in it, and I didn't have to remember a thing.
+Sunday night, the scheduled check I'd set up looked at one of my players before kickoff and came back: active. There was nothing left for me to do. The lineup was set, the group chat was still talking trash, my son was in it, and I didn't have to remember a thing.
