@@ -90,7 +90,7 @@ Everything that fits in the 12GB of VRAM is fast. Past roughly 11.2GB, Ollama st
 
 What I took from it:
 
-- **~13B parameters at Q4_K_M (7–9GB) is the sweet spot** on a 12GB card: big enough to be useful, small enough to stay in VRAM. Anything bigger, test before you trust it.
+- **~13B parameters at Q4_K_M (7–9GB) is the sweet spot** on a 12GB card. Q4_K_M is a common 4-bit compressed format; at that size a model is big enough to be useful and small enough to stay in VRAM. Anything bigger, test before you trust it.
 - **Watch `num_ctx`.** The default context window can eat 2–6GB of VRAM before generating a token, enough to quietly push a 14B model out of VRAM. The README has my settings; the one that matters later is `OLLAMA_MAX_LOADED_MODELS=1`, which comes back to bite me on the Pi.
 - **Fully in VRAM means steady.** `deepseek-r1:14b` held 8.05–8.58 tok/s across four different prompts with no slowdown, which matters more in a real product than a fast first answer.
 
@@ -143,7 +143,7 @@ One receipt beat both models. A Costa Coffee receipt with a €4.24 pre-tax subt
 
 ### Building my own voice assistant: three gotchas that ate an afternoon
 
-Fully offline voice assistants (Whisper for speech-to-text, a local LLM via Ollama for the response, Piper for text-to-speech, no cloud round-trip at all) are one of the more common patterns people build on Pi-class hardware, and talk is cheap until you wire one up and hit record. Claude built exactly that pattern, push-to-talk with `faster-whisper` (`base.en`, CPU, int8) for speech-to-text, Ollama's streaming `/api/chat` for the LLM, and `piper-tts` for the voice, specifically to get a real, measured time-to-first-token number instead of the derived estimate I'd been using elsewhere in this project. Three things broke in ways worth writing down.
+A fully offline voice assistant is one of the most common things people build on hardware like this, and talk is cheap until you wire one up and hit record. Claude built one for me: push-to-talk, `faster-whisper` to turn speech into text, a local model through Ollama to answer, and `piper-tts` to speak the answer, with no cloud round-trip anywhere. The point was a real, measured time to first token (TTFT: how long you wait before the first word of the answer arrives) instead of the estimate I'd been using. Three things broke in ways worth writing down.
 
 | Gotcha | What it looked like | Fix |
 |---|---|---|
@@ -151,7 +151,7 @@ Fully offline voice assistants (Whisper for speech-to-text, a local LLM via Olla
 | Reasoning model starves itself of tokens | One turn returned nothing and the script crashed writing an empty WAV — the hidden thinking block ate the whole 4096-token `num_ctx` | `num_ctx: 8192` |
 | LLMs write Markdown; TTS reads the asterisks aloud | First clean answer was full of `**bold**`, which Piper pronounces | A "voice interface, no formatting" system prompt, plus a regex strip pass as backup |
 
-Two details the table can't hold. The second turn being *worse* than the first is the tell for the `keep_alive` one: a reload penalty shows up as TTFT on whichever turn follows an idle gap, which is exactly backwards from what a warm-up problem looks like. And the reasoning block is not small: even a trivial "hi" burned 258 tokens of hidden thinking before `qwen3.5:9b` said a word, which is why "just double `num_ctx`" worked here and, as a much longer-context test below found, only works up to a point. The Markdown fix is two layers on purpose; models don't follow "no formatting" with 100% consistency, so the regex pass catches what the system prompt lets through.
+Two details the table can't hold. A slower second turn is the tell for the `keep_alive` problem: a warm-up issue would make the first turn slow, but a reload penalty hits whichever turn follows an idle gap. And the hidden thinking isn't small: even "hi" burned 258 tokens before `qwen3.5:9b` said a word. The Markdown fix has two layers on purpose, because models don't follow "no formatting" every time.
 
 **Bonus finding: confident and wrong.** Asked when the Raspberry Pi 5 came out and how much RAM it has, `qwen3.5:9b` got the year right (2023), then invented a "Plus" RAM tier that Raspberry Pi never made, in two differently worded attempts. The easy fact was right; the detail sitting next to it was made up.
 
