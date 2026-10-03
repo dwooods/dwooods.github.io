@@ -1,5 +1,5 @@
 ---
-title: "Local LLMs on a PC and a Pi: Almost Every Obvious Answer Was Wrong"
+title: "The Obvious Answer Was Wrong (Local LLMs on a PC and a Pi)"
 date: 2026-09-21
 draft: false
 tags: ["ai", "llm", "ollama", "raspberry-pi", "self-hosted", "benchmarking"]
