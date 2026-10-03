@@ -38,14 +38,16 @@ draft: true
 tags: ["ai", "raspberry-pi"]
 description: "One or two sentences for the meta description — keep it under ~160 characters."
 summary: "The hook LoveIt shows on the homepage and list pages in place of the auto-excerpt. Make it sell the story."
-featuredImage: "/images/hero.png"
-featuredImagePreview: "/images/hero.png"
+featuredImage: "/images/hero-<slug>.jpeg"
+featuredImagePreview: "/images/hero-<slug>.jpeg"
 ---
 ```
 
-Images go in `static/images/` and are referenced as `/images/<filename>`.
+Images go in `static/images/` and are referenced as `/images/<filename>`. **Resize before committing:** max 1600px wide (never upscale) at JPEG quality 82. AI image generators otherwise hand back 2–3 MB files. Commit only the resized file and keep the original out of the repo.
 
-New posts start as `draft: true`. Preview locally with `hugo server --buildDrafts` (the `-D` flag is required or drafts are hidden) and check the post at `http://localhost:1313/posts/<slug>/` before flipping `draft` to `false`. Anything pushed to `main` with `draft: false` deploys automatically via the `Deploy Hugo site to GitHub Pages` workflow.
+LoveIt stretches featured images to the full content width. If an image is narrower than that, cap it with a page-scoped `<style>.featured-image img, .featured-image img.lazyloaded { max-width: <native-px>px; width: 100% !important; }</style>` after the front matter instead of upscaling the file.
+
+New posts start as `draft: true`. Preview locally with `hugo server --buildDrafts` (short form `-D`; without it drafts are hidden) and check the post at `http://localhost:1313/posts/<slug>/` before flipping `draft` to `false`. Anything pushed to `main` with `draft: false` deploys automatically via the `Deploy Hugo site to GitHub Pages` workflow.
 
 ## Comments
 
