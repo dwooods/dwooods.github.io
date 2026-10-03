@@ -124,7 +124,7 @@ The MCP server gets more right than wrong: positions, quotes, dividend schedules
 4. **Yesterday's official close,** so a day's change matches the app's.
 
 {{< admonition type="warning" title="Correction, October 3, 2026: ask 4 was my mistake" open=true >}}
-I went back to check this before pointing anyone at the list. The server's quote tool already returns the official close of the last completed session (a field called `close`) right next to the live quote. I most likely missed it when I built the dashboard. I can't prove it wasn't added since, but I doubt it, so I'm not crediting Robinhood for it. Asks 1 to 3 are still open as far as I can tell. I'm leaving ask 4 in the list on purpose: it's what I wrote, and it was wrong.
+I went back to check this before pointing anyone at the list. The server's quote tool already returns the official close of the last completed session (a field called `close`) right next to the live quote. I most likely missed it when I built the dashboard. I can't prove it wasn't added since, but I doubt it, so I'm not crediting Robinhood for it. Asks 1 to 3 are still open as far as I can tell. Worse, its stated reason was weak: the day's change already matches the app, because the quote tool also returns an adjusted previous close, which is the field it tells you to use for daily change. I'm leaving ask 4 in the list on purpose: it's what I wrote, and it was wrong.
 {{< /admonition >}}
 
 ### Try the concept
