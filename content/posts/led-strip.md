@@ -1,10 +1,10 @@
 ---
-title: "Building a Raspberry Pi LED Controller with Claude"
+title: "Random Colors Are Not a Bug"
 date: 2026-09-10
 draft: false
 tags: ["raspberry-pi", "led", "ws2812", "sk6812", "python", "hardware"]
 description: "A menu-driven controller for an addressable SK6812/WS2812B LED strip on a Raspberry Pi 5, driven over hardware SPI, with eleven animated effects and a browser-based simulator — built by directing Claude through the implementation."
-summary: "What happens when you have an idea for a hardware project but don't want to spend days writing the code? I used Claude to build a Raspberry Pi LED controller and discovered a different way to turn an idea into a working project."
+summary: "I powered up an LED strip with no data connected and it blinked random colors at me. That turned out to be normal, and it's how I ended up building a Pi 5 LED controller with Claude."
 featuredImage: "/images/hero-led-strip.jpeg"
 featuredImagePreview: "/images/hero-led-strip.jpeg"
 ---
