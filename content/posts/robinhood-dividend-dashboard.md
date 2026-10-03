@@ -116,12 +116,16 @@ That last one taught me something about my own holdings. The yield Robinhood lis
 
 ## What I'd Ask Robinhood For
 
-The MCP server gets more right than wrong: positions, quotes, dividend schedules and price history are enough to build a real dashboard. Four additions would close the gaps, and Robinhood's own app already shows every one of them.
+The MCP server gets more right than wrong: positions, quotes, dividend schedules and price history are enough to build a real dashboard. Four additions would close the gaps (three, it turns out; see the correction below), and Robinhood's own app already shows every one of them.
 
 1. **Account value over time.** The app draws this chart. Without it, every outside dashboard has to rebuild one and add a disclaimer.
 2. **Dividend and activity history.** Right now an agent can see what's coming but not what's been paid. The data seems to exist: community-built tools using Robinhood's unofficial API list a dividend-history call. But they ask for your Robinhood password, which is exactly what the official server was built to avoid.
 3. **Market hours,** including holidays and early closes, so a one-day chart knows when the trading day ends.
 4. **Yesterday's official close,** so a day's change matches the app's.
+
+{{< admonition type="warning" title="Correction, October 3, 2026: ask 4 was my mistake" open=true >}}
+I went back to check this before pointing anyone at the list. The server's quote tool already returns the official close of the last completed session (a field called `close`) right next to the live quote. I most likely missed it when I built the dashboard. I can't prove it wasn't added since, but I doubt it, so I'm not crediting Robinhood for it. Asks 1 to 3 are still open as far as I can tell. I'm leaving ask 4 in the list on purpose: it's what I wrote, and it was wrong.
+{{< /admonition >}}
 
 ### Try the concept
 
