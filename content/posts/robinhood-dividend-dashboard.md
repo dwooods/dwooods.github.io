@@ -57,7 +57,7 @@ Then came the roll-up (2): an account chart across the top and a tiny "Today" ch
 
 Once the page did what I wanted, I wanted it to look finished (3), not like a backend with a chart bolted on. The data came from Robinhood, and Robinhood already has a design system, so why not borrow it? I opened Chrome's inspector on robinhood.com and found the real thing: Robinhood's colors and type sizes, sitting right there as named variables. The page uses them now.
 
-My favorite detail: Robinhood's accent color turns orange on a down day and green on an up day. Mine does too, with one exception. The Refresh button stays green no matter what the market does. Optimism is a design choice. The one thing I couldn't copy is the font. Robinhood's is licensed, so mine falls back to Inter.
+My favorite detail: Robinhood's accent color turns orange on a down day and green on an up day. Mine does too, with one exception. The Refresh button stays green no matter what the market does. Optimism is a design choice. The one thing I couldn't copy is the font, so mine falls back to Inter.
 
 ### The wrong swings
 
@@ -67,7 +67,7 @@ My favorite detail: Robinhood's accent color turns orange on a down day and gree
 
 I was the customer this time, and I still got a few wrong swings, which is why there are sixteen versions.
 
-The one-day chart is the best example. I asked for "the last 24 hours," and that's exactly what Claude built, with the points spread evenly across the width. It's also not what a one-day stock chart means. Next to Robinhood's 1D view the difference was obvious: Robinhood pins the chart to the trading day, 6:30am to 1pm Pacific, and the line stops at now, leaving the rest of the day blank. The rebuild did the same and measured the day's change from yesterday's close, the way Robinhood does. No test would have caught it, because the code did exactly what I asked.
+The one-day chart is the best example. I asked for "the last 24 hours," and that's exactly what Claude built, with the points spread evenly across the width. It's also not what a one-day stock chart means. Next to Robinhood's 1D view the difference was obvious: Robinhood pins the chart to the trading day, 6:30am to 1pm Pacific, and the line stops at now, leaving the rest of the day blank. The rebuild did the same and measured the day's change from yesterday's close, the way Robinhood does. A test written against my request would have passed, because the code did exactly what I asked.
 
 The same side-by-side caught a smaller one later: pick a range like 3M and the header should say "Past 3 months," not "Today." (It's measured on the reconstructed line, so it won't match the app's figure exactly.)
 
