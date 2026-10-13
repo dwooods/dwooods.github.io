@@ -78,8 +78,8 @@ enableGitInfo = false
       paginate = 6
 
   [params.social]
-    GitHub = "https://github.com/dwooods"
-    Linkedin = "https://www.linkedin.com/in/woodsdavid/"
+    GitHub = "dwooods"
+    Linkedin = "woodsdavid"
     Email = "daveawoods@gmail.com"
     RSS = "true"
 
