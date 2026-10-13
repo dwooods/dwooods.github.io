@@ -17,13 +17,13 @@ So I built a page for those questions. I call it the Dividend Dashboard. I didn'
 
 This account is money I had to spare, not my retirement. A financial advisor handles that, and for now it isn't changing. I've been a Robinhood customer since 2017, long before AI assistants like Claude, because there are no commissions, so trying something out doesn't come with a fee.
 
-When Robinhood launched [Agentic Trading](https://robinhood.com/us/en/support/articles/agentic-trading-overview/), it published an official MCP (Model Context Protocol) server, a secure connection that lets an assistant like Claude read your account without ever seeing your password, and a dedicated Agentic account that AI agents connect to. An agent can read my account data, and any trade it places can only land in that account. That's a low-stakes way to use AI with my own money. I do wonder: if this works out, could AI help with my retirement too? I'd rather find out first with money that matters less if the AI gets something wrong.
+When Robinhood launched [Agentic Trading](https://robinhood.com/us/en/support/articles/agentic-trading-overview/), it published an official MCP (Model Context Protocol) server, a secure connection that lets an assistant like Claude read your account without ever seeing your password, and a dedicated Agentic account that AI agents connect to. An agent can read my account data, and any trade it places can only land in that account. Not handing over my password isn't the same as keeping my data private: connecting an assistant still means account data flows to it, so know what you're sharing. That's a low-stakes way to use AI with my own money. I do wonder: if this works out, could AI help with my retirement too? I'd rather find out first with money that matters less if the AI gets something wrong.
 
 Few brokerages offer an MCP server; Fidelity, Schwab and E\*TRADE [don't as of this writing](https://www.stockbrokers.com/guides/ai-agent-brokers). Robinhood has since added a dividend tracker of its own, which I'll get to.
 
 ## What I Built
 
-The whole thing is one interactive web page that Claude built and hosts in my Claude account. Click Refresh and the page [calls Robinhood's MCP server itself](https://x.com/ClaudeDevs/status/2077489907350856038), using my own connection. It's only allowed five read-only tools, so the worst it can do is look at my money, which is also my main hobby. (I use the same connection with Claude to research and make trades, but that's a different post.)
+The whole thing is one interactive web page that Claude built and hosts in my Claude account. Click Refresh and the page [calls Robinhood's MCP server itself](https://x.com/ClaudeDevs/status/2077489907350856038), using my own connection. I only gave the page five read-only tools, so the worst it can do is look at my money, which is also my main hobby. The server itself can place trades; this page can't. (I use the same connection with Claude to research and make trades, but that's a different post.)
 
 I expected to lose a weekend to hosting, a database and somewhere safe to keep a password. I lost none. Claude built the page, published it and gave it a small database, all inside Claude.
 
@@ -100,11 +100,11 @@ So of course I asked Claude to rebuild it, with the same playbook as before. The
 
 *My copy of the tracker, on the sample portfolio. Green is paid, gray is projected, same as Robinhood's.*
 
-Comparing the two turned up a surprise. Robinhood's tracker counts one account, and I'd only moved my positions into the Agentic account in July and August, so it showed a fraction of what I'd been paid this year. My export came from my individual account, where most of those dividends landed before the move. That's also why the export had looked incomplete: the rest were in the other account. Put together with the Agentic account's statements, my page shows the whole year across both accounts. Robinhood's tracker can't, because it only sees one account at a time.
+Comparing the two turned up a surprise. Robinhood's tracker counts one account, and I'd only moved my positions into the Agentic account in July and August, so it showed a fraction of what I'd been paid this year. My export came from my individual account, where most of those dividends landed before the move. That's also why the export had looked incomplete: the rest were in the other account. Put together with the Agentic account's statements, my page shows the whole year across both accounts. Robinhood's tracker showed one account at a time when I tried it (no combined view in the dropdown), so it can't.
 
 The app has one edge that matters: it reads Robinhood's own records, while mine is only as good as what I feed it. But mine has the shape I wanted: every holding on one sortable page, next to price, cost and yield on cost.
 
-That last one taught me something about my own holdings. The yield Robinhood lists is the last year of payouts against today's price. What I actually earn depends on what I paid, so the page shows both.
+That last one taught me something about my own holdings. As far as I can tell, the yield Robinhood lists is the last year of payouts against today's price. What I actually earn depends on what I paid, so the page shows both.
 
 {{< admonition type="tip" title="Why my numbers and the app's don't match (and both are right)" open=true >}}
 | | Robinhood's tracker | My page |
@@ -119,7 +119,7 @@ That last one taught me something about my own holdings. The yield Robinhood lis
 The MCP server gets more right than wrong: positions, quotes, dividend schedules and price history are enough to build a real dashboard. Four additions would close the gaps (three, it turns out; see the correction below), and Robinhood's own app already shows every one of them.
 
 1. **Account value over time.** The app draws this chart. Without it, every outside dashboard has to rebuild one and add a disclaimer.
-2. **Dividend and activity history.** Right now an agent can see what's coming but not what's been paid. The data seems to exist: community-built tools using Robinhood's unofficial API list a dividend-history call. But they ask for your Robinhood password, which is exactly what the official server was built to avoid.
+2. **Dividend and activity history.** In the tools I checked, an agent can see what's coming but not what's been paid. The data seems to exist: community-built tools using Robinhood's unofficial API list a dividend-history call. But they ask for your Robinhood password, which is exactly what the official server was built to avoid.
 3. **Market hours,** including holidays and early closes, so a one-day chart knows when the trading day ends.
 4. **Yesterday's official close,** so a day's change matches the app's.
 
