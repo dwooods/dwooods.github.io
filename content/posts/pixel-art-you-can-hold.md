@@ -2,32 +2,38 @@
 title: "Pixel Art You Can Hold"
 date: 2026-10-20
 draft: true
-tags: ["raspberry-pi", "esp32", "led", "ws2812", "pixel-art", "3d-printing", "hardware"]
-description: "Glow Grid: a browser pixel-art editor, a Raspberry Pi 5 and ESP32-C3 player, and a 3D-printed case for a 16x16 WS2812B LED panel, built by directing Claude through the implementation."
-summary: "A 16x16 LED panel looks harsh on its own. This is the story of the editor, the two players, the case that makes the pixels glow, and the one bug that looked like hardware and wasn't."
+tags: ["esp32-c3", "esp32", "led", "ws2812", "pixel-art", "3d-printing", "hardware"]
+description: "Glow Grid: a browser pixel-art editor, an ESP32-C3 player, and a 3D-printed case for a 16x16 WS2812B LED panel, built by directing Claude through the implementation."
+summary: "A 16x16 LED panel looks harsh on its own. This is the story of the editor, the little board that runs it, the case that makes the pixels glow, and the one bug that looked like hardware and wasn't."
 featuredImage: "/images/hero-glow-grid.jpeg"
 featuredImagePreview: "/images/hero-glow-grid.jpeg"
 ---
 
 Bare LEDs make bad pixels. A 16x16 WS2812B panel has 256 of them, each a hard little point of light, and a sprite on that panel looks like a sprite drawn with tiny flashlights. I wanted something that looked like a pixel: soft, square, and something I could draw on my phone and put on a desk.
 
-That turned into four things: a pixel editor that runs in a browser, a player on a Raspberry Pi 5, a second player on an ESP32-C3 that needs no computer at all, and a 3D-printed case with a black grid and a white diffuser cover. All of it is open source, and the case files are on Printables.
+That turned into three things: a pixel editor that runs in a browser, an ESP32-C3 board that plays what you draw and needs no computer at all, and a 3D-printed case with a black grid and a white diffuser cover. All of it is open source, and the case files are on [Printables](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser).
 
 ## Why I built this
 
 This is another hardware project where I've directed Claude through the implementation instead of writing the code myself. The first was an [LED strip controller](/posts/led-strip/). I have a CS degree, but coding was never the part I loved. I like building things and solving problems, and for years the typing ate the time I would have spent on the problem.
 
-The strip was easy. The next step, a 256-pixel panel, was supposed to be the same thing with more LEDs: same Pi, same driver. It wasn't, and the way it failed taught me more than anything else in this build.
+The strip was easy: 60 LEDs, wires everywhere, and it lived on my workbench. This time I wanted a real product, something with no wires showing that could sit anywhere in the house, not just on a bench.
+
+I also wanted a better way to make things for it. I didn't want people asking an AI to write code and uploading that. You draw in the editor, or upload an image and let it turn that into a sprite, and that's the whole job. I wanted to build something with the person using it in mind. I also kept picturing someone else printing the case and building on it, which is part of why the files are on Printables.
+
+It turned out to be a lot more than the strip. There were 256 LEDs instead of 60, soldering, Wi-Fi setup with a password you read off the panel, buttons, and real design work on the 3D prints. It took far more time.
+
+I started on a Raspberry Pi 5 and moved to an ESP32-C3, a small board that sits inside the case. The Pi was how I found out the idea worked at all. A 256-pixel panel was supposed to be the strip with more LEDs: same Pi, same driver. It wasn't, and the way it failed taught me more than anything else in this build.
 
 ## What you'll need
 
 The editor runs in any browser, so you can try it without building anything. For the hardware, the [Printables page](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) has the full parts list, wiring, assembly order and my slicer profile, and I'd rather keep that in one place than copy it here.
 
-The short version: a 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, and I learned why the hard way, below), a Raspberry Pi 5 or an ESP32-C3 SuperMini, a 3D printer and PLA, and a handful of small parts. Measure your panel before printing. The frame pocket is 162 mm square, and panels from different sellers vary.
+The short version: a 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, and I learned why the hard way, below), an ESP32-C3 SuperMini, a 3D printer and PLA, and a handful of small parts. Measure your panel before printing. The frame pocket is 162 mm square, and panels from different sellers vary.
 
 ## The bug that looked like hardware
 
-My first 256-pixel panel was an 8x32. It worked at first, then random pixels started lighting up in the wrong colors, more of them as I ran more patterns. I did what you'd do. I added a series resistor, which helped a little. I added a 74AHCT125 level shifter, which made things worse, and I took it out. I moved a big capacitor around the board. I worked out that the noise was at the input end of the panel, not the far end, which ruled out one theory and pointed at nothing in particular.
+This happened on the Raspberry Pi prototype. My first 256-pixel panel was an 8x32. It worked at first, then random pixels started lighting up in the wrong colors, more of them as I ran more patterns. I did what you'd do. I added a series resistor, which helped a little. I added a 74AHCT125 level shifter, which made things worse, and I took it out. I moved a big capacitor around the board. I worked out that the noise was at the input end of the panel, not the far end, which ruled out one theory and pointed at nothing in particular.
 
 What I eventually blamed was the power supply. I'd been running the panel from a generic 5 V, 2 A wall adapter, and it got hot enough that I came close to melting the panel. Replacing it with a 6 A supply made for LEDs was the right call, and it also is a real safety lesson: don't size a supply by average current, because LED current comes in sharp spikes, and a cheap adapter with a poor transient response can't hold the rail steady.
 
@@ -40,7 +46,7 @@ The symptoms pointed at the electronics, and the cause was in software. The libr
 That is why the same driver worked on my 60-LED strip: 60 LEDs is 1,482 bytes, which never crosses the limit.
 
 {{< admonition type="note" title="The fix" open=true >}}
-Append `spidev.bufsiz=65536` to the single line in `/boot/firmware/cmdline.txt` and reboot. Check it with `cat /sys/module/spidev/parameters/bufsiz`. Wire data to GPIO10 (pin 19), share a ground, and power the panel from its own supply, never from the Pi's 5 V. No resistor, capacitor, or level shifter is needed in the final build.
+Append `spidev.bufsiz=65536` to the single line in `/boot/firmware/cmdline.txt` and reboot. Check it with `cat /sys/module/spidev/parameters/bufsiz`. Wire data to GPIO10 (pin 19), share a ground, and power the panel from its own supply, never from the Pi's 5 V. With the buffer fixed, no resistor, capacitor, or level shifter is needed on the Pi.
 {{< /admonition >}}
 
 What found it was a 40-line test script: solid red, 256 LEDs hard-coded, none of the application's image, mapping, or gamma code. If the fault survived in that, the application wasn't the cause. Then I read the driver and the `spidev` source, which showed the split.
@@ -51,11 +57,13 @@ Before you buy a part to fix flaky hardware, write the smallest control you can 
 
 One thing I can't fully say. The 8x32 shared the same driver, the same frame size and almost certainly the same 4,096-byte limit, but it's out of service, so I never retested it. The supply and the buffer both mattered there, and I can't prove how much each did.
 
+That was the Pi. The panel worked, the idea held up, and the rest of this post is about the board that replaced it.
+
 ## The editor
 
 The editor is a web page. It runs from GitHub Pages, installs as an app on a phone, and works offline: [dwooods.github.io/glow-grid](https://dwooods.github.io/glow-grid/). You draw on a 16x16 grid, add frames to animate, and export a small PNG that carries its own settings (frame count, frame rate, brightness, gamma) inside the file instead of in the file name. I'd originally put those in the name, `knight_4fps_bright0.35_gamma2.2.png`, until I asked why a file needed a name to know how fast to play.
 
-**Photos and flat art need different imports.** Shrinking a photo to 16x16 with the browser's default smoothing doesn't match what the Pi will do, so the editor has its own area-average resize, checked against Pillow to within one level out of 255. At brightness 0.3 and gamma 2.2, 256 input levels collapse into about 77 LED levels, so the dithering works in LED space, not color space, or dark gradients band. Averaging is wrong for flat art, where outlines blend into muddy in-between colors, so a flat-art mode picks a few main colors first and gives each LED whichever one covers most of its cell.
+**Photos and flat art need different imports.** Shrinking a photo to 16x16 with the browser's default smoothing doesn't match what the player will do, so the editor has its own area-average resize, checked against Pillow to within one level out of 255. At brightness 0.3 and gamma 2.2, 256 input levels collapse into about 77 LED levels, so the dithering works in LED space, not color space, or dark gradients band. Averaging is wrong for flat art, where outlines blend into muddy in-between colors, so a flat-art mode picks a few main colors first and gives each LED whichever one covers most of its cell.
 
 **A phone layout I got wrong.** I built a locked, no-scroll layout with the tools in a bottom dock. It looked right at three simulated phone sizes. On a real iPhone, a finger on the grid painted instead of scrolling, and there was no other place to swipe. The fix removed code instead of adding it: the settings sheet became normal cards below the strip, and the page scrolls. I'd rated that layout 7.5 out of 10 while the settings couldn't be reached on a phone, which is why the editor now has a written rubric. A score based only on a screenshot can't go above a 3 out of 4 on any dimension, and a phone score needs a real phone.
 
@@ -79,19 +87,20 @@ The last one, a missile-defense scene, on the real panel, filmed on my phone:
   <img src="/images/glow-grid-missile-defense-real-panel.gif" alt="The missile-defense sprite playing on the real panel">
 </video>
 
-## Two players
+## The ESP32-C3 board
 
 ```mermaid
 graph LR
-    editor[Browser editor] -->|PNG sprite sheet| pi[Raspberry Pi 5]
-    editor -->|Wi-Fi| c3[ESP32-C3]
-    pi -->|SPI| panel[(16x16 panel)]
-    c3 -->|GPIO6| panel
+    editor[Browser editor] -->|Wi-Fi| c3[ESP32-C3]
+    c3 -->|GPIO6| panel[(16x16 panel)]
+    pi[Raspberry Pi 5] -.->|SPI, prototype| panel
 ```
 
-**The Pi player** reads the exported PNGs from a folder and plays them through a terminal menu. It's the simplest setup, and it needs the Pi plugged in and reachable over SSH.
+The ESP32-C3 is the one that lives inside the case. It has room for 96 sprites in its own flash (40 come preloaded), drives the panel directly, and serves its own copy of the editor over your home Wi-Fi, so you can open it from a phone without a computer. Two buttons change what's showing: Next, and On/off. Holding On/off for five seconds opens Wi-Fi setup.
 
-**The ESP32-C3 player** is the one meant to live inside the case. It stores about 100 sprites in its own flash, drives the panel directly, and serves its own copy of the editor over your home Wi-Fi, so you can open it from a phone without a computer. Two buttons change what's showing: Next, and On/off. Holding On/off for five seconds opens Wi-Fi setup.
+That last part is why the chip is tight. The board holds the player, Wi-Fi, a web server, the setup network and a compressed copy of the whole editor in 1.3 MB of flash, and one firmware version used 97% of it.
+
+The Raspberry Pi can still drive the panel, reading exported PNGs from a folder and playing them through a terminal menu. That's how I prototyped, and it's still in the repo, but the C3 is the product.
 
 ### Getting a screenless board onto Wi-Fi
 
@@ -114,7 +123,7 @@ sequenceDiagram
 
 I tested it on a Windows 11 PC and an iPhone. The iPhone opens the setup page by itself. On Windows 11 you get an "Action needed" entry and have to click it. I haven't tested Android, so I don't claim it works there.
 
-The first real run of the setup page showed "Loading..." forever, on both the PC and the iPhone. I assumed the new WPA3 network was the culprit and built a WPA2 comparison version to prove it. It wasn't. The F12 console on the PC showed a JavaScript syntax error: an apostrophe inside a single-quoted string had stopped the entire page script from running. That bug had shipped for four firmware versions, and every test had passed because the tests compared the page's text instead of running its code. The fix was one character. The test that prevents it runs `node --check` on the page script. The new feature was the suspect, and old unchanged code was guilty.
+The first real run of the setup page showed "Loading..." forever, on both the PC and the iPhone. I assumed the new WPA3 network was the culprit and built a WPA2 comparison version to prove it. It wasn't. The F12 console on the PC showed a JavaScript syntax error: an apostrophe inside a single-quoted string had stopped the entire page script from running. That bug had shipped for four firmware versions and cost me three days, and every test had passed because the tests compared the page's text instead of running its code. The fix was one character. The test that prevents it runs `node --check` on the page script. The new feature was the suspect, and old unchanged code was guilty.
 
 ### One name per board
 
@@ -142,9 +151,9 @@ Four spring fingers on the back plate press the stack forward against the cover.
 
 The first fix Claude tried was wrong: it moved the lip toward the front, but the distance from the lip to the front had been right all along, and only the distance to the back needed to change. That mistake is why the diagram exists.
 
-### The part where it bulged
+### Fifteen versions of a stand
 
-The first layers of my frame prints bulged a little at the bed, a standard elephant foot. I changed two OrcaSlicer settings: elephant foot compensation of 0.2 mm over two layers, and a 55 C first-layer bed temperature with 60 C for the rest. They are in the Printables post as my profile values. I haven't printed the small test block that would confirm them, so treat them as a starting point.
+The desk cradle took 15 versions, more than the frame. Its first design had no front hook because the hook covered the bottom row of LEDs. Then it needed one to hold the panel, so a 1.8 mm hook came back, low enough to stay below the first row. I started with screws into the desk, then removed the desk holes. Two loose feet became two feet joined by a curved bar. Seven of my design decisions were later reversed by a newer one, and I kept both entries in the log instead of editing the first away. My print settings, including the elephant-foot compensation I haven't yet confirmed with a test block, are on the Printables page.
 
 ## What I'd tell you before you build one
 
@@ -161,7 +170,7 @@ Two things. I plan one board per kid, which is what the per-board names were for
 
 1. Open the [editor](https://dwooods.github.io/glow-grid/) and draw something.
 2. Download the [case files](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) from Printables.
-3. Get the [code](https://github.com/dwooods/glow-grid) for the Pi player and the ESP32-C3 firmware.
+3. Get the [code](https://github.com/dwooods/glow-grid) for the ESP32-C3 firmware (the Pi player is in there too).
 4. Wire it as in the diagram below, flash the board, and print the holder first.
 
 ![The ESP32-C3 wiring diagram and build checklist](/images/glow-grid-wiring-checklist.jpg)
@@ -172,6 +181,6 @@ If something doesn't work, [open an issue](https://github.com/dwooods/glow-grid/
 
 Same arrangement as the strip project, with more rules, because the project is bigger. I describe what I want and test the result on the real device. Claude writes the code, the build script, and the commits. We keep a journal and a feature tracker in a project folder, so a new session can pick up where the last one stopped.
 
-That covers the volume: the editor, the two players, the firmware, the case generator. It did not cover being right. Claude moved the frame lip the wrong way in v7, and it wrote a setup page whose tests all passed while the page itself didn't run. I decided what to build, what to throw out, and when something was done, and I could only decide that by looking at the real thing.
+That covers the volume: the editor, the board firmware, the case generator. It did not cover being right. Claude moved the frame lip the wrong way in v7, and it wrote a setup page whose tests all passed while the page itself didn't run. I decided what to build, what to throw out, and when something was done, and I could only decide that by looking at the real thing.
 
 Most of what was wrong was found by using the thing. The Pi bug looked like hardware. The phone layout looked fine in a simulator. The setup page passed every test. The better prompt isn't a cleverer instruction, it's a person holding the device.
