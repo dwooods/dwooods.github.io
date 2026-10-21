@@ -11,7 +11,7 @@ featuredImagePreview: "/images/hero-glow-grid.jpeg"
 
 Bare LEDs make bad pixels. A 16x16 WS2812B panel has 256 of them, each a hard little point of light, and a sprite on that panel looks like a sprite drawn with tiny flashlights. I wanted something that looked like a pixel: soft, square, and something I could draw on my phone and put on a desk.
 
-That turned into four things: a pixel editor that runs in a browser, a player on a Raspberry Pi 5, a second player on an ESP32-C3 that needs no computer at all, and a 3D-printed case with a black grid and a white diffuser cover. All of it is open source, and the case files are on [Printables](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser).
+That turned into four things: a pixel editor that runs in a browser, a player on a Raspberry Pi 5, a second player on an ESP32-C3 that needs no computer at all, and a 3D-printed case with a black grid and a white diffuser cover. All of it is open source, and the case files are on Printables.
 
 ## Why I built this
 
@@ -43,23 +43,21 @@ That is why the same driver worked on my 60-LED strip: 60 LEDs is 1,482 bytes, w
 Append `spidev.bufsiz=65536` to the single line in `/boot/firmware/cmdline.txt` and reboot. Check it with `cat /sys/module/spidev/parameters/bufsiz`. Wire data to GPIO10 (pin 19), share a ground, and power the panel from its own supply, never from the Pi's 5 V. No resistor, capacitor, or level shifter is needed in the final build.
 {{< /admonition >}}
 
-What found it was a 40-line test script: solid red, 256 LEDs hard-coded, none of the application's image, mapping, or gamma code. If the fault survived in that, the application wasn't the cause. Then I read the driver and the `spidev` source, which showed the split. Reading the source first would have saved two evenings of suspecting contacts, ground, the level shifter, and the capacitor.
+What found it was a 40-line test script: solid red, 256 LEDs hard-coded, none of the application's image, mapping, or gamma code. If the fault survived in that, the application wasn't the cause. Then I read the driver and the `spidev` source, which showed the split.
 
-Two things I can't fully say. The 8x32 shared the same driver, the same frame size and almost certainly the same 4,096-byte limit, but it's out of service, so I never retested it. The supply and the buffer both mattered there, and I can't prove how much each did. And the level shifter got recommended to me *again* on the 16x16, before anyone consulted notes from the first panel. I've since written the lesson down where the project can see it: read the driver and write a minimal control before you buy a part. The level shifter stays in the build notes as a fallback if a particular panel flickers, but this one doesn't need it.
+{{< admonition type="tip" title="The lesson to steal" open=true >}}
+Before you buy a part to fix flaky hardware, write the smallest control you can and read the driver. If the fault survives with none of your application in it, the application isn't the cause. I spent two evenings on contacts, ground and capacitors before doing either. It works on any project where a library sits between your code and the pins.
+{{< /admonition >}}
+
+One thing I can't fully say. The 8x32 shared the same driver, the same frame size and almost certainly the same 4,096-byte limit, but it's out of service, so I never retested it. The supply and the buffer both mattered there, and I can't prove how much each did.
 
 ## The editor
 
 The editor is a web page. It runs from GitHub Pages, installs as an app on a phone, and works offline: [dwooods.github.io/glow-grid](https://dwooods.github.io/glow-grid/). You draw on a 16x16 grid, add frames to animate, and export a small PNG that carries its own settings (frame count, frame rate, brightness, gamma) inside the file instead of in the file name. I'd originally put those in the name, `knight_4fps_bright0.35_gamma2.2.png`, until I asked why a file needed a name to know how fast to play.
 
-A few decisions are worth explaining.
-
-**Photos need an LED-aware import.** Shrinking a photo to 16x16 with the browser's default smoothing doesn't match what the Pi will do, so the editor has its own area-average resize, checked against Pillow to within one level out of 255. At brightness 0.3 and gamma 2.2, 256 input levels collapse into about 77 LED levels, and every dark shade ends up at 1 to 3 out of 255. Rounding each pixel on its own makes dark gradients band, so the dithering works in LED space, not color space.
-
-**Illustrations need a different import.** Averaging is right for photos and wrong for flat art: outlines blend into muddy in-between colors. So the import has a flat-art mode that picks a few main colors first and gives each LED whichever one covers most of its cell.
+**Photos and flat art need different imports.** Shrinking a photo to 16x16 with the browser's default smoothing doesn't match what the Pi will do, so the editor has its own area-average resize, checked against Pillow to within one level out of 255. At brightness 0.3 and gamma 2.2, 256 input levels collapse into about 77 LED levels, so the dithering works in LED space, not color space, or dark gradients band. Averaging is wrong for flat art, where outlines blend into muddy in-between colors, so a flat-art mode picks a few main colors first and gives each LED whichever one covers most of its cell.
 
 **A phone layout I got wrong.** I built a locked, no-scroll layout with the tools in a bottom dock. It looked right at three simulated phone sizes. On a real iPhone, a finger on the grid painted instead of scrolling, and there was no other place to swipe. The fix removed code instead of adding it: the settings sheet became normal cards below the strip, and the page scrolls. I'd rated that layout 7.5 out of 10 while the settings couldn't be reached on a phone, which is why the editor now has a written rubric. A score based only on a screenshot can't go above a 3 out of 4 on any dimension, and a phone score needs a real phone.
-
-**Examples are original.** The example sprites in the repo (a campfire, a cauldron, a jack-o'-lantern, fireworks, meteors, lightning) are all drawn from scratch, and none of them is someone else's character.
 
 ![The editor's Board card, for sending a drawing to the ESP32-C3](/images/glow-grid-editor-board-card.png)
 
@@ -97,7 +95,7 @@ graph LR
 
 ### Getting a screenless board onto Wi-Fi
 
-The setup network is the part I thought about longest. A board with no screen has no good place to show a password, and a password printed on a label is the same on every unit. So when you open setup, the board creates a new WPA3 network with a random name and a random 8-digit password, and draws the digits on the LED panel. If you can read them, you're standing in front of the device. The password lives in RAM only and is gone when setup ends or five minutes pass.
+The setup network is the part I thought about longest: a board with no screen has nowhere to show a password, and a password printed on a label is the same on every unit. So the board creates a new WPA3 network with a random name and a random 8-digit password, draws the digits on the LED panel (if you can read them, you're standing in front of the device), and keeps them in RAM only, for five minutes at most.
 
 ```mermaid
 sequenceDiagram
@@ -120,11 +118,9 @@ The first real run of the setup page showed "Loading..." forever, on both the PC
 
 ### One name per board
 
-A latent bug sat in the firmware until I asked the right question. Every board called itself `glowgrid` and advertised `glowgrid.local` over mDNS. With one board that's a nice address. With two boards on the same home Wi-Fi (two kids, two rooms) they fight over the name, and whoever wins the race gets the other person's sprites. One hard-coded `#define` was the whole problem.
+Every board called itself `glowgrid` and advertised `glowgrid.local` over mDNS. With one board that's a nice address. With two boards on the same home Wi-Fi (two kids, two rooms) they fight over the name, and whoever wins the race gets the other person's sprites. One hard-coded `#define` was the whole problem.
 
-The fix: each board now names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`. The editor learns the name when the board joins Wi-Fi and shows it in the Network dialog, the setup page prints it, and the board refuses requests addressed to any other name (that check was already there as a DNS-rebinding guard; it just had the one name baked in). The part I couldn't verify without hardware was the byte order of the MAC as the chip reports it, so the first thing I did after flashing was compare the board's name to the MAC the flash tool printed. They matched.
-
-The follow-up defect was the kind you only find on a real upgrade: my installed copy of the editor still offered the old `glowgrid.local`, because it remembers the last address and nothing had told it the board was renamed. Now the editor asks a board on USB for its name and drops the stale one.
+Now each board names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`. The editor learns the name when the board joins Wi-Fi, the setup page prints it, and the board refuses requests addressed to any other name. I couldn't check the byte order of the MAC without hardware, so the first thing I did after flashing was compare the board's name to the MAC the flash tool printed. They matched. The follow-up defect only showed up on a real upgrade: my installed copy of the editor still offered the old `glowgrid.local`, because nothing had told it the board was renamed. Now the editor asks a board on USB for its name and drops the stale one.
 
 ## The case
 
@@ -157,11 +153,15 @@ The Printables page has the assembly order, the wiring, my print settings, and a
 - **The power wiring needs better connectors than mine.** Parts of the power path on my unit use Dupont-style jumpers, which are typically good for 1 to 3 A, well below what a full-white panel draws. I run the panel at brightness 0.3, where a fully white frame draws about 4.7 A on the 6 A supply. For a unit you leave running, solder the 5 V and ground runs or use terminals rated 10 A or more.
 - **Flash the ESP32-C3 on the bench before you close the case.** Its BOOT and RST buttons face the panel and can't be reached afterward.
 
+## What's next
+
+Two things. I plan one board per kid, which is what the per-board names were for. And Android is the other gap: I've only tested the Wi-Fi setup on Windows 11 and an iPhone. I'm also getting a Mac, and when I do I'll see about an iOS app that runs the editor UI. That one is a plan, not a build.
+
 ## Try it yourself
 
 1. Open the [editor](https://dwooods.github.io/glow-grid/) and draw something.
-2. Download the [case files](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) from Printables (CC BY 4.0).
-3. Get the [code](https://github.com/dwooods/glow-grid) (MIT) for the Pi player and the ESP32-C3 firmware.
+2. Download the [case files](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) from Printables.
+3. Get the [code](https://github.com/dwooods/glow-grid) for the Pi player and the ESP32-C3 firmware.
 4. Wire it as in the diagram below, flash the board, and print the holder first.
 
 ![The ESP32-C3 wiring diagram and build checklist](/images/glow-grid-wiring-checklist.jpg)
