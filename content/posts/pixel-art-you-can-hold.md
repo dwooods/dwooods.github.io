@@ -30,7 +30,7 @@ I started on a Raspberry Pi 5 and moved to an ESP32-C3, a small board that sits 
 
 ## What you'll need
 
-The editor runs in any browser, so you can try it without building anything. For the hardware, the [Printables page](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) has the full parts list, wiring, assembly order and my slicer profile, and I'd rather keep that in one place than copy it here.
+The editor runs in any browser, so you can try it without building anything: [dwooods.github.io/glow-grid](https://dwooods.github.io/glow-grid/). The board also serves its own copy of the editor over your home Wi-Fi, which is how a phone reaches it. For the hardware, the [Printables page](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) has the full parts list, wiring, assembly order and my slicer profile, and I'd rather keep that in one place than copy it here.
 
 {{< admonition type="info" title="The short version" open=true >}}
 A 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, and I learned why the hard way, below), an ESP32-C3 SuperMini, a 3D printer and PLA, and a handful of small parts. Measure your panel before printing. The frame pocket is 162 mm square, and panels from different sellers vary.
@@ -74,11 +74,11 @@ That was the Pi. The panel worked, the idea held up, and the rest of this post i
 
 ## The editor
 
-The editor is a web page. It runs from GitHub Pages, installs as an app on a phone, and works offline: [dwooods.github.io/glow-grid](https://dwooods.github.io/glow-grid/). You draw on a 16x16 grid, add frames to animate, and export a small PNG that carries its own settings (frame count, frame rate, brightness, gamma) inside the file instead of in the file name. I'd originally put those in the name, `knight_4fps_bright0.35_gamma2.2.png`, until I asked why a file needed a name to know how fast to play.
+The editor is a web page that runs from GitHub Pages, installs as an app on a phone, and works offline. You draw on a 16x16 grid, add frames to animate, and export a small PNG that carries its own settings (frame count, frame rate, brightness, gamma) inside the file. I'd originally put those in the file name, `knight_4fps_bright0.35_gamma2.2.png`, but the name was ugly and long, and nobody names files that way. If the editor can read the settings from the file's metadata, I couldn't see a reason to put them in the name too.
 
-**Photos and flat art need different imports.** A photo shrunk to 16x16 with the browser's default smoothing doesn't match what the player will do, so the editor does its own resize, checked against Pillow to within one level out of 255. Gamma is the curve that makes brightness steps look even to the eye, and at brightness 0.3 it leaves only about 77 distinct LED levels, so dark gradients band unless the editor dithers, mixing neighboring levels pixel by pixel to fake the in-between. Flat art needs the opposite: averaging blends outlines into muddy colors, so that mode picks a few main colors first.
+**Photos and flat art need different imports.** A photo shrunk to 16x16 with the browser's default smoothing doesn't match what the player will do, so the editor does its own resize, checked against [Pillow](https://python-pillow.org/), a standard Python image library, to within one level out of 255. Gamma is the curve that makes brightness steps look even to the eye, and at brightness 0.3 it leaves only about 77 distinct LED levels, so dark gradients band unless the editor dithers, mixing neighboring levels pixel by pixel to fake the in-between. Flat art needs the opposite: averaging blends outlines into muddy colors, so that mode picks a few main colors first.
 
-**A phone layout I got wrong.** I built a locked, no-scroll layout with the tools in a bottom dock. It looked right at three simulated phone sizes. On a real iPhone, a finger on the grid painted instead of scrolling, and there was no other place to swipe. The fix removed code instead of adding it: the settings sheet became normal cards below the strip, and the page scrolls. I'd rated that layout 7.5 out of 10 while its settings couldn't be reached on a phone. A screenshot can't show you that.
+**Test it where people actually use it.** The editor gets used on a PC and on a phone, so I spent a good while building test cases for both and comparing them to make sure it worked on each. My first phone layout still failed on a real iPhone. It was a locked, no-scroll layout with the tools in a bottom dock, and it looked right at three simulated phone sizes. On the real phone, a finger on the grid painted instead of scrolling, and there was no other place to swipe. The fix removed code instead of adding it: the settings sheet became normal cards below the strip, and the page scrolls. I'd rated that layout 7.5 out of 10 while its settings couldn't be reached on a phone. A screenshot can't show you that.
 
 ![The Glow Grid editor: pixel grid and tools at the top, the frame strip and panel settings in the middle, and the Board card for sending a drawing to the ESP32-C3 at the bottom](/images/glow-grid-editor-board-card.png "The full editor.")
 
@@ -104,7 +104,9 @@ The last one, a missile-defense scene, on the real panel, filmed on my phone:
 
 ![The editor talks to the ESP32-C3 over Wi-Fi, and the ESP32-C3 drives the 16x16 panel from GPIO6. The Raspberry Pi 5 drove the panel over SPI in the prototype.](/images/glow-grid-architecture.svg)
 
-The ESP32-C3 is the one that lives inside the case. It has room for 96 sprites in its own flash (40 come preloaded), drives the panel directly, and serves its own copy of the editor over your home Wi-Fi. That isn't a convenience: a page loaded from GitHub over HTTPS isn't allowed to talk to a plain-HTTP board on your network, so the board hands you its own copy, and you can open it from a phone without a computer. Two buttons change what's showing: Next, and On/off. Holding On/off for five seconds opens Wi-Fi setup.
+The ESP32-C3 is the one that lives inside the case. It holds up to 96 sprites in its own flash (40 come preloaded), drives the panel directly, and serves its own copy of the editor over your home Wi-Fi. I wanted it to work from Safari on an iPhone, and a page loaded from GitHub over HTTPS isn't allowed to talk to a plain-HTTP board on your network, so the board hands you its own copy. Bluetooth was the other route; I dropped it, and this was the next option. Two buttons change what's showing: Next, and On/off. Holding On/off for five seconds opens Wi-Fi setup.
+
+**Why 96?** Part arithmetic, part product decision. A frame is 768 bytes (16 × 16 pixels × 3 colors), and I capped a sprite at 16 frames, which makes the biggest one about 12 KB. The flash I set aside for sprites is about 1.5 MB, which would fit roughly 400 of them, so flash isn't the limit. The limit is RAM: the board keeps the list of sprite names in memory, and I cap that list. I started at 64, then raised it to 96 once I'd made almost 40 example sprites and the estimates showed there was room. The 16-frame cap was a product call about what a 16×16 panel is for: short loops, not video. It also matches the editor, which lays frames out in two rows of 8. I could have shrunk sprites to fit more of them, or dropped Wi-Fi and the served editor to free room. I kept the features.
 
 The chip is tight. The board holds the player, Wi-Fi, a web server, the setup network and a compressed copy of the whole editor in 1.3 MB of flash, and one firmware version used 97% of it.
 
@@ -112,25 +114,23 @@ The Pi player is still in the repo, but the C3 is the product.
 
 ### Getting a screenless board onto Wi-Fi
 
-The setup network is the part I thought about longest: a board with no screen has nowhere to show a password, and a password printed on a label is the same on every unit. So the board creates a new WPA3 network (the current Wi-Fi security standard) with a random name and a random 8-digit password, draws the digits on the LED panel (if you can read them, you're standing in front of the device), and keeps them in RAM only, for five minutes at most.
+Two problems came with putting a board with no screen on a home network: joining it safely, and telling two of them apart.
+
+**Part 1: joining without leaving a door open.** The 8-digit code started as a security question. A password printed on a label is the same on every unit, so anyone who owns one knows the password for all of them, and I didn't want to hand users a code anyway. But the board has a panel, so it can show the code itself.
+
+When you hold On/off for five seconds, the board creates its own WPA3 network (the current Wi-Fi security standard) with a random name and a random 8-digit password. It draws the digits on the LED panel and keeps them in RAM only, for five minutes at most. If you can read the code, you're standing in front of the device. The board is exposed for that short window and no other time. The risk is small, but I wanted to close it anyway, because if I sold these, I'd want buyers to be able to secure their board the same way.
 
 ![Wi-Fi setup sequence between you, the ESP32-C3 board, and the LED panel: hold On/off for 5 seconds, read the 8 digits drawn on the panel, join the setup network, pick your home Wi-Fi, and the board forgets the setup key and returns to your sprite.](/images/glow-grid-wifi-setup.svg)
 
 I tested it on a Windows 11 PC and an iPhone. The iPhone opens the setup page by itself. On Windows 11 you get an "Action needed" entry and have to click it. I haven't tested Android, so I don't claim it works there.
 
-The first real run of the setup page showed "Loading..." forever, on both the PC and the iPhone. I assumed the new WPA3 network was the culprit and built a WPA2 comparison version to prove it. It wasn't. The F12 console on the PC showed a JavaScript syntax error: an apostrophe inside a single-quoted string had stopped the entire page script from running. That bug had shipped for four firmware versions, and every test had passed because the tests compared the page's text instead of running its code. Three days of debugging, one character of fix. The test that prevents it runs `node --check` on the page script. The new feature was the suspect, and old unchanged code was guilty.
+**Part 2: giving each board its own name.** Every board originally advertised itself as `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With two boards on one home Wi-Fi, say two kids in two rooms, they fight over the name, and whoever wins gets the other person's sprites. Now each board names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`. The editor learns the name when the board joins Wi-Fi, the setup page prints it, and the board refuses requests addressed to any other name. I checked the name against the MAC the flash tool printed, since I couldn't verify the byte order without hardware. The one miss showed up on a real upgrade: my installed editor still offered the old `glowgrid.local`, so it now asks a board on USB for its name and drops the stale one.
 
-### One name per board
-
-Every board called itself `glowgrid` and advertised `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With one board that's a nice address. With two boards on the same home Wi-Fi (two kids, two rooms) they fight over the name, and whoever wins the race gets the other person's sprites. One hard-coded `#define`, a single constant in the firmware, was the whole problem.
-
-Now each board names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`. The editor learns the name when the board joins Wi-Fi, the setup page prints it, and the board refuses requests addressed to any other name. I couldn't check the byte order of the MAC without hardware, so the first thing I did after flashing was compare the board's name to the MAC the flash tool printed. They matched. The follow-up defect only showed up on a real upgrade: my installed copy of the editor still offered the old `glowgrid.local`, because nothing had told it the board was renamed. Now the editor asks a board on USB for its name and drops the stale one.
-
-## The case
+## Why the Glow Comes from the Case
 
 ![The case: frame, grid, diffuser cover, ESP32-C3 holder, and cradle, rendered from the generator script](/images/glow-grid-enclosure-preview.jpg)
 
-The glow comes from the case. A black grid sits on the panel so each LED gets its own square, and a thin white cover over the grid diffuses each LED into a soft pixel. A frame holds the stack, a small tray holds the ESP32-C3 inside the back, and a cradle tips the whole thing back 12 degrees on a desk.
+The glow comes from the case, and the case was a list of things I wanted. I wanted the light to look like individual bright squares, a 2D pixel effect, not a smear, so a black grid sits on the panel and gives each LED its own square, and a thin white cover over the grid diffuses each LED into a soft pixel. The cover snaps on, so it's easy to hold in place. I wanted it to sit on a counter with the wires out of sight in the back, so a cradle tips the whole thing back 12 degrees, and I wanted it to look good enough to be a product. The ESP32-C3 gets its own tray in the back, so it stays put and is easy to replace, and the back has two buttons: on/off, and next sprite for when the board runs without the editor. None of the designs I started from had a place for the C3 or buttons.
 
 The parts are generated by a Python script (`enclosure/build.py` in the repo), so changing a hole or a clearance is a one-line edit. The design descends from three CC BY designs on Thingiverse: ["16x16 RGB Matrix"](https://www.thingiverse.com/thing:4127683) by The_Wrench_DIY, its [remix by chummer](https://www.thingiverse.com/thing:4459985), and the [one-part-frame remix by makeitworktech / Make It Work](https://www.thingiverse.com/thing:5737371). I used only the 10 mm pitch and 1 mm grid walls from those designs and built the rest from scratch. The Printables page is CC BY 4.0, and the code, editor, and example sprites are MIT.
 
@@ -138,7 +138,7 @@ The parts are generated by a Python script (`enclosure/build.py` in the repo), s
 
 The frame went through several versions. The change worth explaining is v7, because it taught me how a small geometry change shows up somewhere you aren't looking.
 
-I made the frame 3 mm deeper because the wires soldered to the C3's pin tips were touching the back of the LED panel. All the numbers moved with the extra depth. The lip that holds the grid kept the same distance from the front (11.6 mm, as before), which put it 24 mm from the back instead of 21.
+I made the frame and the cradle 3 mm deeper because the wires on the C3 were sticking up into the back of the LED panel. I hadn't soldered them: I'd pushed each wire into its hole and left it, so they stood up instead of lying flat. Cutting them short and soldering them would probably have fixed it, but I'd never soldered before, I didn't want to ruin the board, and it's a hobby, so I'd rather fix a problem I can undo. The few joints I did solder came out terrible even after several YouTube videos, and learning to solder cost me half a day. The lip that holds the grid was fine, so I left it and just made room for the wires. All the numbers moved with the extra depth. The lip kept the same distance from the front (11.6 mm, as before), which put it 24 mm from the back instead of 21.
 
 ![Side sections of frame v6, v7 and v8: the lip stays 11.6 mm from the front, the distance to the back goes from 21 to 24 mm, and the v8 spring fingers are thicker](/images/glow-grid-frame-lip-v6-v7-v8.png)
 
@@ -148,7 +148,7 @@ The first fix Claude tried was wrong: it moved the lip toward the front, but the
 
 ### Fifteen versions of a stand
 
-The desk cradle took 15 versions, more than the frame, for a part whose whole job is to sit there. Its first design had no front hook because the hook covered the bottom row of LEDs. Then it needed one to hold the panel, so a 1.8 mm hook came back, low enough to stay below the first row. I started with screws into the desk, then removed the desk holes. Two loose feet became two feet joined by a curved bar. Seven of my design decisions were later reversed by a newer one, and I kept both entries in the log instead of editing the first away. My print settings are on the Printables page.
+The desk cradle took 15 versions, more than the frame, for a part whose whole job is to sit there. Most of those versions were me designing something that looks good, not just something that works, and that takes longer than you'd think. Claude's first cradle was bulky. I wanted something curved and more appealing, then I wanted wording on it, then I tried to add a snake, and Claude couldn't get it right, or I couldn't explain it. It never looked right, so I dropped it. Then came a lot of back and forth about the middle. Early on, Claude's front lip covered the bottom row of LEDs, and I had to tell it I only wanted a small lip, which meant raising the back to compensate. Its next design had no front hook because the hook covered the bottom row of LEDs. Then it needed one to hold the panel, so a 1.8 mm hook came back, low enough to stay below the first row. I started with screws into the desk, then removed the desk holes. Two loose feet became two feet joined by a curved bar. Seven of my design decisions were later reversed by a newer one, and I kept both entries in the log instead of editing the first away. What I pictured, what I said, and what came out were three different things, and the only way to close the gap was to look at the print. My print settings are on the Printables page.
 
 ## What I'd tell you before you build one
 
@@ -159,7 +159,7 @@ The Printables page has the assembly order, the wiring, my print settings, and a
 
 ## What's next
 
-Two things. I plan one board per kid, which is what the per-board names were for. And Android is the other gap: I've only tested the Wi-Fi setup on Windows 11 and an iPhone. I'm also getting a Mac, and when I do I'll see about an iOS app that runs the editor UI. That one is a plan, not a build.
+Two things. I plan one board per kid, which is what the per-board names were for. I'm also getting a Mac, and when I do I'll see about an iOS app that runs the editor UI. That one is a plan, not a build.
 
 ## Try it yourself
 
@@ -176,6 +176,6 @@ If something doesn't work, [open an issue](https://github.com/dwooods/glow-grid/
 
 Same arrangement as the strip project, with more rules, because the project is bigger. I describe what I want and test the result on the real device. Claude writes the code, the build script, and the commits. We keep a journal and a feature tracker in a project folder, so a new session can pick up where the last one stopped.
 
-That covers the volume: the editor, the board firmware, the case generator. It did not cover being right. Claude moved the frame lip the wrong way in v7, and it wrote a setup page whose tests all passed while the page itself didn't run. The decisions were mine: asking why a file needed its name to know how fast to play, having the board draw its own Wi-Fi password on the panel, and checking the layout on a real iPhone. I could only judge any of it by looking at the real thing.
+That covers the volume: the editor, the board firmware, the case generator. It did not cover being right. Claude made mistakes along the way, like moving the frame lip the wrong way in v7. So I had it build a whole test suite and add test cases as we went, and that works to keep Claude in check. The decisions were mine: keeping a sprite's settings inside the file instead of its name, having the board draw its own Wi-Fi password on the panel, and checking the layout on a real iPhone. I could only judge any of it by looking at the real thing.
 
 The better prompt isn't a cleverer instruction, it's a person holding the device.
