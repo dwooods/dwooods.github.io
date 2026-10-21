@@ -1,7 +1,7 @@
 ---
 title: "Pixel Art You Can Hold"
 date: 2026-10-20
-draft: false
+draft: true
 tags: ["raspberry-pi", "esp32", "led", "ws2812", "pixel-art", "3d-printing", "hardware"]
 description: "Glow Grid: a browser pixel-art editor, a Raspberry Pi 5 and ESP32-C3 player, and a 3D-printed case for a 16x16 WS2812B LED panel, built by directing Claude through the implementation."
 summary: "A 16x16 LED panel looks harsh on its own. This is the story of the editor, the two players, the case that makes the pixels glow, and the one bug that looked like hardware and wasn't."
