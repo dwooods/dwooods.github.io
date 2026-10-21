@@ -19,7 +19,7 @@ That turned into four things: a pixel editor that runs in a browser, a player on
 
 This is another hardware project where I've directed Claude through the implementation instead of writing the code myself. The first was an [LED strip controller](/posts/led-strip/). I have a CS degree, but coding was never the part I loved. I like building things and solving problems, and for years the typing ate the time I would have spent on the problem.
 
-The strip was easy. The next step, a 256-pixel panel, was supposed to be the same thing with more LEDs: same Pi, same driver. It wasn't, and the way it failed taught me more than anything else in this build. The other thing I wanted was a display my sons could draw on. My younger son is 13 and has never written code. A picture he draws on a phone, appearing on a glowing panel on a desk, is the most direct way I know to show him that code can be a physical object.
+The strip was easy. The next step, a 256-pixel panel, was supposed to be the same thing with more LEDs: same Pi, same driver. It wasn't, and the way it failed taught me more than anything else in this build.
 
 ## What you'll need
 
@@ -66,7 +66,7 @@ A few decisions are worth explaining.
 
 **A phone layout I got wrong.** I built a locked, no-scroll layout with the tools in a bottom dock. It looked right at three simulated phone sizes. On a real iPhone, a finger on the grid painted instead of scrolling, and there was no other place to swipe. The fix removed code instead of adding it: the settings sheet became normal cards below the strip, and the page scrolls. I'd rated that layout 7.5 out of 10 while the settings couldn't be reached on a phone, which is why the editor now has a written rubric. A score based only on a screenshot can't go above a 3 out of 4 on any dimension, and a phone score needs a real phone.
 
-**Examples are original.** When I asked for a crochet-style Hello Kitty sprite, Claude declined to draw a character that belongs to someone else, and offered an original character prompt plus the flat-art import path instead. The example sprites in the repo (a campfire, a cauldron, a jack-o'-lantern, fireworks, meteors, lightning) are all drawn from scratch.
+**Examples are original.** The example sprites in the repo (a campfire, a cauldron, a jack-o'-lantern, fireworks, meteors, lightning) are all drawn from scratch, and none of them is someone else's character.
 
 ![The editor's Board card, for sending a drawing to the ESP32-C3](/images/glow-grid-editor-board-card.png)
 
@@ -130,7 +130,7 @@ The first real run of the setup page showed "Loading..." forever, on both the PC
 
 ### One name per board
 
-A latent bug sat in the firmware until I asked the right question. Every board called itself `glowgrid` and advertised `glowgrid.local` over mDNS. With one board that's a nice address. With two boards on the same home Wi-Fi (two kids, two rooms) they fight over the name, and whoever wins the race gets the other person's sprites. One hard-coded `#define` was the whole problem.
+A latent bug sat in the firmware until I asked the right question. Every board called itself `glowgrid` and advertised `glowgrid.local` over mDNS. With one board that's a nice address. With two boards on the same home Wi-Fi (two people, two rooms) they fight over the name, and whoever wins the race gets the other person's sprites. One hard-coded `#define` was the whole problem.
 
 The fix: each board now names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`. The editor learns the name when the board joins Wi-Fi and shows it in the Network dialog, the setup page prints it, and the board refuses requests addressed to any other name (that check was already there as a DNS-rebinding guard; it just had the one name baked in). The part I couldn't verify without hardware was the byte order of the MAC as the chip reports it, so the first thing I did after flashing was compare the board's name to the MAC the flash tool printed. They matched.
 
