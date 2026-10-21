@@ -57,15 +57,7 @@ The whole thing ended up being three pieces:
 
 So a typical question looks something like this:
 
-```mermaid
-graph LR
-    Sleeper[(Sleeper API<br/>rosters, owners, trades)] -. fetch tool, screenshots as fallback .-> Me
-    Me[Me] -->|asks a question| Claude[Claude]
-    Claude <-->|reads/writes league notes| Project[(Claude Project<br/>scoring rules, rosters, trade log)]
-    Claude -->|tool call| MCP[fantasypros-mcp<br/>Cloudflare Worker]
-    MCP -->|cached| FP[(FantasyPros API<br/>rankings, projections, news)]
-    Claude -. scheduled check-ins .-> Me
-```
+![Flow of a typical question: Sleeper data reaches me by fetch tool or screenshot; I ask Claude; Claude reads and writes the league notes in a Claude Project and calls the fantasypros-mcp Cloudflare Worker, which caches FantasyPros data; scheduled check-ins come back to me.](/images/fantasy-football-architecture.svg)
 
 Net result: I built a tiny fantasy football data pipeline so I could ask an AI whether I should pick up a guy who is 0% rostered.
 
