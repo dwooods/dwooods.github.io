@@ -123,7 +123,7 @@ sequenceDiagram
 
 I tested it on a Windows 11 PC and an iPhone. The iPhone opens the setup page by itself. On Windows 11 you get an "Action needed" entry and have to click it. I haven't tested Android, so I don't claim it works there.
 
-The first real run of the setup page showed "Loading..." forever, on both the PC and the iPhone. I assumed the new WPA3 network was the culprit and built a WPA2 comparison version to prove it. It wasn't. The F12 console on the PC showed a JavaScript syntax error: an apostrophe inside a single-quoted string had stopped the entire page script from running. That bug had shipped for four firmware versions and cost me three days, and every test had passed because the tests compared the page's text instead of running its code. The fix was one character. The test that prevents it runs `node --check` on the page script. The new feature was the suspect, and old unchanged code was guilty.
+The first real run of the setup page showed "Loading..." forever, on both the PC and the iPhone. I assumed the new WPA3 network was the culprit and built a WPA2 comparison version to prove it. It wasn't. The F12 console on the PC showed a JavaScript syntax error: an apostrophe inside a single-quoted string had stopped the entire page script from running. That bug had shipped for four firmware versions, and every test had passed because the tests compared the page's text instead of running its code. Three days of debugging, one character of fix. The test that prevents it runs `node --check` on the page script. The new feature was the suspect, and old unchanged code was guilty.
 
 ### One name per board
 
@@ -153,7 +153,7 @@ The first fix Claude tried was wrong: it moved the lip toward the front, but the
 
 ### Fifteen versions of a stand
 
-The desk cradle took 15 versions, more than the frame. Its first design had no front hook because the hook covered the bottom row of LEDs. Then it needed one to hold the panel, so a 1.8 mm hook came back, low enough to stay below the first row. I started with screws into the desk, then removed the desk holes. Two loose feet became two feet joined by a curved bar. Seven of my design decisions were later reversed by a newer one, and I kept both entries in the log instead of editing the first away. My print settings, including the elephant-foot compensation I haven't yet confirmed with a test block, are on the Printables page.
+The desk cradle took 15 versions, more than the frame, for a part whose whole job is to sit there. Its first design had no front hook because the hook covered the bottom row of LEDs. Then it needed one to hold the panel, so a 1.8 mm hook came back, low enough to stay below the first row. I started with screws into the desk, then removed the desk holes. Two loose feet became two feet joined by a curved bar. Seven of my design decisions were later reversed by a newer one, and I kept both entries in the log instead of editing the first away. My print settings, including the elephant-foot compensation I haven't yet confirmed with a test block, are on the Printables page.
 
 ## What I'd tell you before you build one
 
