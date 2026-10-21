@@ -138,7 +138,7 @@ The follow-up defect was the kind you only find on a real upgrade: my installed 
 
 ## The case
 
-![The case: frame, grid, diffuser cover, ESP32-C3 holder, and cradle, rendered from the generator script](/images/glow-grid-enclosure-preview.png)
+![The case: frame, grid, diffuser cover, ESP32-C3 holder, and cradle, rendered from the generator script](/images/glow-grid-enclosure-preview.jpg)
 
 The glow comes from the case. A black grid sits on the panel so each LED gets its own square, and a thin white cover over the grid diffuses each LED into a soft pixel. A frame holds the stack, a small tray holds the ESP32-C3 inside the back, and a cradle tips the whole thing back 12 degrees on a desk.
 
@@ -181,6 +181,6 @@ Most of what was wrong was found by using the thing. The Pi bug looked like hard
 3. Get the [code](https://github.com/dwooods/glow-grid) (MIT) for the Pi player and the ESP32-C3 firmware.
 4. Wire it as in the diagram below, flash the board, and print the holder first.
 
-![The ESP32-C3 wiring diagram and build checklist](/images/glow-grid-wiring-checklist.png)
+![The ESP32-C3 wiring diagram and build checklist](/images/glow-grid-wiring-checklist.jpg)
 
 If something doesn't work, [open an issue](https://github.com/dwooods/glow-grid/issues). The example sprites are all original, and I'd ask that remixes keep it that way.
