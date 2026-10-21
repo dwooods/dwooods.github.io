@@ -51,16 +51,7 @@ If a Pi 5 GPIO tutorial predates the Pi 5 (most do), assume it needs a translati
 
 Here's how the pieces talk to each other:
 
-```mermaid
-graph LR
-    run[run.sh] --> menu[led.py]
-    menu -->|SIGINT, then wait| stop((stop current effect))
-    menu -->|subprocess.Popen| effect["effect.py<br/>(fire.py, pacman.py, ...)"]
-    menu -->|key: o| off[off.py]
-    effect --> common[led_common.py]
-    off --> common
-    common -->|SPI| strip[(LED strip)]
-```
+![run.sh starts led.py, which launches an effect script or off.py; both use led_common.py, which drives the LED strip over SPI.](/images/led-strip-architecture.svg)
 
 `run.sh` (symlinked as `ledstrip` on `PATH`) just erases the "was it `source venv/bin/activate` first or `cd` first?" friction — it creates the venv if one doesn't exist yet and launches the menu.
 
