@@ -84,6 +84,8 @@ enableGitInfo = false
     RSS = "true"
 
   [params.page]
+    # Click-to-zoom on markdown images (LoveIt's lightgallery). Off by default in the theme.
+    lightgallery = true
     [params.page.toc]
       enable = true
       keepStatic = false
