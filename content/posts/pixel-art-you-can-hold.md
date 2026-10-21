@@ -35,7 +35,7 @@ The short version: a 16x16 WS2812B flexible panel, a 5 V supply rated for addres
 
 ## The bug that looked like hardware
 
-This happened on the Raspberry Pi prototype. My first 256-pixel panel was an 8x32. It worked at first, then random pixels started lighting up in the wrong colors, more of them as I ran more patterns. I did what you'd do. I added a series resistor, which helped a little. I added a 74AHCT125 level shifter, which made things worse, and I took it out. I moved a big capacitor around the board. I worked out that the noise was at the input end of the panel, not the far end, which ruled out one theory and pointed at nothing in particular.
+This happened on the Raspberry Pi prototype. My first 256-pixel panel was an 8x32. It worked at first, then random pixels started lighting up in the wrong colors, more of them as I ran more patterns. I did what you'd do. I added a series resistor, which helped a little. I added a 74AHCT125 level shifter (a chip that converts the Pi's 3.3 V data signal to 5 V), which made things worse, and I took it out. I moved a big capacitor around the board. I worked out that the noise was at the input end of the panel, not the far end, which ruled out one theory and pointed at nothing in particular.
 
 What I eventually blamed was the power supply. Something was wrong with the panel's power: it got hot enough that the wires melted and I came close to a fire, so I retired it. I replaced the adapter with a 6 A supply made for LEDs, which was the right call for the 16x16 too. Check an adapter's voltage and rating before you plug anything in.
 
@@ -59,7 +59,7 @@ Before you buy a part to fix flaky hardware, write the smallest control you can 
 
 One thing I can't fully say. The 8x32 shared the same driver, the same frame size and almost certainly the same 4,096-byte limit, but it was damaged by a power problem before I found the buffer bug, so I never retested it. I can't say how much each one caused.
 
-That was the Pi. The panel worked, the idea held up, and the rest of this post is about the board that replaced it.
+That was the Pi. The panel worked, the idea held up, and the rest of this post is about what replaced it: the editor, the board and the case.
 
 ## The editor
 
@@ -67,7 +67,7 @@ The editor is a web page. It runs from GitHub Pages, installs as an app on a pho
 
 **Photos and flat art need different imports.** A photo shrunk to 16x16 with the browser's default smoothing doesn't match what the player will do, so the editor does its own resize, checked against Pillow to within one level out of 255. Gamma is the curve that makes brightness steps look even to the eye, and at brightness 0.3 it leaves only about 77 distinct LED levels, so dark gradients band unless the editor dithers, mixing neighboring levels pixel by pixel to fake the in-between. Flat art needs the opposite: averaging blends outlines into muddy colors, so that mode picks a few main colors first.
 
-**A phone layout I got wrong.** I built a locked, no-scroll layout with the tools in a bottom dock. It looked right at three simulated phone sizes. On a real iPhone, a finger on the grid painted instead of scrolling, and there was no other place to swipe. The fix removed code instead of adding it: the settings sheet became normal cards below the strip, and the page scrolls. I'd rated that layout 7.5 out of 10 while the settings couldn't be reached on a phone, which is why the editor now has a written rubric. A score based only on a screenshot can't go above a 3 out of 4 on any dimension, and a phone score needs a real phone.
+**A phone layout I got wrong.** I built a locked, no-scroll layout with the tools in a bottom dock. It looked right at three simulated phone sizes. On a real iPhone, a finger on the grid painted instead of scrolling, and there was no other place to swipe. The fix removed code instead of adding it: the settings sheet became normal cards below the strip, and the page scrolls. I'd rated that layout 7.5 out of 10 while its settings couldn't be reached on a phone. A screenshot can't show you that.
 
 ![The editor's Board card, for sending a drawing to the ESP32-C3](/images/glow-grid-editor-board-card.png)
 
@@ -167,4 +167,4 @@ Same arrangement as the strip project, with more rules, because the project is b
 
 That covers the volume: the editor, the board firmware, the case generator. It did not cover being right. Claude moved the frame lip the wrong way in v7, and it wrote a setup page whose tests all passed while the page itself didn't run. The decisions were mine: asking why a file needed its name to know how fast to play, having the board draw its own Wi-Fi password on the panel, and checking the layout on a real iPhone. I could only judge any of it by looking at the real thing.
 
-Most of what was wrong was found by using the thing. The better prompt isn't a cleverer instruction, it's a person holding the device.
+The better prompt isn't a cleverer instruction, it's a person holding the device.
