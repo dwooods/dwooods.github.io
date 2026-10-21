@@ -32,7 +32,9 @@ I started on a Raspberry Pi 5 and moved to an ESP32-C3, a small board that sits 
 
 The editor runs in any browser, so you can try it without building anything. For the hardware, the [Printables page](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) has the full parts list, wiring, assembly order and my slicer profile, and I'd rather keep that in one place than copy it here.
 
-The short version: a 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, and I learned why the hard way, below), an ESP32-C3 SuperMini, a 3D printer and PLA, and a handful of small parts. Measure your panel before printing. The frame pocket is 162 mm square, and panels from different sellers vary.
+{{< admonition type="info" title="The short version" open=true >}}
+A 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, and I learned why the hard way, below), an ESP32-C3 SuperMini, a 3D printer and PLA, and a handful of small parts. Measure your panel before printing. The frame pocket is 162 mm square, and panels from different sellers vary.
+{{< /admonition >}}
 
 ## The bug that looked like hardware
 
