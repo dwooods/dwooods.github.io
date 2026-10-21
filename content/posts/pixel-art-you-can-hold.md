@@ -38,13 +38,20 @@ A 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, an
 
 ## The bug that looked like hardware
 
-This happened on the Raspberry Pi prototype. My first 256-pixel panel was an 8x32. It worked at first, then random pixels started lighting up in the wrong colors, more of them as I ran more patterns. I did what you'd do. I added a series resistor, which helped a little. I added a 74AHCT125 level shifter (a chip that converts the Pi's 3.3 V data signal to 5 V), which made things worse, and I took it out. I moved a big capacitor around the board. I worked out that the noise was at the input end of the panel, not the far end, which ruled out one theory and pointed at nothing in particular.
+This happened on the Raspberry Pi prototype, with my first 256-pixel panel, an 8x32. It worked at first, then random pixels lit up in the wrong colors, more of them the more patterns I ran. I tried what you'd try:
 
-What I eventually blamed was the power supply. Something was wrong with the panel's power: it got hot enough that the wires melted and I came close to a fire, so I retired it. I replaced the adapter with a 6 A supply made for LEDs, which was the right call for the 16x16 too. Check an adapter's voltage and rating before you plug anything in.
+1. **A series resistor on the data line.** It helped a little.
+2. **A 74AHCT125 level shifter** (a chip that converts the Pi's 3.3 V data signal to 5 V). It made things worse, so I took it out.
+3. **A big capacitor, moved around the board.** No fix. It did show the noise was at the input end of the panel, not the far end, which ruled out one theory and pointed at nothing in particular.
+4. **The power supply.** The one I had ran the 60-LED strip fine, which turned out to prove nothing about the 8x32. I knew nothing about volts and amps (volts are how hard the power pushes, amps are how much of it flows), and I wasn't paying attention to either. The wrong voltage fried the panel: the wires melted and I came close to a fire. I retired it and got a 6 A supply made for LEDs, which later ran the 16x16 too. **Hard lesson: match the supply to the panel before you plug anything in, or you can break the board and start a fire. It cost me money and time, and the panel paid for my education.**
 
-It wasn't the whole story. When I moved to the 16x16 panel with the proper supply, no breadboard and a resistor on the data line, the same symptoms came back. A static check pattern was mostly right but had different wrong pixels on every run. A solid-red fill of all 256 LEDs looked fine for about five seconds and then grew yellow columns at the input end while nothing was touched.
+On the 16x16, with the right supply and no breadboard, the same symptoms came back: wrong-colored pixels that changed on every run, missing pixels in the first row and column, red coming out orange. A solid-red fill looked fine for about five seconds, then grew yellow columns at the input end while nothing was touched.
 
-The symptoms pointed at the electronics, and the cause was in software. The library that drives the panel, `rpi5-ws2812`, talks to the LEDs over SPI, a fast serial link on the Pi's header, and sends one SPI byte for every WS2812 data bit, so a frame for 256 LEDs is 42 preamble bytes plus 24 bytes per LED, which is **6,186 bytes**. Linux's default `spidev` buffer is **4,096 bytes**. Every frame went out as two separate writes with a scheduler-dependent pause between them, landing 7 bits into LED 168. Depending on the length of that pause, the LEDs either rode through it or treated it as the end of the frame and re-applied the second half from LED 0. Solid red shifted by a few bits turns green bits on, and red plus green is yellow.
+The symptoms pointed at the electronics. The cause was software:
+
+- The `rpi5-ws2812` library drives the LEDs over SPI (a fast serial link on the Pi's header) and sends one SPI byte per WS2812 data bit. A 256-LED frame is 42 bytes of framing plus 24 per LED: **6,186 bytes**.
+- Linux's default `spidev` buffer is **4,096 bytes**, so every frame went out as two writes with a scheduler-dependent pause between them. The split lands 7 bits into LED 168.
+- Short pause: the LEDs ride through it. Long pause: they treat it as the end of the frame and re-apply the second half from LED 0. Solid red shifted by a few bits turns green bits on, and red plus green is yellow.
 
 ![One 6,186-byte frame split into a 4,096-byte write and a 2,090-byte write, against a 60-LED strip frame that never splits](/images/glow-grid-spi-buffer-split.png)
 
