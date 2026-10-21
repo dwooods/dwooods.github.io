@@ -5,15 +5,13 @@ draft: true
 tags: ["raspberry-pi", "esp32", "led", "ws2812", "pixel-art", "3d-printing", "hardware"]
 description: "Glow Grid: a browser pixel-art editor, a Raspberry Pi 5 and ESP32-C3 player, and a 3D-printed case for a 16x16 WS2812B LED panel, built by directing Claude through the implementation."
 summary: "A 16x16 LED panel looks harsh on its own. This is the story of the editor, the two players, the case that makes the pixels glow, and the one bug that looked like hardware and wasn't."
-featuredImage: "/images/glow-grid-lit-still.jpg"
-featuredImagePreview: "/images/glow-grid-lit-still.jpg"
+featuredImage: "/images/hero-glow-grid.jpeg"
+featuredImagePreview: "/images/hero-glow-grid.jpeg"
 ---
 
 Bare LEDs make bad pixels. A 16x16 WS2812B panel has 256 of them, each a hard little point of light, and a sprite on that panel looks like a sprite drawn with tiny flashlights. I wanted something that looked like a pixel: soft, square, and something I could draw on my phone and put on a desk.
 
 That turned into four things: a pixel editor that runs in a browser, a player on a Raspberry Pi 5, a second player on an ESP32-C3 that needs no computer at all, and a 3D-printed case with a black grid and a white diffuser cover. All of it is open source, and the case files are on [Printables](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser).
-
-![The finished panel running a campfire sprite](/images/glow-grid-lit-still.jpg)
 
 ## Why I built this
 
@@ -74,22 +72,19 @@ A few decisions are worth explaining.
 
 The sprites that ship with the repo are all drawn as text in a Python file, one character per pixel, so they live in git as source and not as binary images. Four of them, rendered here from that data with a soft glow added (this is a preview render, not a photo of the panel):
 
-![Fireworks: three shells rise, burst, and fade](/images/glow-grid-sprite-fireworks.gif)
+<div style="display:flex;gap:8px;justify-content:center;margin:1em 0;">
+  <img src="/images/glow-grid-sprite-fireworks.gif" alt="Fireworks: three shells rise, burst, and fade" style="flex:1 1 0;min-width:0;max-width:150px;height:auto;margin:0;">
+  <img src="/images/glow-grid-sprite-meteors.gif" alt="Meteors crossing a starry sky on clean diagonals" style="flex:1 1 0;min-width:0;max-width:150px;height:auto;margin:0;">
+  <img src="/images/glow-grid-sprite-lightning.gif" alt="A storm cloud, rain, and two lightning strikes" style="flex:1 1 0;min-width:0;max-width:150px;height:auto;margin:0;">
+  <img src="/images/glow-grid-sprite-missile-defense.gif" alt="Two incoming missiles caught by interceptors over a small skyline" style="flex:1 1 0;min-width:0;max-width:150px;height:auto;margin:0;">
+</div>
 
-![Meteors crossing a starry sky on clean diagonals](/images/glow-grid-sprite-meteors.gif)
-
-![A storm cloud, rain, and two lightning strikes](/images/glow-grid-sprite-lightning.gif)
-
-![Two incoming missiles caught by interceptors over a small skyline](/images/glow-grid-sprite-missile-defense.gif)
-
-The last one is the one I like for showing what working this way is like. I asked Claude for a sprite in the style of a classic arcade missile-defense game. It came back as an original scene with a generic name instead of a copy: a skyline, a launcher, incoming missiles with red tails, interceptors on 45-degree lines, and blast rings that go from white to orange to red. It took a few minutes to draw, check frame by frame, and add to the editor. The GIF above is the editor's preview. This is the same sprite on the real panel, filmed on my phone:
+The last one, a missile-defense scene, on the real panel, filmed on my phone:
 
 <video autoplay loop muted playsinline controls preload="metadata" width="100%" poster="/images/glow-grid-missile-defense-real-panel.gif" style="max-width:480px;display:block;margin:1em auto;">
   <source src="/images/glow-grid-missile-defense-real-panel.mp4" type="video/mp4">
   <img src="/images/glow-grid-missile-defense-real-panel.gif" alt="The missile-defense sprite playing on the real panel">
 </video>
-
-The diffuser softens each pixel and the blast rings read cleanly, so I left the sprite as drawn.
 
 ## Two players
 
