@@ -9,6 +9,8 @@ featuredImage: "/images/hero-glow-grid.jpeg"
 featuredImagePreview: "/images/hero-glow-grid.jpeg"
 ---
 
+<p style="font-size:0.75em;opacity:0.7;margin-top:-0.75em;text-align:center;">AI-generated illustration. The real panel is in the video below.</p>
+
 Bare LEDs make bad pixels. A 16x16 WS2812B panel has 256 of them, each a hard little point of light, and a sprite on that panel looks like a sprite drawn with tiny flashlights. I wanted something that looked like a pixel: soft, square, and something I could draw on my phone and put on a desk.
 
 That turned into three things: a pixel editor that runs in a browser, an ESP32-C3 board that plays what you draw and needs no computer at all, and a 3D-printed case with a black grid and a white diffuser cover. All of it is open source, and the case files are on [Printables](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser).
