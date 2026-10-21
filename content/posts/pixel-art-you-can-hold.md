@@ -13,8 +13,6 @@ Bare LEDs make bad pixels. A 16x16 WS2812B panel has 256 of them, each a hard li
 
 That turned into four things: a pixel editor that runs in a browser, a player on a Raspberry Pi 5, a second player on an ESP32-C3 that needs no computer at all, and a 3D-printed case with a black grid and a white diffuser cover. All of it is open source, and the case files are on [Printables](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser).
 
-*The image at the top is an AI-generated illustration based on my build. The real panel is in the video further down.*
-
 ## Why I built this
 
 This is another hardware project where I've directed Claude through the implementation instead of writing the code myself. The first was an [LED strip controller](/posts/led-strip/). I have a CS degree, but coding was never the part I loved. I like building things and solving problems, and for years the typing ate the time I would have spent on the problem.
