@@ -4,7 +4,7 @@ date: 2026-10-20
 draft: true
 tags: ["esp32-c3", "esp32", "led", "ws2812", "pixel-art", "3d-printing", "hardware"]
 description: "Glow Grid: a browser pixel-art editor, an ESP32-C3 player, and a 3D-printed case for a 16x16 WS2812B LED panel, built by directing Claude through the implementation."
-summary: "A 16x16 LED panel looks harsh on its own. This is the story of the editor, the little board that runs it, the case that makes the pixels glow, and the one bug that looked like hardware and wasn't."
+summary: "A 16x16 LED panel looks harsh on its own. This is the story of the editor, the little board that runs it, the case that makes the pixels glow, and a bug hunt that was hardware, hardware, then software."
 featuredImage: "/images/hero-glow-grid.jpeg"
 featuredImagePreview: "/images/hero-glow-grid.jpeg"
 lightgallery: true
@@ -36,18 +36,19 @@ The editor runs in any browser, so you can try it without building anything. For
 A 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, and I learned why the hard way, below), an ESP32-C3 SuperMini, a 3D printer and PLA, and a handful of small parts. Measure your panel before printing. The frame pocket is 162 mm square, and panels from different sellers vary.
 {{< /admonition >}}
 
-## The bug that looked like hardware
+## Hardware, Hardware, Then Software
 
 This happened on the Raspberry Pi prototype, with my first 256-pixel panel, an 8x32. It worked at first, then random pixels lit up in the wrong colors, more of them the more patterns I ran. I tried what you'd try:
 
 1. **A series resistor on the data line.** It helped a little.
 2. **A 74AHCT125 level shifter** (a chip that converts the Pi's 3.3 V data signal to 5 V). It made things worse, so I took it out.
 3. **A big capacitor, moved around the board.** No fix. It did show the noise was at the input end of the panel, not the far end, which ruled out one theory and pointed at nothing in particular.
-4. **The power supply.** The one I had ran the 60-LED strip fine, which turned out to prove nothing about the 8x32. I knew nothing about volts and amps (volts are how hard the power pushes, amps are how much of it flows), and I wasn't paying attention to either. The wrong voltage fried the panel: the wires melted and I came close to a fire. I retired it and got a 6 A supply made for LEDs, which later ran the 16x16 too. **Hard lesson: match the supply to the panel before you plug anything in, or you can break the board and start a fire. It cost me money and time, and the panel paid for my education.**
+4. **Too little power.** The supply I had ran the 60-LED strip fine, which turned out to prove nothing about the 8x32. It couldn't feed it.
+5. **Too much power.** I knew nothing about volts and amps (volts are how hard the power pushes, amps are how much of it flows), and I wasn't paying attention to either. The next supply had the wrong voltage and fried the panel: the wires melted and I came close to a fire. I retired it and got a 6 A supply made for LEDs, which later ran the 16x16 too. **Hard lesson: match the supply to the panel before you plug anything in, or you can break the board and start a fire. It cost me money and time, and the panel paid for my education.**
 
 On the 16x16, with the right supply and no breadboard, the same symptoms came back: wrong-colored pixels that changed on every run, missing pixels in the first row and column, red coming out orange. A solid-red fill looked fine for about five seconds, then grew yellow columns at the input end while nothing was touched.
 
-The symptoms pointed at the electronics. The cause was software:
+With the power fixed, one cause was left, and it was software:
 
 - The `rpi5-ws2812` library drives the LEDs over SPI (a fast serial link on the Pi's header) and sends one SPI byte per WS2812 data bit. A 256-LED frame is 42 bytes of framing plus 24 per LED: **6,186 bytes**.
 - Linux's default `spidev` buffer is **4,096 bytes**, so every frame went out as two writes with a scheduler-dependent pause between them. The split lands 7 bits into LED 168.
