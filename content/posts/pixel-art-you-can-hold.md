@@ -35,7 +35,7 @@ The short version: a 16x16 WS2812B flexible panel, a 5 V supply rated for addres
 
 This happened on the Raspberry Pi prototype. My first 256-pixel panel was an 8x32. It worked at first, then random pixels started lighting up in the wrong colors, more of them as I ran more patterns. I did what you'd do. I added a series resistor, which helped a little. I added a 74AHCT125 level shifter, which made things worse, and I took it out. I moved a big capacitor around the board. I worked out that the noise was at the input end of the panel, not the far end, which ruled out one theory and pointed at nothing in particular.
 
-What I eventually blamed was the power supply. I'd been running the panel from a generic 5 V, 2 A wall adapter, and it got hot enough that I came close to melting the panel. Replacing it with a 6 A supply made for LEDs was the right call, and it also is a real safety lesson: don't size a supply by average current, because LED current comes in sharp spikes, and a cheap adapter with a poor transient response can't hold the rail steady.
+What I eventually blamed was the power supply. Something was wrong with the panel's power: it got hot enough that the wires melted and I came close to a fire, so I retired it. I replaced the adapter with a 6 A supply made for LEDs, which was the right call for the 16x16 too. Check an adapter's voltage and rating before you plug anything in.
 
 It wasn't the whole story. When I moved to the 16x16 panel with the proper supply, no breadboard and a resistor on the data line, the same symptoms came back. A static check pattern was mostly right but had different wrong pixels on every run. A solid-red fill of all 256 LEDs looked fine for about five seconds and then grew yellow columns at the input end while nothing was touched.
 
@@ -55,7 +55,7 @@ What found it was a 40-line test script: solid red, 256 LEDs hard-coded, none of
 Before you buy a part to fix flaky hardware, write the smallest control you can and read the driver. If the fault survives with none of your application in it, the application isn't the cause. I spent two evenings on contacts, ground and capacitors before doing either. It works on any project where a library sits between your code and the pins.
 {{< /admonition >}}
 
-One thing I can't fully say. The 8x32 shared the same driver, the same frame size and almost certainly the same 4,096-byte limit, but it's out of service, so I never retested it. The supply and the buffer both mattered there, and I can't prove how much each did.
+One thing I can't fully say. The 8x32 shared the same driver, the same frame size and almost certainly the same 4,096-byte limit, but it was damaged by a power problem before I found the buffer bug, so I never retested it. I can't say how much each one caused.
 
 That was the Pi. The panel worked, the idea held up, and the rest of this post is about the board that replaced it.
 
