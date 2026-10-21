@@ -19,7 +19,7 @@ This is another hardware project where I've directed Claude through the implemen
 
 The strip was easy: 60 LEDs, wires everywhere, and it lived on my workbench. This time I wanted a real product, something with no wires showing that could sit anywhere in the house, not just on a bench.
 
-I also wanted a better way to make things for it. I didn't want people asking an AI to write code and uploading that. You draw in the editor, or upload an image and let it turn that into a sprite, and that's the whole job. I wanted to build something with the person using it in mind. I also kept picturing someone else printing the case and building on it, which is part of why the files are on Printables.
+I also wanted a better way to make things for it. I didn't want people asking an AI to write code and uploading that. You draw in the editor, or upload an image and let it turn that into a sprite, and that's the whole job. I wanted to build something with the person using it in mind. I also kept picturing someone else printing the case and building on it.
 
 It turned out to be a lot more than the strip. There were 256 LEDs instead of 60, soldering, Wi-Fi setup with a password you read off the panel, buttons, and real design work on the 3D prints. It took far more time.
 
@@ -96,15 +96,15 @@ graph LR
     pi[Raspberry Pi 5] -.->|SPI, prototype| panel
 ```
 
-The ESP32-C3 is the one that lives inside the case. It has room for 96 sprites in its own flash (40 come preloaded), drives the panel directly, and serves its own copy of the editor over your home Wi-Fi, so you can open it from a phone without a computer. Two buttons change what's showing: Next, and On/off. Holding On/off for five seconds opens Wi-Fi setup.
+The ESP32-C3 is the one that lives inside the case. It has room for 96 sprites in its own flash (40 come preloaded), drives the panel directly, and serves its own copy of the editor over your home Wi-Fi. That isn't a convenience: a page loaded from GitHub over HTTPS isn't allowed to talk to a plain-HTTP board on your network, so the board hands you its own copy, and you can open it from a phone without a computer. Two buttons change what's showing: Next, and On/off. Holding On/off for five seconds opens Wi-Fi setup.
 
 That last part is why the chip is tight. The board holds the player, Wi-Fi, a web server, the setup network and a compressed copy of the whole editor in 1.3 MB of flash, and one firmware version used 97% of it.
 
-The Raspberry Pi can still drive the panel, reading exported PNGs from a folder and playing them through a terminal menu. That's how I prototyped, and it's still in the repo, but the C3 is the product.
+The Pi player is still in the repo, but the C3 is the product.
 
 ### Getting a screenless board onto Wi-Fi
 
-The setup network is the part I thought about longest: a board with no screen has nowhere to show a password, and a password printed on a label is the same on every unit. So the board creates a new WPA3 network with a random name and a random 8-digit password, draws the digits on the LED panel (if you can read them, you're standing in front of the device), and keeps them in RAM only, for five minutes at most.
+The setup network is the part I thought about longest: a board with no screen has nowhere to show a password, and a password printed on a label is the same on every unit. So the board creates a new WPA3 network (the current Wi-Fi security standard) with a random name and a random 8-digit password, draws the digits on the LED panel (if you can read them, you're standing in front of the device), and keeps them in RAM only, for five minutes at most.
 
 ```mermaid
 sequenceDiagram
@@ -127,7 +127,7 @@ The first real run of the setup page showed "Loading..." forever, on both the PC
 
 ### One name per board
 
-Every board called itself `glowgrid` and advertised `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With one board that's a nice address. With two boards on the same home Wi-Fi (two kids, two rooms) they fight over the name, and whoever wins the race gets the other person's sprites. One hard-coded `#define` was the whole problem.
+Every board called itself `glowgrid` and advertised `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With one board that's a nice address. With two boards on the same home Wi-Fi (two kids, two rooms) they fight over the name, and whoever wins the race gets the other person's sprites. One hard-coded `#define`, a single constant in the firmware, was the whole problem.
 
 Now each board names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`. The editor learns the name when the board joins Wi-Fi, the setup page prints it, and the board refuses requests addressed to any other name. I couldn't check the byte order of the MAC without hardware, so the first thing I did after flashing was compare the board's name to the MAC the flash tool printed. They matched. The follow-up defect only showed up on a real upgrade: my installed copy of the editor still offered the old `glowgrid.local`, because nothing had told it the board was renamed. Now the editor asks a board on USB for its name and drops the stale one.
 
@@ -147,13 +147,13 @@ I made the frame 3 mm deeper because the wires soldered to the C3's pin tips wer
 
 ![Side sections of frame v6, v7 and v8: the lip stays 11.6 mm from the front, the distance to the back goes from 21 to 24 mm, and the v8 spring fingers are thicker](/images/glow-grid-frame-lip-v6-v7-v8.png)
 
-Four spring fingers on the back plate press the stack forward against the cover. The extra depth made them 3 mm longer, and a longer arm is softer: roughly 1.6 times softer, by arithmetic. On the v7 print there was a gap between the grid and the cover. I think the softer fingers let the panel sink onto the lip, but I haven't measured the finger force, so that's a hypothesis, not a finding. v8 keeps the same geometry and makes the fingers 2.0 mm thick instead of 1.6, which is about 1.95 times stiffer, for a net stiffness about 1.2 times the original. My v8 print doesn't sag, and that's the evidence I have.
+Four spring fingers on the back plate press the stack forward against the cover. The extra depth made them 3 mm longer, and a longer arm is softer. On the v7 print there was a gap between the grid and the cover. I think the softer fingers let the panel sink onto the lip, but I haven't measured the finger force, so that's a hypothesis, not a finding. v8 keeps the same geometry and makes the fingers 2.0 mm thick instead of 1.6, which by arithmetic puts them about 1.2 times stiffer than the original. My v8 print doesn't sag, and that's the evidence I have.
 
 The first fix Claude tried was wrong: it moved the lip toward the front, but the distance from the lip to the front had been right all along, and only the distance to the back needed to change. That mistake is why the diagram exists.
 
 ### Fifteen versions of a stand
 
-The desk cradle took 15 versions, more than the frame, for a part whose whole job is to sit there. Its first design had no front hook because the hook covered the bottom row of LEDs. Then it needed one to hold the panel, so a 1.8 mm hook came back, low enough to stay below the first row. I started with screws into the desk, then removed the desk holes. Two loose feet became two feet joined by a curved bar. Seven of my design decisions were later reversed by a newer one, and I kept both entries in the log instead of editing the first away. My print settings, including the elephant-foot compensation I haven't yet confirmed with a test block, are on the Printables page.
+The desk cradle took 15 versions, more than the frame, for a part whose whole job is to sit there. Its first design had no front hook because the hook covered the bottom row of LEDs. Then it needed one to hold the panel, so a 1.8 mm hook came back, low enough to stay below the first row. I started with screws into the desk, then removed the desk holes. Two loose feet became two feet joined by a curved bar. Seven of my design decisions were later reversed by a newer one, and I kept both entries in the log instead of editing the first away. My print settings are on the Printables page.
 
 ## What I'd tell you before you build one
 
