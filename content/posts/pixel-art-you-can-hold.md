@@ -130,7 +130,7 @@ The first real run of the setup page showed "Loading..." forever, on both the PC
 
 ### One name per board
 
-A latent bug sat in the firmware until I asked the right question. Every board called itself `glowgrid` and advertised `glowgrid.local` over mDNS. With one board that's a nice address. With two boards on the same home Wi-Fi (two people, two rooms) they fight over the name, and whoever wins the race gets the other person's sprites. One hard-coded `#define` was the whole problem.
+A latent bug sat in the firmware until I asked the right question. Every board called itself `glowgrid` and advertised `glowgrid.local` over mDNS. With one board that's a nice address. With two boards on the same home Wi-Fi (two kids, two rooms) they fight over the name, and whoever wins the race gets the other person's sprites. One hard-coded `#define` was the whole problem.
 
 The fix: each board now names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`. The editor learns the name when the board joins Wi-Fi and shows it in the Network dialog, the setup page prints it, and the board refuses requests addressed to any other name (that check was already there as a DNS-rebinding guard; it just had the one name baked in). The part I couldn't verify without hardware was the byte order of the MAC as the chip reports it, so the first thing I did after flashing was compare the board's name to the MAC the flash tool printed. They matched.
 
