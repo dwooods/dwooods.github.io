@@ -7,6 +7,7 @@ description: "Glow Grid: a browser pixel-art editor, an ESP32-C3 player, and a 3
 summary: "A 16x16 LED panel looks harsh on its own. This is the story of the editor, the little board that runs it, the case that makes the pixels glow, and the one bug that looked like hardware and wasn't."
 featuredImage: "/images/hero-glow-grid.jpeg"
 featuredImagePreview: "/images/hero-glow-grid.jpeg"
+lightgallery: true
 ---
 
 <p style="font-size:0.75em;opacity:0.7;margin-top:-0.75em;text-align:center;">AI-generated illustration. The real panel is in the video below.</p>
@@ -69,7 +70,7 @@ The editor is a web page. It runs from GitHub Pages, installs as an app on a pho
 
 **A phone layout I got wrong.** I built a locked, no-scroll layout with the tools in a bottom dock. It looked right at three simulated phone sizes. On a real iPhone, a finger on the grid painted instead of scrolling, and there was no other place to swipe. The fix removed code instead of adding it: the settings sheet became normal cards below the strip, and the page scrolls. I'd rated that layout 7.5 out of 10 while its settings couldn't be reached on a phone. A screenshot can't show you that.
 
-![The editor's Board card, for sending a drawing to the ESP32-C3](/images/glow-grid-editor-board-card.png)
+![The Glow Grid editor: pixel grid and tools at the top, the frame strip and panel settings in the middle, and the Board card for sending a drawing to the ESP32-C3 at the bottom](/images/glow-grid-editor-board-card.png "The full editor. Click to enlarge.")
 
 ## What it can show
 
