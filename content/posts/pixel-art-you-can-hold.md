@@ -91,16 +91,11 @@ The last one, a missile-defense scene, on the real panel, filmed on my phone:
 
 ## The ESP32-C3 board
 
-```mermaid
-graph LR
-    editor[Browser editor] -->|Wi-Fi| c3[ESP32-C3]
-    c3 -->|GPIO6| panel[(16x16 panel)]
-    pi[Raspberry Pi 5] -.->|SPI, prototype| panel
-```
+![The editor talks to the ESP32-C3 over Wi-Fi, and the ESP32-C3 drives the 16x16 panel from GPIO6. The Raspberry Pi 5 drove the panel over SPI in the prototype.](/images/glow-grid-architecture.svg)
 
 The ESP32-C3 is the one that lives inside the case. It has room for 96 sprites in its own flash (40 come preloaded), drives the panel directly, and serves its own copy of the editor over your home Wi-Fi. That isn't a convenience: a page loaded from GitHub over HTTPS isn't allowed to talk to a plain-HTTP board on your network, so the board hands you its own copy, and you can open it from a phone without a computer. Two buttons change what's showing: Next, and On/off. Holding On/off for five seconds opens Wi-Fi setup.
 
-That last part is why the chip is tight. The board holds the player, Wi-Fi, a web server, the setup network and a compressed copy of the whole editor in 1.3 MB of flash, and one firmware version used 97% of it.
+The chip is tight. The board holds the player, Wi-Fi, a web server, the setup network and a compressed copy of the whole editor in 1.3 MB of flash, and one firmware version used 97% of it.
 
 The Pi player is still in the repo, but the C3 is the product.
 
@@ -108,20 +103,7 @@ The Pi player is still in the repo, but the C3 is the product.
 
 The setup network is the part I thought about longest: a board with no screen has nowhere to show a password, and a password printed on a label is the same on every unit. So the board creates a new WPA3 network (the current Wi-Fi security standard) with a random name and a random 8-digit password, draws the digits on the LED panel (if you can read them, you're standing in front of the device), and keeps them in RAM only, for five minutes at most.
 
-```mermaid
-sequenceDiagram
-    participant U as You (phone or PC)
-    participant B as ESP32-C3 board
-    participant P as LED panel
-    U->>B: Hold On/off for 5 s, or tap Network in the editor
-    B->>P: Draw 8 random digits and a shrinking timeout bar
-    B-->>U: Open network GlowGrid-Setup-NNNN (WPA3)
-    U->>P: Read the digits
-    U->>B: Join with the digits, open the setup page
-    U->>B: Pick your home Wi-Fi, Save
-    B->>B: Rejoin home Wi-Fi, forget the setup key
-    B->>P: Back to your sprite
-```
+![Wi-Fi setup sequence between you, the ESP32-C3 board, and the LED panel: hold On/off for 5 seconds, read the 8 digits drawn on the panel, join the setup network, pick your home Wi-Fi, and the board forgets the setup key and returns to your sprite.](/images/glow-grid-wifi-setup.svg)
 
 I tested it on a Windows 11 PC and an iPhone. The iPhone opens the setup page by itself. On Windows 11 you get an "Action needed" entry and have to click it. I haven't tested Android, so I don't claim it works there.
 
