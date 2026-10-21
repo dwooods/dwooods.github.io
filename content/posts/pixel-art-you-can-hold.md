@@ -23,14 +23,9 @@ The strip was easy. The next step, a 256-pixel panel, was supposed to be the sam
 
 ## What you'll need
 
-You don't need everything to try the editor, which runs in any browser. For the hardware:
+The editor runs in any browser, so you can try it without building anything. For the hardware, the [Printables page](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) has the full parts list, wiring, assembly order and my slicer profile, and I'd rather keep that in one place than copy it here.
 
-- **Panel:** a 16x16 WS2812B flexible LED matrix, 256 pixels, 10 mm pitch. I used a "DC5V WS2812 Digital Flexible RGB Matrix Screen Module Light, 16x16". Measure yours before printing: the frame pocket is 162 mm square, and panels from different sellers vary.
-- **Power:** a 5 V supply rated for addressable LEDs, 6 A, with a 5.5 x 2.5 mm barrel plug, center positive, and a UL or ETL mark. I learned the hard way that a generic 2 A adapter is not enough (more on that below).
-- **Controller:** a Raspberry Pi 5, or an ESP32-C3 SuperMini (24 x 18 mm, USB-C) with its stick-on Wi-Fi antenna. SuperMini clones vary, so print the holder first and test the fit.
-- **Case hardware:** a panel-mount DC jack for a 12 mm hole, two panel-mount push buttons for 12.3 mm holes (check the body length first), a 1N5819 Schottky diode, 18 AWG wire for the panel power and 22 AWG for the C3.
-- **Cradle:** four M3 x 8 mm screws (not M3 x 10, which poke through) and about 1 mm of double-sided tape.
-- **Printer:** a 3D printer and PLA. Mine is an ELEGOO Neptune 4 Pro. The frame takes about 2 hours 40 minutes and 125 g, the grid about 2 hours 30 minutes and 45 g, the cradle about 1 hour 40 minutes, the cover about 30 minutes.
+The short version: a 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, and I learned why the hard way, below), a Raspberry Pi 5 or an ESP32-C3 SuperMini, a 3D printer and PLA, and a handful of small parts. Measure your panel before printing. The frame pocket is 162 mm square, and panels from different sellers vary.
 
 ## The bug that looked like hardware
 
@@ -159,17 +154,10 @@ The first layers of my frame prints bulged a little at the bed, a standard eleph
 
 ## What I'd tell you before you build one
 
+The Printables page has the assembly order, the wiring, my print settings, and a longer list of what I haven't verified (spring-finger force, how the cover's friction fit behaves on other printers, the cradle's tape and screws over time). Two things I'd say even if you read nothing else there:
+
 - **The power wiring needs better connectors than mine.** Parts of the power path on my unit use Dupont-style jumpers, which are typically good for 1 to 3 A, well below what a full-white panel draws. I run the panel at brightness 0.3, where a fully white frame draws about 4.7 A on the 6 A supply. For a unit you leave running, solder the 5 V and ground runs or use terminals rated 10 A or more.
 - **Flash the ESP32-C3 on the bench before you close the case.** Its BOOT and RST buttons face the panel and can't be reached afterward.
-- **Print the small ESP32-C3 holder first.** It takes about ten minutes and tells you whether your board matches mine. Clones vary.
-- **Don't fit the jack tight.** The 12.3 mm holes are slightly loose for a 10.8 mm jack body, but the nut tightened from inside holds it fine.
-- **Not verified:** the spring-finger force, how the cover's friction fit behaves on other printers, the cradle's tape and self-tapping screws over time, and Android for the Wi-Fi setup.
-
-## Building it with Claude
-
-Same arrangement as the strip project, with more rules, because the project is bigger. I describe what I want and test the result on the real device. Claude writes the code, the build script, and the commits. We keep a journal and a feature tracker in a project folder, so a new session can pick up where the last one stopped.
-
-Most of what was wrong was found by using the thing. The Pi bug looked like hardware. The phone layout looked fine in a simulator. The setup page passed every test. The better prompt isn't a cleverer instruction, it's a person holding the device.
 
 ## Try it yourself
 
@@ -181,3 +169,11 @@ Most of what was wrong was found by using the thing. The Pi bug looked like hard
 ![The ESP32-C3 wiring diagram and build checklist](/images/glow-grid-wiring-checklist.jpg)
 
 If something doesn't work, [open an issue](https://github.com/dwooods/glow-grid/issues). The example sprites are all original, and I'd ask that remixes keep it that way.
+
+## Tools & AI assist
+
+Same arrangement as the strip project, with more rules, because the project is bigger. I describe what I want and test the result on the real device. Claude writes the code, the build script, and the commits. We keep a journal and a feature tracker in a project folder, so a new session can pick up where the last one stopped.
+
+That covers the volume: the editor, the two players, the firmware, the case generator. It did not cover being right. Claude moved the frame lip the wrong way in v7, and it wrote a setup page whose tests all passed while the page itself didn't run. I decided what to build, what to throw out, and when something was done, and I could only decide that by looking at the real thing.
+
+Most of what was wrong was found by using the thing. The Pi bug looked like hardware. The phone layout looked fine in a simulator. The setup page passed every test. The better prompt isn't a cleverer instruction, it's a person holding the device.
