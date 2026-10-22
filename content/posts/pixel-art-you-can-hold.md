@@ -112,7 +112,7 @@ Hold On/off for five seconds and the board starts its own WPA3 network (the curr
 
 ![Wi-Fi setup sequence between you, the ESP32-C3 board, and the LED panel: hold On/off for 5 seconds, read the 8 digits drawn on the panel, join the setup network, pick your home Wi-Fi, and the board forgets the setup key and returns to your sprite.](/images/glow-grid-wifi-setup.svg)
 
-I tested setup on a Windows 11 PC and an iPhone. The iPhone opens the setup page by itself; Windows 11 shows an "Action needed" entry you have to click. I haven't tested Android.
+I tested setup on a Windows 11 PC and an iPhone. The iPhone opens the setup page by itself; Windows 11 shows an "Action needed" entry you have to click. I haven't tested Android. Phones from before about 2018 can't join a WPA3 network, so with one of those you set up Wi-Fi over USB instead.
 
 **Part 2: giving each board its own name.** Every board originally advertised itself as `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With two boards on one home Wi-Fi, say two kids in two rooms, they fight over the name, and whoever wins gets the other person's sprites. Now each board names itself `glowgrid-` plus the last two bytes of its own hardware ID (its MAC address), so mine is `glowgrid-b274.local`.
 
