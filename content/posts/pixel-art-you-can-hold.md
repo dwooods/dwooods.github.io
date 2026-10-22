@@ -38,13 +38,9 @@ A 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, an
 
 ## Hardware, Hardware, Then Software
 
-This happened on the Raspberry Pi prototype, with my first 256-pixel panel, an 8x32. It worked at first, then random pixels lit up in the wrong colors, more of them the more patterns I ran. I tried what you'd try:
+This happened on the Raspberry Pi prototype, with my first 256-pixel panel, an 8x32. It worked at first, then random pixels lit up in the wrong colors, more of them the more patterns I ran. I tried what you'd try. A series resistor on the data line helped a little. A 74AHCT125 level shifter (a chip that converts the Pi's 3.3 V data signal to 5 V) made things worse, so I took it out. A big capacitor moved around the board fixed nothing, though it did show the noise was at the input end of the panel. Too little power was next: the supply I had ran the 60-LED strip fine, which proved nothing about the 8x32.
 
-1. **A series resistor on the data line.** It helped a little.
-2. **A 74AHCT125 level shifter** (a chip that converts the Pi's 3.3 V data signal to 5 V). It made things worse, so I took it out.
-3. **A big capacitor, moved around the board.** No fix. It did show the noise was at the input end of the panel, not the far end, which ruled out one theory and pointed at nothing in particular.
-4. **Too little power.** The supply I had ran the 60-LED strip fine, which turned out to prove nothing about the 8x32. It couldn't feed it.
-5. **Too much power.** I knew nothing about volts and amps (volts are how hard the power pushes, amps are how much of it flows), and I wasn't paying attention to either. The next supply had the wrong voltage and fried the panel: the wires melted and I came close to a fire. I retired it and got a 6 A supply made for LEDs, which later ran the 16x16 too. **Hard lesson: match the supply to the panel before you plug anything in, or you can break the board and start a fire. It cost me money and time, and the panel paid for my education.**
+Then I overcorrected. I knew nothing about volts and amps (volts are how hard the power pushes, amps are how much of it flows), and I wasn't paying attention to either. The next supply had the wrong voltage and fried the panel: the wires melted and I came close to a fire. I retired it and got a 6 A supply made for LEDs, which later ran the 16x16 too. **Hard lesson: match the supply to the panel before you plug anything in, or you can break the board and start a fire. It cost me money and time, and the panel paid for my education.**
 
 On the 16x16, with the right supply and no breadboard, the same symptoms came back: wrong-colored pixels that changed on every run, missing pixels in the first row and column, red coming out orange. A solid-red fill looked fine for about five seconds, then grew yellow columns at the input end while nothing was touched.
 
@@ -62,15 +58,15 @@ That is why the same driver worked on my 60-LED strip: 60 LEDs is 1,482 bytes, w
 Append `spidev.bufsiz=65536` to the single line in `/boot/firmware/cmdline.txt` and reboot. Check it with `cat /sys/module/spidev/parameters/bufsiz`. Wire data to GPIO10 (pin 19), share a ground, and power the panel from its own supply, never from the Pi's 5 V. With the buffer fixed, no resistor, capacitor, or level shifter is needed on the Pi.
 {{< /admonition >}}
 
-What found it was a 40-line test script: solid red, 256 LEDs hard-coded, none of the application's image, mapping, or gamma code. If the fault survived in that, the application wasn't the cause. Then I read the driver and the `spidev` source, which showed the split.
+What found it was a 40-line test script: solid red, 256 LEDs hard-coded, none of the application's image, mapping, or gamma code. Then I read the driver and the `spidev` source, which showed the split.
 
 {{< admonition type="tip" title="The lesson to steal" open=true >}}
 Before you buy a part to fix flaky hardware, write the smallest control you can and read the driver. If the fault survives with none of your application in it, the application isn't the cause. I spent two evenings on contacts, ground and capacitors before doing either. It works on any project where a library sits between your code and the pins.
 {{< /admonition >}}
 
-One thing I can't fully say. The 8x32 shared the same driver, the same frame size and almost certainly the same 4,096-byte limit, but it was damaged by a power problem before I found the buffer bug, so I never retested it. I can't say how much each one caused.
+One caveat: the 8x32 shared the same driver and almost certainly the same 4,096-byte limit, but the power problem damaged it before I found the buffer bug. I never retested it, so I can't say how much each one caused.
 
-That was the Pi. The panel worked, the idea held up, and the rest of this post is about what replaced it: the editor, the board and the case.
+That was the Pi. The idea held up, and the rest of this post is what replaced it: the editor, the board and the case.
 
 ## The editor
 
@@ -120,9 +116,9 @@ When you hold On/off for five seconds, the board creates its own WPA3 network (t
 
 ![Wi-Fi setup sequence between you, the ESP32-C3 board, and the LED panel: hold On/off for 5 seconds, read the 8 digits drawn on the panel, join the setup network, pick your home Wi-Fi, and the board forgets the setup key and returns to your sprite.](/images/glow-grid-wifi-setup.svg)
 
-I tested it on a Windows 11 PC and an iPhone. The iPhone opens the setup page by itself. On Windows 11 you get an "Action needed" entry and have to click it. I haven't tested Android, so I don't claim it works there.
+I tested setup on a Windows 11 PC and an iPhone. The iPhone opens the setup page by itself; Windows 11 shows an "Action needed" entry you have to click. I haven't tested Android.
 
-**Part 2: giving each board its own name.** Every board originally advertised itself as `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With two boards on one home Wi-Fi, say two kids in two rooms, they fight over the name, and whoever wins gets the other person's sprites. Now each board names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`. The editor learns the name when the board joins Wi-Fi, the setup page prints it, and the board refuses requests addressed to any other name.
+**Part 2: giving each board its own name.** Every board originally advertised itself as `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With two boards on one home Wi-Fi, say two kids in two rooms, they fight over the name, and whoever wins gets the other person's sprites. Now each board names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`.
 
 ## Why the Glow Comes from the Case
 
@@ -138,19 +134,17 @@ The parts are generated by a Python script (`enclosure/build.py` in the repo), s
 
 The frame went through several versions. The change worth explaining is v7, because it taught me how a small geometry change shows up somewhere you aren't looking.
 
-I made the frame and the cradle 3 mm deeper because the wires on the C3 were sticking up into the back of the LED panel. I hadn't soldered them: I'd pushed each wire into its hole and left it, so they stood up instead of lying flat. Cutting them short and soldering them would probably have fixed it, but I'd never soldered before, I didn't want to ruin the board, and it's a hobby, so I'd rather fix a problem I can undo. The few joints I did solder came out terrible even after several YouTube videos, and learning to solder cost me half a day. The lip that holds the grid was fine, so I left it and just made room for the wires. The lesson: a design fits the model of your parts, not your actual wiring, so print it, put everything in it, and expect to change the design after you see how you really wired it. All the numbers moved with the extra depth. The lip kept the same distance from the front (11.6 mm, as before), which put it 24 mm from the back instead of 21.
+I made the frame and the cradle 3 mm deeper because the wires on the C3 were sticking up into the back of the LED panel. I hadn't soldered them: I'd pushed each wire into its hole, so they stood up instead of lying flat. Soldering them flat would probably have fixed it, but I'd never soldered before and didn't want to ruin the board, so I fixed a problem I could undo. The lip that holds the grid was fine, so I left it and just made room for the wires. The lesson: a design fits the model of your parts, not your actual wiring, so print it, put everything in it, and expect to change the design after you see how you really wired it. The lip kept the same distance from the front (11.6 mm), which put it 24 mm from the back instead of 21.
 
 ![Side sections of frame v6, v7 and v8: the lip stays 11.6 mm from the front, the distance to the back goes from 21 to 24 mm, and the v8 spring fingers are thicker](/images/glow-grid-frame-lip-v6-v7-v8.png)
 
-Four spring fingers on the back plate press the stack forward against the cover. The extra depth made them 3 mm longer, and a longer arm is softer. On the v7 print there was a gap between the grid and the cover. I think the softer fingers let the panel sink onto the lip, but I haven't measured the finger force, so that's a hypothesis, not a finding. v8 keeps the same geometry and makes the fingers 2.0 mm thick instead of 1.6, which by arithmetic puts them about 1.2 times stiffer than the original. My v8 print doesn't sag, and that's the evidence I have.
+Four spring fingers on the back plate press the stack forward against the cover. The extra depth made them 3 mm longer, and a longer arm is softer. On the v7 print there was a gap between the grid and the cover. I think the softer fingers let the panel sink onto the lip, but I haven't measured the finger force, so that's a hypothesis, not a finding. v8 makes the fingers 2.0 mm thick instead of 1.6, which by arithmetic is about 1.2 times stiffer. My v8 print doesn't sag, and that's the evidence I have.
 
 The first fix Claude tried was wrong: it moved the lip toward the front, but the distance from the lip to the front had been right all along, and only the distance to the back needed to change. That mistake is why the diagram exists.
 
 ### Fifteen versions of a stand
 
-The desk cradle took 15 versions, more than the frame, for a part whose whole job is to sit there. Most of those versions were me designing something that looks good, not just something that works, and that takes longer than you'd think. Claude's first cradle was bulky. I wanted something curved and more appealing, then I wanted wording on it, then I tried to add a snake, and Claude couldn't get it right, or I couldn't explain it. It never looked right, so I dropped it. Then came a lot of back and forth about the middle. What I pictured, what I said, and what came out were three different things, and the only way to close the gap was to look at the print.
-
-Claude's first design had a front lip that covered the bottom row of LEDs; I had it lower the lip and raise the back to compensate. Screws into the desk came and went, two loose feet became two feet joined by a curved bar, and seven of my decisions were later reversed.
+The desk cradle took 15 versions, more than the frame, for a part whose whole job is to sit there. Most of them were me designing something that looks good, not just something that works. Claude's first cradle was bulky, and its front lip covered the bottom row of LEDs; I had it lower the lip and raise the back to compensate. Then I wanted curves, then wording, then a snake, which Claude couldn't get right, or I couldn't explain. What I pictured, what I said, and what came out were three different things, and the only way to close the gap was to look at the print. Seven of my decisions were later reversed.
 
 ## What I'd tell you before you build one
 
