@@ -75,7 +75,7 @@ enableGitInfo = false
       social = true
     [params.home.posts]
       enable = true
-      paginate = 6
+      paginate = 10
 
   [params.social]
     GitHub = "dwooods"
