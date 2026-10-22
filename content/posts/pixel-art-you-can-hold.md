@@ -76,7 +76,7 @@ That was the Pi. The panel worked, the idea held up, and the rest of this post i
 
 The editor is a web page that runs from GitHub Pages, installs as an app on a phone, and works offline. You draw on a 16x16 grid, add frames to animate, and export a small PNG that carries its own settings (frame count, frame rate, brightness, gamma) inside the file. I'd originally put those in the file name, `knight_4fps_bright0.35_gamma2.2.png`, but the name was ugly and long, and nobody names files that way. If the editor can read the settings from the file's metadata, I couldn't see a reason to put them in the name too.
 
-**Photos and flat art need different imports.** A photo shrunk to 16x16 with the browser's default smoothing doesn't match what the player will do, so the editor does its own resize, checked against [Pillow](https://python-pillow.org/), a standard Python image library, to within one level out of 255. Gamma is the curve that makes brightness steps look even to the eye, and at brightness 0.3 it leaves only about 77 distinct LED levels, so dark gradients band unless the editor dithers, mixing neighboring levels pixel by pixel to fake the in-between. Flat art needs the opposite: averaging blends outlines into muddy colors, so that mode picks a few main colors first.
+**Photos and flat art need different imports.** A photo shrunk to 16x16 with the browser's default smoothing doesn't match what the player will do, so the editor does its own resize, checked against [Pillow](https://python-pillow.org/), a standard Python image library, on test images Claude ran, to within one level out of 255. Gamma is the curve that makes brightness steps look even to the eye, and at brightness 0.3 it leaves only about 77 distinct LED levels, so dark gradients band unless the editor dithers, mixing neighboring levels pixel by pixel to fake the in-between. Flat art needs the opposite: averaging blends outlines into muddy colors, so that mode picks a few main colors first.
 
 **Test it where people actually use it.** The editor gets used on a PC and on a phone, so I spent a good while building test cases for both and comparing them to make sure it worked on each. My first phone layout still failed on a real iPhone. It was a locked, no-scroll layout with the tools in a bottom dock, and it looked right at three simulated phone sizes. On the real phone, a finger on the grid painted instead of scrolling, and there was no other place to swipe. The fix removed code instead of adding it: the settings sheet became normal cards below the strip, and the page scrolls. I'd rated that layout 7.5 out of 10 while its settings couldn't be reached on a phone. A screenshot can't show you that.
 
@@ -152,7 +152,7 @@ The first fix Claude tried was wrong: it moved the lip toward the front, but the
 
 The desk cradle took 15 versions, more than the frame, for a part whose whole job is to sit there. Most of those versions were me designing something that looks good, not just something that works, and that takes longer than you'd think. Claude's first cradle was bulky. I wanted something curved and more appealing, then I wanted wording on it, then I tried to add a snake, and Claude couldn't get it right, or I couldn't explain it. It never looked right, so I dropped it. Then came a lot of back and forth about the middle. What I pictured, what I said, and what came out were three different things, and the only way to close the gap was to look at the print.
 
-Claude's first design had a front lip that covered the bottom row of LEDs; I had it lower the lip and raise the back to compensate. Screws into the desk came and went, two loose feet became two feet joined by a curved bar, and seven of my decisions were later reversed. I kept both entries in the log instead of editing the first away. My print settings are on the Printables page.
+Claude's first design had a front lip that covered the bottom row of LEDs; I had it lower the lip and raise the back to compensate. Screws into the desk came and went, two loose feet became two feet joined by a curved bar, and seven of my decisions were later reversed.
 
 ## What I'd tell you before you build one
 
@@ -167,10 +167,13 @@ Two things. I plan one board per kid, which is what the per-board names were for
 
 ## Try it yourself
 
-1. Open the [editor](https://dwooods.github.io/glow-grid/) and draw something.
-2. Download the [case files](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) from Printables.
-3. Get the [code](https://github.com/dwooods/glow-grid) for the ESP32-C3 firmware (the Pi player is in there too).
-4. Wire it as in the diagram below, flash the board, and print the holder first.
+**Just want to try it?** Open the [editor](https://dwooods.github.io/glow-grid/) and draw something.
+
+**Want to build it?**
+
+1. Download the [case files](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) from Printables.
+2. Get the [code](https://github.com/dwooods/glow-grid) for the ESP32-C3 firmware (the Pi player is in there too).
+3. Wire it as in the diagram below, flash the board, and print the holder first.
 
 ![The ESP32-C3 wiring diagram and build checklist](/images/glow-grid-wiring-checklist.jpg)
 
