@@ -12,7 +12,7 @@ lightgallery: true
 
 <p style="font-size:0.75em;opacity:0.7;margin-top:-0.75em;text-align:center;">AI-generated illustration. The real panel is in the video below.</p>
 
-Bare LEDs make bad pixels. A 16x16 WS2812B panel has 256 of them, each a hard little point of light, and a sprite on that panel looks like a sprite drawn with tiny flashlights. I wanted something that looked like a pixel: soft, square, and something I could draw on my phone and put on a desk.
+Bare LEDs make bad pixels. A 16x16 WS2812B panel has 256 of them, each a hard little point of light, and a sprite (a small drawn image or animation) on that panel looks like one drawn with tiny flashlights. I wanted something that looked like a pixel: soft, square, and something I could draw on my phone and put on a desk.
 
 That turned into three things: a pixel editor that runs in a browser, an ESP32-C3 board that plays what you draw and needs no computer at all, and a 3D-printed case with a black grid and a white diffuser cover. All of it is open source, and the case files are on [Printables](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser).
 
@@ -44,8 +44,8 @@ On the 16x16, with the right supply and no breadboard, the same symptoms came ba
 
 With the power fixed, one cause was left, and it was software:
 
-- The `rpi5-ws2812` library drives the LEDs over SPI (a fast serial link on the Pi's header) and sends one SPI byte per WS2812 data bit. A 256-LED frame is 42 bytes of framing plus 24 per LED: **6,186 bytes**.
-- Linux's default `spidev` buffer is **4,096 bytes**, so every frame went out as two writes with a scheduler-dependent pause between them. The split lands 7 bits into LED 168.
+- The `rpi5-ws2812` library drives the LEDs over SPI (a fast serial link on the Pi's header) and sends one SPI byte per WS2812 data bit. A 256-LED frame is 42 bytes of overhead plus 24 per LED: **6,186 bytes**.
+- Linux's default `spidev` buffer is **4,096 bytes**, so every frame went out as two writes with a pause of unpredictable length between them. The split lands 7 bits into LED 168.
 - Short pause: the LEDs ride through it. Long pause: they treat it as the end of the frame and re-apply the second half from LED 0. Solid red shifted by a few bits turns green bits on, and red plus green is yellow.
 
 ![One 6,186-byte frame split into a 4,096-byte write and a 2,090-byte write, against a 60-LED strip frame that never splits](/images/glow-grid-spi-buffer-split.png)
@@ -78,7 +78,7 @@ The editor is a web page that runs from GitHub Pages, installs as an app on a ph
 
 ## What it can show
 
-The sprites that ship with the repo are all drawn as text in a Python file, one character per pixel, so they live in git as source and not as binary images. Four of them, rendered here from that data with a soft glow added (this is a preview render, not a photo of the panel):
+The sprites that ship with the repo are drawn as text, one character per pixel, so they're easy to read and edit. Four of them, rendered here from that data with a soft glow added (this is a preview render, not a photo of the panel):
 
 <div style="display:flex;gap:8px;justify-content:center;margin:1em 0;">
   <img src="/images/glow-grid-sprite-fireworks.gif" alt="Fireworks: three shells rise, burst, and fade" style="flex:1 1 0;min-width:0;max-width:150px;height:auto;margin:0;">
@@ -98,7 +98,7 @@ The last one, a missile-defense scene, on the real panel, filmed on my phone:
 
 ![The editor talks to the ESP32-C3 over Wi-Fi, and the ESP32-C3 drives the 16x16 panel from GPIO6. The Raspberry Pi 5 drove the panel over SPI in the prototype.](/images/glow-grid-architecture.svg)
 
-The ESP32-C3 is the one that lives inside the case. It holds up to 96 sprites in its own flash (40 come preloaded), drives the panel directly, and serves its own copy of the editor over your home Wi-Fi. I wanted it to work from Safari on an iPhone, and a page loaded from GitHub over HTTPS isn't allowed to talk to a plain-HTTP board on your network, so the board hands you its own copy. Bluetooth was the other route; I dropped it, and this was the next option. Two buttons change what's showing: Next, and On/off. Holding On/off for five seconds opens Wi-Fi setup.
+The ESP32-C3 is the one that lives inside the case. It holds up to 96 sprites in its own storage (flash memory), with 40 preloaded, drives the panel directly, and serves its own copy of the editor over your home Wi-Fi. I wanted it to work from Safari on an iPhone, and browsers won't let a secure web page like the one on GitHub talk to an unsecured device on your home network, so the board hands you its own copy. Bluetooth was the other route; I dropped it, and this was the next option. Two buttons change what's showing: Next, and On/off. Holding On/off for five seconds opens Wi-Fi setup.
 
 **Why 96?** Part arithmetic, part product decision. A frame is 768 bytes (16 × 16 pixels × 3 colors). I capped a sprite at 16 frames, which makes the biggest one about 12 KB. The flash I set aside for sprites is about 1.5 MB, which would fit roughly 400 of them, so flash isn't the limit. The limit is RAM: the board keeps the list of sprite names in memory, and I cap that list. I started at 64, then raised it to 96 once I'd made almost 40 example sprites and the estimates showed there was room. The 16-frame cap was a product call about what a 16×16 panel is for: short loops, not video. It also matches the editor, which lays frames out in two rows of 8. I could have shrunk sprites to fit more of them, or dropped Wi-Fi and the served editor to free room. I kept the features.
 
@@ -108,13 +108,13 @@ Two problems came with putting a board with no screen on a home network: joining
 
 **Part 1: joining without leaving a door open.** The 8-digit code started as a security question. A password printed on a label is the same on every unit, so anyone who owns one knows the password for all of them, and I didn't want to hand users a code anyway. But the board has a panel, so it can show the code itself.
 
-When you hold On/off for five seconds, the board creates its own WPA3 network (the current Wi-Fi security standard) with a random name and a random 8-digit password. It draws the digits on the LED panel and keeps them in RAM only, for five minutes at most. If you can read the code, you're standing in front of the device. The setup network exists only for those five minutes, and nobody can join it without seeing the panel. That window was the part worth protecting, because the board is broadcasting a network anyone nearby could try to join, and if I sold these, I'd want buyers to be able to secure their board the same way. Once the board is on your home Wi-Fi, I left it open: anyone on that network can add or delete sprites. A sprite isn't sensitive or harmful, and you should keep your drawings on your computer or phone anyway, so a deleted one can be added back.
+When you hold On/off for five seconds, the board creates its own WPA3 network (the current Wi-Fi security standard) with a random name and a random 8-digit password. It draws the digits on the LED panel and keeps them in memory only, never saved, for five minutes at most. If you can read the code, you're standing in front of the device. The setup network exists only for those five minutes, and nobody can join it without seeing the panel. That window was the part worth protecting, because the board is broadcasting a network anyone nearby could try to join, and if I sold these, I'd want buyers to be able to secure their board the same way. Once the board is on your home Wi-Fi, I left it open: anyone on that network can add or delete sprites. A sprite isn't sensitive or harmful, and you should keep your drawings on your computer or phone anyway, so a deleted one can be added back.
 
 ![Wi-Fi setup sequence between you, the ESP32-C3 board, and the LED panel: hold On/off for 5 seconds, read the 8 digits drawn on the panel, join the setup network, pick your home Wi-Fi, and the board forgets the setup key and returns to your sprite.](/images/glow-grid-wifi-setup.svg)
 
 I tested setup on a Windows 11 PC and an iPhone. The iPhone opens the setup page by itself; Windows 11 shows an "Action needed" entry you have to click. I haven't tested Android.
 
-**Part 2: giving each board its own name.** Every board originally advertised itself as `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With two boards on one home Wi-Fi, say two kids in two rooms, they fight over the name, and whoever wins gets the other person's sprites. Now each board names itself `glowgrid-` plus the last two bytes of its own MAC address, so mine is `glowgrid-b274.local`.
+**Part 2: giving each board its own name.** Every board originally advertised itself as `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With two boards on one home Wi-Fi, say two kids in two rooms, they fight over the name, and whoever wins gets the other person's sprites. Now each board names itself `glowgrid-` plus the last two bytes of its own hardware ID (its MAC address), so mine is `glowgrid-b274.local`.
 
 ## Why the Glow Comes from the Case
 
@@ -124,7 +124,7 @@ I tested setup on a Windows 11 PC and an iPhone. The iPhone opens the setup page
 
 The glow comes from the case, and the case was a list of things I wanted. I wanted the light to look like individual bright squares, a 2D pixel effect, not a smear, so a black grid sits on the panel and gives each LED its own square, and a thin white cover over the grid diffuses each LED into a soft pixel. The cover snaps on, so it's easy to hold in place. I wanted it to sit on a counter with the wires out of sight in the back, so a cradle tips the whole thing back 12 degrees, and I wanted it to look good enough to be a product. The ESP32-C3 gets its own tray in the back, so it stays put and is easy to replace, and the back has two buttons: on/off, and next sprite for when the board runs without the editor. None of the designs I started from had a place for the C3 or buttons.
 
-The parts are generated by a Python script (`enclosure/build.py` in the repo), so changing a hole or a clearance is a one-line edit; the photos are the parts as printed, in the silk PLA I had on hand. The design descends from three CC BY designs on Thingiverse: ["16x16 RGB Matrix"](https://www.thingiverse.com/thing:4127683) by The_Wrench_DIY, its [remix by chummer](https://www.thingiverse.com/thing:4459985), and the [one-part-frame remix by makeitworktech / Make It Work](https://www.thingiverse.com/thing:5737371). I used only the 10 mm pitch and 1 mm grid walls from those designs and built the rest from scratch. The Printables page is CC BY 4.0, and the code, editor, and example sprites are MIT.
+The parts are generated by a Python script (`enclosure/build.py` in the repo), so changing a hole or a clearance is a one-line edit; the photos are the parts as printed, in the silk PLA I had on hand. The design descends from three CC BY designs on Thingiverse: ["16x16 RGB Matrix"](https://www.thingiverse.com/thing:4127683) by The_Wrench_DIY, its [remix by chummer](https://www.thingiverse.com/thing:4459985), and the [one-part-frame remix by makeitworktech / Make It Work](https://www.thingiverse.com/thing:5737371). I used only the 10 mm LED spacing and 1 mm grid walls from those designs and built the rest from scratch. The Printables page is CC BY 4.0, and the code, editor, and example sprites are MIT.
 
 ### Three millimetres and a gap
 
@@ -144,10 +144,10 @@ The desk cradle took 15 versions, more than the frame, for a part whose whole jo
 
 ## What I'd tell you before you build one
 
-The Printables page has the assembly order, the wiring, my print settings, and a longer list of what I haven't verified (spring-finger force, how the cover's friction fit behaves on other printers, the cradle's tape and screws over time). Two things I'd say even if you read nothing else there:
+The Printables page has a longer list of what I haven't verified (spring-finger force, how the cover's friction fit behaves on other printers, the cradle's tape and screws over time). Two things I'd say even if you read nothing else:
 
-- **The power wiring needs better connectors than mine.** Parts of the power path on my unit use Dupont-style jumpers, which are typically good for 1 to 3 A, well below what a full-white panel draws. I run the panel at brightness 0.3, where a fully white frame draws about 4.7 A on the 6 A supply. For a unit you leave running, solder the 5 V and ground runs or use terminals rated 10 A or more.
-- **Flash the ESP32-C3 on the bench before you close the case.** Its BOOT and RST buttons face the panel and can't be reached afterward.
+- **The power wiring needs better connectors than mine.** Parts of the power path on my unit use Dupont-style jumpers (the thin push-on jumper wires), which are typically good for 1 to 3 A, well below what a full-white panel draws. I run the panel at brightness 0.3, where a fully white frame draws about 4.7 A on the 6 A supply. For a unit you leave running, solder the 5 V and ground runs or use terminals rated 10 A or more.
+- **Load the firmware onto the ESP32-C3 on the bench before you close the case.** Its BOOT and RST buttons face the panel and can't be reached afterward.
 
 ## What's next
 
