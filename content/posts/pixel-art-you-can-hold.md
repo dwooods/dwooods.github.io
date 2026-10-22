@@ -161,7 +161,7 @@ Two things. I plan one board per kid, which is what the per-board names were for
 
 1. Download the [case files](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) from Printables.
 2. Get the [code](https://github.com/dwooods/glow-grid) for the ESP32-C3 firmware (the Pi player is in there too).
-3. Wire it as in the diagram below, flash the board, and print the holder first.
+3. Wire it as in the diagram below, load the firmware, and print the holder first.
 
 ![The ESP32-C3 wiring diagram and build checklist](/images/glow-grid-wiring-checklist.jpg)
 
