@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" role="img" aria-labelledby="t d" style="background-color:#fff">
+  <title id="t">Modem monitor architecture</title>
+  <desc id="d">The modem's status page and three internet checks feed a Python container on the NAS, which writes CSV files, serves a dashboard, sends queued alerts through ntfy and Gmail, and pings healthchecks.io.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1000" height="560" fill="#ffffff"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#1e293b">
+    <!-- sources -->
+    <rect x="30" y="90" width="230" height="110" rx="10" fill="#e0f2fe" stroke="#0369a1" stroke-width="2"/>
+    <text x="145" y="128" font-size="20" font-weight="bold" text-anchor="middle">Cable modem</text>
+    <text x="145" y="154" font-size="16" text-anchor="middle">status page + event log</text>
+    <text x="145" y="178" font-size="16" text-anchor="middle">read every 5 min</text>
+
+    <rect x="30" y="300" width="230" height="130" rx="10" fill="#e0f2fe" stroke="#0369a1" stroke-width="2"/>
+    <text x="145" y="338" font-size="20" font-weight="bold" text-anchor="middle">Internet checks</text>
+    <text x="145" y="364" font-size="16" text-anchor="middle">1.1.1.1, 8.8.8.8, 9.9.9.9</text>
+    <text x="145" y="388" font-size="16" text-anchor="middle">every 60 s</text>
+    <text x="145" y="412" font-size="16" text-anchor="middle">outage = 2 failed rounds</text>
+
+    <!-- NAS -->
+    <rect x="340" y="40" width="330" height="480" rx="14" fill="#f8fafc" stroke="#64748b" stroke-width="2" stroke-dasharray="8 5"/>
+    <text x="505" y="72" font-size="18" font-weight="bold" text-anchor="middle" fill="#475569">Synology NAS (Docker + Portainer)</text>
+
+    <rect x="370" y="105" width="270" height="130" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+    <text x="505" y="143" font-size="20" font-weight="bold" text-anchor="middle">modem-monitor</text>
+    <text x="505" y="169" font-size="16" text-anchor="middle">Python container</text>
+    <text x="505" y="193" font-size="16" text-anchor="middle">standard library only</text>
+    <text x="505" y="217" font-size="16" text-anchor="middle">alert queue</text>
+
+    <rect x="370" y="300" width="270" height="80" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+    <text x="505" y="334" font-size="20" font-weight="bold" text-anchor="middle">6 CSV files</text>
+    <text x="505" y="360" font-size="16" text-anchor="middle">polls, channels, events, outages...</text>
+
+    <rect x="370" y="420" width="270" height="80" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="2"/>
+    <text x="505" y="454" font-size="20" font-weight="bold" text-anchor="middle">Dashboard</text>
+    <text x="505" y="480" font-size="16" text-anchor="middle">port 8088, charts as SVG</text>
+
+    <!-- outputs -->
+    <rect x="750" y="60" width="220" height="80" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="2"/>
+    <text x="860" y="94" font-size="20" font-weight="bold" text-anchor="middle">ntfy</text>
+    <text x="860" y="120" font-size="16" text-anchor="middle">push to my phone</text>
+
+    <rect x="750" y="170" width="220" height="80" rx="10" fill="#ede9fe" stroke="#6d28d9" stroke-width="2"/>
+    <text x="860" y="204" font-size="20" font-weight="bold" text-anchor="middle">Gmail</text>
+    <text x="860" y="230" font-size="16" text-anchor="middle">email alert</text>
+
+    <rect x="750" y="300" width="220" height="110" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
+    <text x="860" y="334" font-size="20" font-weight="bold" text-anchor="middle">healthchecks.io</text>
+    <text x="860" y="360" font-size="16" text-anchor="middle">heartbeat ping</text>
+    <text x="860" y="384" font-size="16" text-anchor="middle">silence = it tells me</text>
+
+    <!-- arrows -->
+    <g stroke="#475569" stroke-width="2.5" fill="none" marker-end="url(#a)">
+      <path d="M260,145 L370,145"/>
+      <path d="M260,365 L320,365 L320,200 L370,200"/>
+      <path d="M505,235 L505,300"/>
+      <path d="M640,170 L695,170 L695,100 L750,100"/>
+      <path d="M640,190 L695,190 L695,210 L750,210"/>
+      <path d="M640,215 L700,215 L700,340 L750,340"/>
+    </g>
+    <path d="M505,235 L505,300" stroke="#475569" stroke-width="2.5" fill="none"/>
+    <path d="M505,380 L505,420" stroke="#475569" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+    <text x="760" y="445" font-size="15" fill="#475569">Alerts queue while the</text>
+    <text x="760" y="467" font-size="15" fill="#475569">internet is down and send</text>
+    <text x="760" y="489" font-size="15" fill="#475569">when it returns.</text>
+  </g>
+</svg>
