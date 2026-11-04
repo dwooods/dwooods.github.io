@@ -1,13 +1,16 @@
 {{- /* Site override of themes/LoveIt/layouts/_markup/render-image.html.
-       The theme only links an image for click-to-zoom (lightgallery) when it has a title.
-       Here the no-title branch is linked too, so every markdown image zooms. */ -}}
+       1. The theme only links an image for click-to-zoom (lightgallery) when it has a title.
+          Here the no-title branch is linked too, so every markdown image zooms.
+       2. The theme never passes "Alt" to plugin/img.html, so every alt attribute fell back to the
+          image path. Pass the markdown alt text (.Text) as "Alt" so screen readers, search and the
+          lightbox caption get the real description. */ -}}
 {{- if .Title -}}
     <figure>
-        {{- dict "Src" .Destination "Title" .Text "Caption" .Title "Linked" true "Resources" .Page.Resources | partial "plugin/img.html" -}}
+        {{- dict "Src" .Destination "Title" .Text "Alt" .Text "Caption" .Title "Linked" true "Resources" .Page.Resources | partial "plugin/img.html" -}}
         <figcaption class="image-caption">
             {{- .Title | safeHTML -}}
         </figcaption>
     </figure>
 {{- else -}}
-    {{- dict "Src" .Destination "Title" .Text "Linked" true "Resources" .Page.Resources | partial "plugin/img.html" -}}
+    {{- dict "Src" .Destination "Title" .Text "Alt" .Text "Linked" true "Resources" .Page.Resources | partial "plugin/img.html" -}}
 {{- end -}}
