@@ -82,6 +82,7 @@ Once the GPU was engaged, the difference was dramatic, but only up to a point, a
 | `qwen2.5-coder:32b` | split (GPU+RAM) | ~19GB | **4.25** | **0.6x — the new worst** |
 
 ![Horizontal bar chart of generation speed for five models on the RX 6700 XT, colored by whether the model fits in 12GB VRAM or splits into system RAM, with a dashed CPU-only baseline at 6.88 tok/s; gemma4:31b and qwen2.5-coder:32b fall below the baseline](/images/chart-vram-cliff.png)
+
 *The same numbers as a picture. `qwen2.5:3b` (138.94 tok/s) is left off so the split-mode bars stay readable; the point is the two 31B+ models landing to the left of the no-GPU line.*
 
 Everything that fits in the 12GB of VRAM is fast. Past roughly 11.2GB, Ollama starts splitting layers into system RAM over the PCIe bus, and the slowdown isn't gentle: `gpt-oss:20b` still beat the CPU baseline in split mode, but `gemma4:31b` ran slower than a smaller model on CPU alone.
@@ -101,6 +102,7 @@ Raw tok/s tells you nothing about whether a model is *right*. So I set up `promp
 One caveat: these suites are small, three to sixteen cases each. That's enough to catch a model that can't do something, or a harness that's grading wrong, which is what this section is about. It's not enough to rank models, so read "4 out of 4" as "passed the smoke test," not "the best." The configs and cases are in the repo linked at the end.
 
 ![Terminal running npx promptfoo eval on the vision suite, 8 of 12 test cases complete](/images/promptfoo-cli-running.png)
+
 *`npx promptfoo@latest eval -c promptfoo-vision-pc.yaml -j 1 --no-cache` mid-run: `-j 1` so results are directly comparable, `--no-cache` so every case re-queries the model instead of replaying a cached response.*
 
 Five suites, five surprises:
@@ -122,18 +124,21 @@ Two of these deserve the full story.
 One receipt beat both models. A Costa Coffee receipt with a €4.24 pre-tax subtotal and a €5.00 total came back as €4.24 every time, even after I rewrote the instructions to ask for "the final amount actually paid." That's a small-model limitation, not a wording problem.
 
 ![promptfoo eval dashboard showing glm-ocr and qwen3-vl:8b both FAIL(0.50) on the Costa receipt with the identical reason — vendor match=true, total match=false (got 4.24, expected 5) — and both PASS on La Cabaña](/images/promptfoo-dashboard-vision.png)
+
 *The actual promptfoo dashboard, mid-suite: both models fail Costa the same way (4.24 vs. 5, the VAT-vs-net limitation above) and both pass La Cabaña once the diacritic-normalization fix was in; "La Cabana" without the tilde reads as a match now.*
 
 <div style="display:flex; gap:1rem; flex-wrap:wrap; margin:1.5rem 0;">
 <figure style="flex:1; min-width:220px; margin:0;">
 
 ![Costa Coffee receipt from Malta International Airport, showing a pre-tax subtotal of €4.24 and a VAT-inclusive total of €5.00](/images/receipt-costa-coffee.jpg)
+
 *The Costa Coffee receipt every model extracted wrong the same way: €4.24 (pre-tax) instead of the €5.00 actually paid.*
 
 </figure>
 <figure style="flex:1; min-width:220px; margin:0;">
 
 ![Home Depot receipt, the one glm-ocr attributed to the wrong vendor](/images/receipt-home-depot.png)
+
 *The Home Depot receipt `glm-ocr` mis-extracted the vendor on; the footer survey URL is the likely culprit.*
 
 </figure>
@@ -167,6 +172,7 @@ With the voice assistant finally working, time to first word was awful: 14 to 84
 A second, easier batch of questions shows where the time goes:
 
 ![Stacked bar chart: five questions, each run against qwen3.5:9b with think:true and think:false at num_ctx 8192. The think:true bars are 81–99% invisible reasoning time; the think:false bars are 40–63% invisible and all under 5.5 seconds total.](/images/chart-think-stacked.png)
+
 *Blue is time you spend staring at nothing. With reasoning on, it's 81–99% of every turn; with it off, the bar shrinks and most of what's left is the answer actually streaming.*
 
 What to take from this:
@@ -195,6 +201,7 @@ Recall wasn't the interesting number, though.
 | 32,768 tokens | ~203 tok/s | ~11.8 tok/s | ~154s |
 
 ![Line chart on a log scale with prefill speed, generation speed, and time to first token for qwen3.5:9b, each indexed to its 1,024-token value as 100; the two speed lines decay to 31 and 19 while time to first token climbs to 4,162](/images/chart-needle-in-haystack.png)
+
 *All three metrics indexed to their 1,024-token value (=100) on a log scale, because they don't share units. Throughput decays gently; TTFT goes near-vertical, and the model was 100% GPU-resident the whole way.*
 
 Generation speed fell more than 5x with the model 100% in VRAM the whole time (5.4GB at 1K tokens, 6.6GB at 32K). So this isn't the VRAM cliff from earlier, where weights spill into slow system RAM. Nothing spilled. It's a compute problem: every new token gets compared against every token already in the window, and that gets more expensive as the window grows. At 32K, `qwen3.5:9b` generated at 11.8 tok/s, almost exactly what `gpt-oss:20b` managed while spilling out of VRAM. A long conversation costs about as much as the cliff itself.
@@ -212,9 +219,11 @@ Everything in this section runs on the Pi 5: 8GB RAM, no discrete GPU, CPU-only 
 No GPU means every model lives or dies by the Pi's ~17GB/s memory bandwidth, so speed comes down to how big the model file is. Five 7–9B models all landed at 2–2.9 tok/s: technically running, but submit-and-wait, not a conversation. The usable tier is under 4B, so that's where I measured six models for speed and then ran them through the same quality suites as the PC. One setup note: the Pi can't hold the 14B judge model, so Claude's fix was to keep generation on the Pi and send only the grading call across the LAN to the PC.
 
 ![Architecture diagram: the model, promptfoo, and the llm-rubric grading assertion all run on the Raspberry Pi 5; only the grading call crosses the LAN to the PC's deepseek-r1:14b judge model, whose verdict text returns to the Pi, where llm-rubric turns it into a pass/fail score.](/images/chart-lan-judge-diagram.png)
+
 *Everything runs on the Pi except the judge model itself. `llm-rubric` is a promptfoo assertion, so it's the Pi that sends the grading prompt across the LAN and the Pi that turns the verdict that comes back into a score.*
 
 ![Scatter plot: measured generation speed against aggregate pass rate across all four quality suites for the six Pi shortlist models. qwen2.5:1.5b sits far right at 12.08 tok/s and 40%; llama3.2:3b and qwen2.5:3b cluster near 5.5 tok/s at 73–80%, the best on the shortlist.](/images/chart-pi-speed-vs-quality.png)
+
 *All six shortlist models, one dot each: the fastest model and the two best-scoring models sit in opposite corners. Hatched dots are the two whose agentic score was zeroed by the memory-pressure bug, not by the model. 15 cases per model.*
 
 What I'd want someone to know before testing their own Pi:
@@ -233,6 +242,7 @@ The Pi's vision suite, the same receipt-extraction workload from the PC showdown
 The Pi has had Raspberry Pi's own Active Cooler (heatsink plus fan) installed since before any benchmarking began, confirmed present and spinning every time I checked.
 
 ![Raspberry Pi 5 with the official Active Cooler (heatsink and fan) mounted](/images/pi5-active-cooler.jpeg)
+
 *The Pi 5 with its Active Cooler on, present and spinning through all six crashes below. Necessary, it turned out, but not sufficient.*
 
 Running the six-case, two-model matrix anyway produced six hard, silent reboots: some fast and with no warning, some after cycles of visible throttling. My first guess was power, so I logged per-rail voltage with `vcgencmd pmic_read_adc` through several crashes; every rail held steady. My second guess, that the cooler had this covered, I'd half-written into a draft before retracting it: the fan was spinning through all six crashes, single-model runs included. And since the board survived an 80.7°C peak while other runs died in the same 79–86°C band, there was no clean trip point. My best read at the time: crashes were probabilistic near that range, and I didn't know what separated a crash from a clean run.
@@ -246,6 +256,7 @@ It still wasn't usable for `qwen3-vl:2b`: that model's normal time per case was 
 **Postscript, September 22 — I went back and crashed it on purpose.** That was where I left it when I wrote the section above: probabilistic, cause unknown. I wasn't happy leaving it as an open question, so I reran the vision suite with a logger Claude wrote for the occasion. Once a second it recorded the chip's temperature, whether the firmware was throttling, the voltage and current on every power rail, the CPU speed and the fan speed, and it forced each line onto the disk immediately, so the last second before a reset would survive it. It crashed on the first try, three minutes and ten seconds in, and this time I have the whole thing.
 
 ![Four stacked time-series panels over the 191 seconds before the Pi reset, one sample per second: SoC temperature, fan RPM, SoC core current, and 5 V input voltage. A vertical line marks the model swap from minicpm-v4.6 to qwen3-vl:2b; a dashed line marks the last sample before the reset.](/images/chart-pi-crash-timeline.png)
+
 *The 29 seconds that mattered, one sample per second. Pink bands on the top panel are the seconds the firmware's temperature limit kicked in. The dashed line is the last row the logger wrote; the next one came 3 minutes 48 seconds later, after the reboot, at 47°C.*
 
 The story the one-second data tells is not the one I'd been telling. `minicpm-v4.6` ran first, and the board didn't care: the main chip (the SoC) drew about 6.8 amps at 67°C, with the fan at 6,400 RPM, for a minute and a half. Then the suite swapped to `qwen3-vl:2b`, and the chip went from 60°C to 80°C in six seconds (twenty degrees in the time it takes to read this sentence), then settled at 11.5 amps, roughly 12 W, with the fan pinned at its maximum of 8,774 RPM and the firmware's temperature limit switching on and off for 11 of the last 24 seconds. Twenty-nine seconds after the swap, the last row. Peak 84.5°C.
@@ -253,6 +264,7 @@ The story the one-second data tells is not the one I'd been telling. `minicpm-v4
 The power was steady. The 5 V input stayed between 4.97 and 5.32 V the whole run (the low-voltage warning trips at 4.63), and the chip's core supply held 1.0 V while delivering 12 amps. Memory wasn't the problem either: 3.5 GB free, nothing pushed out to disk. Not the power supply, not memory — the same conclusion as before, now with numbers attached. And the finding that reframed this section for me: the highest current of the entire run, 15.2 amps, was `minicpm-v4.6`'s load spike at the one-minute mark, and the board shrugged it off. What killed it was `qwen3-vl:2b` holding 12 W for half a minute. Not a spike — a sustained load about 70% higher than the other model in the same suite, on a cooler whose ceiling sits somewhere between the two.
 
 ![htop on the Raspberry Pi at 00:51:36 uptime: all four CPU cores at 100%, four llama-server processes at the top of the process list, the thermal logger script a few rows below them.](/images/pi-htop-at-reset.png)
+
 *`htop` at 00:51:36 uptime, which works out to the last second in the CSV. The board reset before the next refresh.*
 
 So "probabilistic near that range" was me not having enough data. It's closer to deterministic than that: this cooler holds about 7 W indefinitely and does not hold about 12 W, and which of your models is the 12-watt one is not something the model card tells you.
