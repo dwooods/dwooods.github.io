@@ -19,7 +19,7 @@ This post is about how that went: three modems, three tech visits, a monitor tha
 
 <div style="max-width: 640px; margin: 0 auto;">
 
-![The monitor's dashboard, 3-day view on November 4: status tiles, no outages, signal-loss events by hour, uncorrectable errors per check, and the event log with hardware addresses masked](/images/modem-monitor-dashboard.jpeg)
+![Dashboard of the modem monitor, 3-day view](/images/modem-monitor-dashboard.jpeg "The monitor's dashboard, 3-day view on November 4: status tiles, no outages, signal-loss events by hour, uncorrectable errors per check, and the event log with hardware addresses masked")
 
 </div>
 
@@ -29,8 +29,7 @@ The week before I built it was a blur of changes. On Sunday, October 25, I put i
 
 Two tech visits followed, Monday and Tuesday. Between them they replaced the outside connector twice, redid the inside connectors and cables, and added a 3-way splitter to the line feeding the modem. The splitter was the visit that changed the plan: as the tech put it to me, the point was to dampen the signal, so apparently the line was too strong at the modem, not too weak. The first tech also told me the ARRIS SB6190 was the modem to get and that Astound supports it, so I ordered one as a controlled test, and it went in on Wednesday.
 
-![The wiring box: the coax line that feeds the modem runs in from the top and across, with the 3-way splitter the tech added in the middle of the frame](/images/wiring-box-splitter.jpeg)
-*The coax that feeds the modem, with the tech's 3-way splitter in the middle, after the cleanup.*
+![The wiring box: the coax line that feeds the modem runs in from the top and across, with the 3-way splitter the tech added in the middle of the frame](/images/wiring-box-splitter.jpeg "The coax that feeds the modem, with the tech's 3-way splitter in the middle, after the cleanup.")
 
 Every one of those fixes was a guess made without data. Each ended with "let's see if it holds," and the only way I could see was to be online when it didn't. The monitor didn't exist yet for the first two visits; it started logging at 4:49 PM that Wednesday. So I wanted a witness, not a fix: something that would sit on the network, log the connection every minute, read the modem's own numbers, and tell me when something happened. I wanted to hand a tech a timeline instead of a feeling.
 
@@ -44,13 +43,13 @@ A cable modem is the box that turns the coax line from the street into Ethernet,
 
 | Piece | What it does |
 |---|---|
-| Python script, standard library only | Checks three public addresses every 60 seconds and calls an outage after two failed rounds; reads the modem page and event log every five minutes |
+| Python script, standard library only | Checks three public addresses every 60 seconds and calls an outage after two rounds in a row where all three fail; reads the modem page and event log every five minutes |
 | Six CSV files | Outages, issues, events, polls, per-channel readings and connectivity checks, kept for later analysis |
 | Dashboard | Charts drawn on the server as SVG, so it still loads while the internet is down |
 | [ntfy](https://ntfy.sh) and Gmail | A push to my phone and an email, queued while offline and sent when the connection returns |
 | [healthchecks.io](https://healthchecks.io) | A heartbeat for when the internet is down and the NAS can't send anything: the pings stop, so an outside service tells me |
 
-It runs in a `python:3.12-slim` container on my DS918+, deployed as a stack in [Portainer](https://www.portainer.io), a web dashboard for managing containers. The alerts queue because the thing that notices an outage can't report it over the connection that just died. The dashboard's "no CDN" detail means it doesn't borrow code from third-party servers (a CDN, in web-speak), so it still loads when the thing that's broken is the internet. And each five-minute poll writes a summary row plus one row per channel, which is why the per-channel file is the one that grows.
+It runs in a `python:3.12-slim` container on my DS918+, deployed as a stack in [Portainer](https://www.portainer.io), a web dashboard for managing containers. The alerts queue because the thing that notices an outage can't report it over the connection that just died. The dashboard doesn't rely on third-party servers for its code, so it still loads when the thing that's broken is the internet. And each five-minute poll writes a summary row plus one row per channel, which is why the per-channel file is the one that grows.
 
 ### Tools & AI Assist
 
@@ -64,7 +63,7 @@ The misses: it assumed my NAS ran Container Manager, guessed wrong about why Goo
 
 The original README walked through Container Manager, Synology's newer container app. My NAS runs the older Docker package with Portainer. Different tools, different steps, so Claude redid the deployment as a Portainer stack.
 
-Then, alerts. I wanted to reuse my NAS's own email notifications so the monitor wouldn't need another credential. It can't: the NAS signs in to Google with OAuth, a token handshake a container can't borrow. So the monitor needed a Gmail app password, and Google's page for those said "setting not available." Claude guessed Advanced Protection and sent me to a URL that returned a 404. The real cause was on my screen the whole time. 2-Step Verification was off, and the page said "Turn on." I turned it on, made the password, and the first alert landed a few minutes later. That first alert was about an event from before the monitor existed: the modem keeps its own log, and the monitor reads it on startup. A later restart didn't repeat it, so the monitor remembers what it has already seen.
+Then, alerts. I wanted to reuse my NAS's own email notifications so the monitor wouldn't need another credential. It can't: the NAS signs in to Google through OAuth, and the container can't reuse that login. So the monitor needed a Gmail app password, and Google's page for those said "setting not available." Claude guessed Advanced Protection and sent me to a URL that returned a 404. The real cause was on my screen the whole time. 2-Step Verification was off, and the page said "Turn on." I turned it on, made the password, and the first alert landed a few minutes later. That first alert was about an event from before the monitor existed: the modem keeps its own log, and the monitor reads it on startup. A later restart didn't repeat it, so the monitor remembers what it has already seen.
 
 The alarm earned its keep fast. Around 5:30 PM, less than an hour after I deployed it, the modem logged "RCS Partial Service," which I read as it losing some of its channels, and the error count jumped by 63,704 between two polls. My phone buzzed. It was the first time the monitor told me something I couldn't have known.
 
@@ -124,7 +123,7 @@ There's one more thing in that data I can't explain. The dashboard's outage tabl
 
 ## Lessons Learned & What's Next
 
-Here is what the monitor recorded, from the first poll on Wednesday, October 28 to the afternoon of Tuesday, November 3, counted from the raw polls file:
+Here is what the monitor recorded, from the first poll on Wednesday, October 28 to the afternoon of Tuesday, November 3, counted from the raw polls file. These are the modem's own counts of line trouble, not a count of dropped connections; the modem can log plenty while the connection holds.
 
 | Period | Polls | New uncorrectable errors | Signal-loss events |
 |---|---|---|---|
@@ -136,7 +135,7 @@ Here is what the monitor recorded, from the first poll on Wednesday, October 28 
 
 The first evening was the loud one, and the quiet after 10:36 on the morning of October 29 fits the tech finishing somewhere between 10 and 11, as best I remember. From noon that day until the morning of November 1, all 32 downstream channels stayed locked on every poll. Then the line came back: four signal-loss events between about 1:50 and 5:25 PM on November 1, including an "RCS Partial Service" and a "T3 time-out," one check at 1:51 PM that added about 5,400 uncorrectable errors, and two more on November 3, a partial-service warning at 9:29 AM and a T3 time-out at 11:58 AM. That is far below the first evening, and it is not nothing: about 82 percent of the week's errors landed in the first six hours, and there have been no outages or modem restarts since October 29. Every one of the November events came after I muted the alerts that morning.
 
-Even so, the whole record is the timeline I wanted to hand a tech: what changed, what the line did before, and what it did after. A tech can argue with a feeling. It's harder to argue with a few thousand polls. Here's the honest version. My "before" is six hours and a morning. I changed at least five things in a week (the connectors, the cables, a splitter, the power block in my wiring box and the modem), so I can't tell you which one mattered. And four quiet days couldn't promise a fifth, and didn't deliver one.
+Even so, the whole record is the timeline I wanted to hand a tech: what changed, what the line did before, and what it did after. Here's the honest version. My "before" is six hours and a morning. I changed at least five things in a week (the connectors, the cables, a splitter, the power block in my wiring box and the modem), so I can't tell you which one mattered. And four quiet days couldn't promise a fifth, and didn't deliver one.
 
 The lesson I'd hand to anyone with a different project: zero is not the same as quiet. A sensor that fails silently looks exactly like a calm system, so before you trust a clean chart, find one row where the thing you care about has an actual number in it. If I'd opened the CSV on day one and looked for a single upstream reading, I'd have saved four days. The better version is a monitor that shouts about its own blind spots. An alert for "this column has been empty for an hour" would take a few lines, and I haven't written them yet. The other lesson is about timing. Get the logging running before the people with the wrenches arrive.
 
