@@ -13,7 +13,7 @@ The modem's own log says my internet went down at 6:54 PM on Sunday, October 25,
 
 I've had Astound for over a year, and the connection has always dropped now and then, rarely enough that I shrugged and rebooted something. Over the last couple of months it got worse, with longer outages. I'm also job hunting, which means video interviews from home, and an outage in the middle of one is the kind of thing you rehearse at 3 a.m.
 
-The real problem was that I never knew when it dropped or how often. As far as I could tell, nothing on my modem, my router or the provider's side would tell me, so unless I happened to be using the connection, an outage didn't exist. My evidence was my memory, which is not a measuring instrument.
+The real problem was that I never knew when it dropped or how often. The modem's log is a page nobody reads, and it wipes itself on a reboot, so unless I happened to be using the connection, an outage didn't exist. My evidence was my memory, which is not a measuring instrument.
 
 So I did what I do these days: I opened a chat with Claude and built a smoke alarm. It's a small Python program in a Docker container on my Synology NAS that checks the internet every minute, reads the modem's own signal numbers every five minutes, writes everything to files, draws a dashboard, and, for about four days, tapped my phone when something looked wrong.
 
