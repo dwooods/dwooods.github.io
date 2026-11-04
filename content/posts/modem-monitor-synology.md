@@ -89,16 +89,16 @@ That's the design. Here's where it caught me instead. That same evening, healthc
 
 ### Four days of blank columns
 
-The monitor had columns for upstream power, how loudly the modem has to shout to be heard by the provider, measured in dBmV (a unit of signal strength; higher means louder). High upstream power is one classic sign of trouble on the line, so it was the number I most wanted. Four days in, I asked Claude to analyze the CSV for a before-and-after. It opened `polls.csv`, 763 polls, and found `us_locked`, the count of locked upstream channels, was 0 on every row and both upstream power columns were empty. The monitor had never recorded a single upstream reading. And Claude had told me, earlier, that the file would contain upstream power. It had read the column names in the code and assumed. That one was mine to catch, and I didn't, until the data was already four days old.
+The monitor had columns for upstream power: how loudly the modem has to shout to be heard by the provider, in dBmV (higher means louder). It's a classic sign of line trouble and the number I most wanted. Four days in, I asked Claude to analyze the CSV. All 763 polls had `us_locked`, the count of locked upstream channels, at 0, and both upstream power columns were empty. The monitor had never recorded a single upstream reading. Claude had told me earlier the file would contain one; it had read the column names in the code and assumed. That one was mine to catch, and I didn't until the data was four days old.
 
-Nothing complained, because a scraper that finds nothing doesn't raise an error. It writes a blank. To find out why, I needed the raw page, so Claude asked me to save the modem's page source and told me to press Cmd+U. On a Mac in Chrome that's Option+Cmd+U, and Cmd+U does nothing useful. It's a tiny miss, but I'm keeping a list. Once Claude had the saved page, it spotted the cause: the modem's HTML leaves out the closing row tags in the upstream table.
+Nothing complained, because a scraper that finds nothing writes a blank instead of raising an error. Claude had me save the modem's page source (Option+Cmd+U on a Mac; it first said Cmd+U, which does nothing useful, a tiny miss, but I'm keeping a list) and spotted the cause: the upstream table leaves out its closing row tags.
 
 ```html
 <tr><td>1</td><td> Locked </td> ... <td>46.50 dBmV</td><tr><td>2</td> ... <td>45.75 dBmV</td>
 </table>
 ```
 
-Browsers shrug and render that fine, which is why I could see the numbers myself the whole time. My parser trusted closing tags, so each new `<tr>` meant "throw away the unfinished row," and the last row vanished at `</table>`. Two rows in, zero out. Before changing anything, Claude ran the old parser against the saved page and got zero upstream rows, which is the only way to know a fix is fixing the thing you think it is. The fix is to close the open row whenever a new one starts or the table ends:
+Browsers render that fine, which is why I could see the numbers myself the whole time. My parser trusted closing tags, so each new `<tr>` threw away the unfinished row, and the last row vanished at `</table>`. Claude ran the old parser against the saved page first and got zero upstream rows, which is the only way to know a fix fixes the thing you think it does. The fix closes the open row whenever a new one starts or the table ends:
 
 ```python
 elif tag == "tr" and self._stack:
@@ -119,9 +119,13 @@ def _flush_row(self):
     self._row = None
 ```
 
-I tested it against the real page. The old parser found 0 upstream rows and the fixed one found 2 (46.5 and 45.75 dBmV), downstream still read 32, and well-formed tables still parsed. The cost is that the upstream history for those four days is gone. All I have are two readings from screenshots: 44.5 and 43.25 dBmV on the evening of October 28, and 46.5 and 45.75 four days later. That's about 2 dB higher, from two readings, which is not a trend. The running container confirms it: since 7:37 AM on November 1, all 430 polls (to this afternoon) show both upstream channels locked, at 45.75 and 46.5 dBmV, and those two numbers haven't moved.
+What the fix did and didn't recover:
 
-The dashboard's outage table has two entries, both on the morning of October 29: 35 minutes starting at 8:38 AM and 15 minutes starting at 9:19 AM, 50.6 minutes in all, logged as the modem being unreachable. The modem's uptime counter kept counting through both, and the seven-day view shows zero modem restarts, so the modem itself never rebooted. Both windows were the Thursday tech visit: the first is when he replaced the outside drop, and the second is when he replaced the inside components.
+- **Test on the saved page:** the old parser found 0 upstream rows and the fixed one found 2 (46.5 and 45.75 dBmV). Downstream still read 32, and well-formed tables still parsed.
+- **Lost:** the first four days of upstream history. All I have are two readings from screenshots, 44.5 and 43.25 dBmV on the evening of October 28 and 46.5 and 45.75 four days later. About 2 dB higher, from two readings, is not a trend.
+- **Since November 1, 7:37 AM:** all 430 polls show both upstream channels locked at 45.75 and 46.5 dBmV, and those numbers haven't moved.
+
+The monitor's only outages are on the morning of October 29: 35 minutes from 8:38 AM and 15 minutes from 9:19 AM. Those were the Thursday tech visit, with the outside drop replaced in the first window and the inside components in the second. The modem never rebooted.
 
 ## Lessons Learned & What's Next
 
