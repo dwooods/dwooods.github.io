@@ -17,7 +17,7 @@ I don't actually blame them for wanting recurring revenue. Plex runs infrastruct
 
 This is the story of how I un-decided that, mostly by asking Claude a lot of increasingly specific questions from an SSH session.
 
-<p align="center"><img src="/images/tailscale-plex-flow.svg" alt="The full path a movie takes from my NAS to a vacation-home TV" style="max-width:100%;"></p>
+![The full path a movie takes from my NAS to a vacation-home TV](/images/tailscale-plex-flow.svg)
 
 ## Why I Built This
 
@@ -25,7 +25,11 @@ We rely entirely on our own library — no subscriptions, no "well we could just
 
 The actual message wasn't even honest about what was happening — it just acted like the content wasn't available, the same as if the file had been deleted. It took some digging to learn that Plex began enforcing a subscription requirement for remote streaming of personal media in late 2025, with the change showing up on TV platforms first. Unless the server owner or the viewer has an active Plex Pass, or the viewer buys a "Remote Watch Pass," remote playback is just blocked. Not throttled, not watermarked — blocked.
 
-<p align="center"><img src="/images/plex-remote-watch-pass-paywall.png" alt="Plex's &quot;you need a Remote Watch Pass&quot; paywall, shown here as a deliberate test with Tailscale turned off" style="max-width:340px; width:100%;"></p>
+<div style="max-width: 340px; margin: 0 auto;">
+
+![Plex's "you need a Remote Watch Pass" paywall, shown here as a deliberate test with Tailscale turned off](/images/plex-remote-watch-pass-paywall.png)
+
+</div>
 
 My first instinct was "I already pay for a VPN, can't I just use that?" I already pay Private Internet Access for exactly this kind of thing. Claude's answer was fast and a little deflating: no, and not almost-no, structurally no. A commercial VPN like PIA solves the opposite problem — it routes your traffic *out* through someone else's servers so the internet can't tell where you really are. I needed the reverse: I needed a device six hundred miles from home to convincingly pretend it *was* home. Different job entirely. That's one subscription I now know I'm paying for something it was never going to do.
 
@@ -107,7 +111,11 @@ To be clear, I'm not the one who figured this out. It's sitting in the open on P
 
 I didn't just take my own word for it either. I pulled up Plex's Now Playing panel while streaming to my phone over the tunnel, away from home Wi-Fi, and there it was: `Local (192.168.X.X) — 2 Mbps`. Not a Tailscale address, not a CGNAT address — Plex itself labeling the session "Local," at the exact IP the subnet router hands out. Mechanism confirmed.
 
-<p align="center"><img src="/images/plex-now-playing-local-proof.png" alt="Plex's server dashboard labeling a phone streaming over cellular data, miles from home Wi-Fi, as &quot;Local (192.168.X.X) — 2 Mbps&quot;" style="max-width:293px; width:100%;"></p>
+<div style="max-width: 293px; margin: 0 auto;">
+
+![Plex's server dashboard labeling a phone streaming over cellular data, miles from home Wi-Fi, as "Local (192.168.X.X) — 2 Mbps"](/images/plex-now-playing-local-proof.png)
+
+</div>
 
 ## Lessons Learned & What's Next
 
