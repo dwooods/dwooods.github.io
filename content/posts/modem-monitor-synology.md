@@ -5,7 +5,6 @@ draft: true
 tags: ["docker", "synology", "portainer", "networking", "cable-modem", "monitoring", "python", "self-hosted"]
 description: "A Python container on my Synology NAS that logs my cable modem's signal, built after three modems, three tech visits and a year of drops."
 summary: "My internet had been dropping for a year and nothing would tell me when. So Claude and I built a monitor on my NAS, which then recorded nothing at all for half of what I built it to watch."
-featuredImage: "/images/hero-modem-monitor-framed.jpeg"
 featuredImagePreview: "/images/hero-modem-monitor-framed.jpeg"
 ---
 
