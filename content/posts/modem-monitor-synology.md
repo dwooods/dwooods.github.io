@@ -4,7 +4,7 @@ date: 2026-11-03
 draft: true
 tags: ["docker", "synology", "portainer", "networking", "cable-modem", "monitoring", "python", "self-hosted"]
 description: "A Python container on my Synology NAS that logs my cable modem's signal, built after three modems, three tech visits and a year of drops."
-summary: "My internet had been dropping for a year and nothing would tell me when. So Claude and I built a monitor on my NAS, which then recorded nothing at all for half of what I built it to watch."
+summary: "My internet had been dropping for a year and nothing would tell me when. So Claude and I built a monitor on my NAS, which then recorded nothing at all for half of what it was built to watch."
 featuredImagePreview: "/images/hero-modem-monitor-framed.jpeg"
 images: ["/images/modem-monitor-dashboard.jpeg"]
 ---
@@ -79,7 +79,7 @@ Time zone:  America/Los_Angeles
 Grace:      10 minutes
 ```
 
-The time zone matters, because without it the service reads the schedule in UTC and the quiet hours land mid-afternoon. The grace window gives the NAS time to boot at 7 before anyone panics.
+The time zone matters, because without it the service reads the schedule in UTC and the quiet hours land mid-afternoon. The grace window gives the NAS time to boot at 7 before anyone panics. That's the everyday setup. For the nights of October 29 and 30 I turned the NAS shutdown off so the monitor could watch overnight, and both nights were quiet: about 86 polls each, no events, no new uncorrectable errors, all 32 downstream channels locked.
 
 I tested it the only way that counts, by stopping the container on purpose. The email arrived. The phone push needed its own integration and a test message ("TEST is DOWN") before it showed up, and I never saw the matching "UP" on the phone. An alarm you've never set off is a hope.
 
@@ -139,7 +139,7 @@ Even so, the whole record is the timeline I wanted to hand a tech: what changed,
 
 The lesson I'd hand to anyone with a different project: zero is not the same as quiet. A sensor that fails silently looks exactly like a calm system, so before you trust a clean chart, find one row where the thing you care about has an actual number in it. If I'd opened the CSV on day one and looked for a single upstream reading, I'd have saved four days. The better version is a monitor that shouts about its own blind spots. An alert for "this column has been empty for an hour" would take a few lines, and I haven't written them yet. The other lesson is about timing. Get the logging running before the people with the wrenches arrive.
 
-A few days in, I turned the alerts off and went back to reading the dashboard. Nothing was reaching me, or anyone else in the house. The modem kept logging the occasional complaint, and I can see every one of them in the table above, but the monitor hasn't logged a dropped connection since the morning of October 29, a week of polls now. This is a home connection, not a server room. A phone that buzzes about errors the internet absorbed on its own is a smoke alarm going off when I make toast, and at night the NAS is off anyway. The monitor keeps recording, and the per-channel file trims itself at 60 days, since it was growing by about half a megabyte a day. What I still don't have is the thing I wanted at the start: as far as I can tell, no one will tell me when the line goes bad.
+A few days in, I turned the alerts off and went back to reading the dashboard. Nothing was reaching me, or anyone else in the house. The modem kept logging the occasional complaint, and I can see every one of them in the table above, but the monitor hasn't logged a dropped connection since the morning of October 29, a week of polls now. This is a home connection, not a server room. A phone that buzzes about errors the internet absorbed on its own is a smoke alarm going off when I make toast. The monitor keeps recording, and the per-channel file trims itself at 60 days, since it was growing by about half a megabyte a day. What I still don't have is the thing I wanted at the start: as far as I can tell, no one will tell me when the line goes bad.
 
 ## Try This Yourself
 
