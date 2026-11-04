@@ -6,6 +6,7 @@ tags: ["docker", "synology", "portainer", "networking", "cable-modem", "monitori
 description: "A Python container on my Synology NAS that logs my cable modem's signal, built after three modems, three tech visits and a year of drops."
 summary: "My internet had been dropping for a year and nothing would tell me when. So Claude and I built a monitor on my NAS, which then recorded nothing at all for half of what I built it to watch."
 featuredImagePreview: "/images/hero-modem-monitor-framed.jpeg"
+images: ["/images/modem-monitor-dashboard.jpeg"]
 ---
 
 I've had Astound for over a year, and the connection has always dropped now and then, rarely enough that I shrugged and rebooted something. Over the last couple of months it got worse, with longer outages. I'm also job hunting, which means video interviews from home, and an outage in the middle of one is the kind of thing you rehearse at 3 a.m.
