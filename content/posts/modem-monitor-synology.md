@@ -9,6 +9,8 @@ featuredImagePreview: "/images/hero-modem-monitor-framed.jpeg"
 images: ["/images/modem-monitor-dashboard.jpeg"]
 ---
 
+The modem's own log says my internet went down at 6:54 PM on Sunday, October 25, and again at 6:54 PM on Monday, the same minute. Nothing was watching, so the log was the only witness.
+
 I've had Astound for over a year, and the connection has always dropped now and then, rarely enough that I shrugged and rebooted something. Over the last couple of months it got worse, with longer outages. I'm also job hunting, which means video interviews from home, and an outage in the middle of one is the kind of thing you rehearse at 3 a.m.
 
 The real problem was that I never knew when it dropped or how often. As far as I could tell, nothing on my modem, my router or the provider's side would tell me, so unless I happened to be using the connection, an outage didn't exist. My evidence was my memory, which is not a measuring instrument.
