@@ -47,10 +47,10 @@
     <text x="860" y="204" font-size="20" font-weight="bold" text-anchor="middle">Gmail</text>
     <text x="860" y="230" font-size="16" text-anchor="middle">email alert</text>
 
-    <rect x="750" y="300" width="220" height="110" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
-    <text x="860" y="334" font-size="20" font-weight="bold" text-anchor="middle">healthchecks.io</text>
-    <text x="860" y="360" font-size="16" text-anchor="middle">heartbeat ping</text>
-    <text x="860" y="384" font-size="16" text-anchor="middle">silence = it tells me</text>
+    <rect x="750" y="350" width="220" height="110" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
+    <text x="860" y="384" font-size="20" font-weight="bold" text-anchor="middle">healthchecks.io</text>
+    <text x="860" y="410" font-size="16" text-anchor="middle">heartbeat ping</text>
+    <text x="860" y="434" font-size="16" text-anchor="middle">silence = it tells me</text>
 
     <!-- arrows -->
     <g stroke="#475569" stroke-width="2.5" fill="none" marker-end="url(#a)">
@@ -59,12 +59,12 @@
       <path d="M505,235 L505,300"/>
       <path d="M640,170 L695,170 L695,100 L750,100"/>
       <path d="M640,190 L695,190 L695,210 L750,210"/>
-      <path d="M640,215 L700,215 L700,340 L750,340"/>
+      <path d="M640,215 L700,215 L700,390 L750,390"/>
     </g>
     <path d="M505,235 L505,300" stroke="#475569" stroke-width="2.5" fill="none"/>
     <path d="M505,380 L505,420" stroke="#475569" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
-    <text x="760" y="445" font-size="15" fill="#475569">Alerts queue while the</text>
-    <text x="760" y="467" font-size="15" fill="#475569">internet is down and send</text>
-    <text x="760" y="489" font-size="15" fill="#475569">when it returns.</text>
+    <text x="760" y="276" font-size="15" fill="#475569">ntfy and Gmail alerts queue</text>
+    <text x="760" y="298" font-size="15" fill="#475569">while the internet is down</text>
+    <text x="760" y="320" font-size="15" fill="#475569">and send when it returns.</text>
   </g>
 </svg>
