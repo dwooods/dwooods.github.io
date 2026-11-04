@@ -129,7 +129,7 @@ The monitor's only outages are on the morning of October 29: 35 minutes from 8:3
 
 ## Lessons Learned & What's Next
 
-Here is what the monitor recorded, from the first poll on Wednesday, October 28 to the afternoon of Tuesday, November 3, counted from the raw polls file. These are the modem's own counts of line trouble, not a count of dropped connections; the modem can log plenty while the connection holds.
+Here is what the monitor recorded from the first poll on Wednesday, October 28 to the afternoon of Tuesday, November 3, counted from the raw polls file. These are the modem's own counts of line trouble, not a count of dropped connections.
 
 | Period | Polls | New uncorrectable errors | Signal-loss events |
 |---|---|---|---|
@@ -139,13 +139,20 @@ Here is what the monitor recorded, from the first poll on Wednesday, October 28 
 | Nov 1, 7:30 AM to Nov 3, 3:20 PM | 430 | 14,246 | 6 |
 | Whole week (the dashboard's total) | 1,195 | 88,228 | 21 |
 
-The first evening was the loud one. On the morning of October 29 the events stop after 10:36, which fits the tech finishing somewhere between 10 and 11, as best I remember, and one last burst of 1,680 errors came at 11:53. From noon that day until the morning of November 1, all 32 downstream channels stayed locked on every poll. Then the line came back: four signal-loss events between about 1:50 and 5:25 PM on November 1, including an "RCS Partial Service" and a "T3 time-out," one check at 1:51 PM that added about 5,400 uncorrectable errors, and two more on November 3, a partial-service warning at 9:29 AM and a T3 time-out at 11:58 AM. That is far below the first evening, and it is not nothing: about 82 percent of the week's errors landed in the first six hours, and the monitor has logged no outages or modem restarts since October 29. Every one of the November events came after I muted the alerts that morning.
+What happened when:
 
-Even so, the whole record is the timeline I wanted to hand a tech: what changed, what the line did before, and what it did after. Here's the honest version. My "before" is six hours and a morning. I changed at least five things in a week (the connectors, the cables, a splitter, the power block in my wiring box and the modem), so I can't tell you which one mattered. And four quiet days couldn't promise a fifth, and didn't deliver one. Whether the timeline helps is still open: when I texted the last tech about the November 1 errors, he said it happens, and that he was looking for an outage longer than five minutes, which the monitor hasn't logged since October 29.
+- **Oct 29 morning:** the events stop after 10:36, which fits the tech finishing somewhere between 10 and 11, as best I remember. One last burst of 1,680 errors came at 11:53.
+- **Oct 29 noon to Nov 1:** quiet. All 32 downstream channels stayed locked on every poll.
+- **Nov 1, 1:50 to 5:25 PM:** four signal-loss events, including an "RCS Partial Service" and a "T3 time-out," and one check at 1:51 PM that added about 5,400 errors.
+- **Nov 3:** a partial-service warning at 9:29 AM and a T3 time-out at 11:58 AM.
 
-The lesson I'd hand to anyone with a different project: zero is not the same as quiet. A sensor that fails silently looks exactly like a calm system, so before you trust a clean chart, find one row where the thing you care about has an actual number in it. If I'd opened the CSV on day one and looked for a single upstream reading, I'd have saved four days. The better version is a monitor that shouts about its own blind spots. An alert for "this column has been empty for an hour" would take a few lines, and I haven't written them yet. The other lesson is about timing. Get the logging running before the people with the wrenches arrive.
+That is far below the first evening, and it is not nothing: about 82 percent of the week's errors landed in the first six hours, and the monitor has logged no outages or modem restarts since October 29. Every one of the November events came after I muted the alerts that morning.
 
-A few days in, I turned the alerts off and went back to reading the dashboard. Nothing was reaching me, or anyone else in the house. The modem kept logging the occasional complaint, and I can see every one of them in the table above, but the monitor hasn't logged a dropped connection since the morning of October 29, a week of polls now. This is a home connection, not a server room. A phone that buzzes about errors the internet absorbed on its own is a smoke alarm going off when I make toast. The monitor keeps recording, and the per-channel file trims itself at 60 days, since it was growing by about half a megabyte a day. What I still don't have is the thing I wanted at the start: as far as I can tell, no one will tell me when the line goes bad.
+The whole record is the timeline I wanted to hand a tech, with limits. My "before" is six hours and a morning, and I changed at least five things in a week (the connectors, the cables, a splitter, the power block in my wiring box and the modem), so I can't tell you which one mattered. And four quiet days couldn't promise a fifth, and didn't deliver one. Whether the timeline helps is still open: when I texted the last tech about the November 1 errors, he said it happens, and that he was looking for an outage longer than five minutes, which the monitor hasn't logged since October 29.
+
+The lesson I'd hand to anyone with a different project: zero is not the same as quiet. A sensor that fails silently looks exactly like a calm system, so before you trust a clean chart, find one row where the thing you care about has an actual number in it. One look at the CSV on day one would have saved four days. The better version is a monitor that shouts about its own blind spots; an alert for "this column has been empty for an hour" would take a few lines, and I haven't written it yet. The other lesson is about timing: get the logging running before the people with the wrenches arrive.
+
+A few days in, I turned the alerts off and went back to reading the dashboard. Nothing was reaching me, or anyone else in the house. The modem still logs the occasional complaint, counted in the table above, but the monitor hasn't logged a dropped connection since the morning of October 29. This is a home connection, not a server room, and a phone that buzzes about errors the internet absorbed on its own is a smoke alarm going off when I make toast. The monitor keeps recording, and the per-channel file trims itself at 60 days. What I still don't have is the thing I wanted at the start: as far as I can tell, no one will tell me when the line goes bad.
 
 ## Try This Yourself
 
