@@ -17,7 +17,11 @@ So I did what I do these days: I opened a chat with Claude and built a smoke ala
 
 This post is about how that went: three modems, three tech visits, a monitor that spent four days recording nothing for half of what it was built to watch, and a result I'd like to trust more than I do.
 
-![The monitor's dashboard, 7-day view: status tiles, two outages on October 29, and signal-loss events by hour](/images/modem-monitor-dashboard.jpeg)
+<div style="max-width: 640px; margin: 0 auto;">
+
+![The monitor's dashboard, 3-day view on November 4: status tiles, no outages, signal-loss events by hour, uncorrectable errors per check, and the event log with hardware addresses masked](/images/modem-monitor-dashboard.jpeg)
+
+</div>
 
 ## Why I Built This
 
@@ -131,9 +135,6 @@ Here is what the monitor recorded, from the first poll on Wednesday, October 28 
 | Whole week (the dashboard's total) | 1,195 | 88,228 | 21 |
 
 The first evening was the loud one, and the quiet after 10:36 on the morning of October 29 fits the tech finishing somewhere between 10 and 11, as best I remember. From noon that day until the morning of November 1, all 32 downstream channels stayed locked on every poll. Then the line came back: four signal-loss events between about 1:50 and 5:25 PM on November 1, including an "RCS Partial Service" and a "T3 time-out," one check at 1:51 PM that added about 5,400 uncorrectable errors, and two more on November 3, a partial-service warning at 9:29 AM and a T3 time-out at 11:58 AM. That is far below the first evening, and it is not nothing: about 82 percent of the week's errors landed in the first six hours, and there have been no outages or modem restarts since October 29. Every one of the November events came after I muted the alerts that morning.
-
-![The dashboard's color-coded event log: two signal-loss events on November 3 and November 1, with a DHCP renewal notice between them, MAC addresses masked](/images/modem-monitor-events.jpeg)
-*The event log as the dashboard shows it, newest first: red is critical, amber is a warning, blue is a notice. The modem and provider hardware addresses are masked.*
 
 Even so, the whole record is the timeline I wanted to hand a tech: what changed, what the line did before, and what it did after. A tech can argue with a feeling. It's harder to argue with a few thousand polls. Here's the honest version. My "before" is six hours and a morning, because the monitor didn't exist for the first two tech visits. I changed at least five things in a week (the connectors, the cables, a splitter, the power block in my wiring box and the modem), so I can't tell you which one mattered. And four quiet days couldn't promise a fifth, and didn't deliver one.
 
