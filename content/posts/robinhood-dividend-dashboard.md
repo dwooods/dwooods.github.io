@@ -13,7 +13,7 @@ I kept asking Claude the same questions about one Robinhood account. When does e
 
 So I built a page for those questions. I call it the Dividend Dashboard. I didn't write any of the code; Claude did. My job turned out to be something I'd do at work without thinking: product management, mostly by holding up a screenshot of Robinhood's app and saying "I like this, but it doesn't show me what I'm getting paid."
 
-## Why I Built This
+## Why I built this
 
 This account is money I had to spare, not my retirement. A financial advisor handles that, and for now it isn't changing. I've been a Robinhood customer since 2017, long before AI assistants like Claude, because there are no commissions, so trying something out doesn't come with a fee.
 
@@ -21,7 +21,7 @@ When Robinhood launched [Agentic Trading](https://robinhood.com/us/en/support/ar
 
 Few brokerages offer an MCP server; Fidelity, Schwab and E\*TRADE [don't as of this writing](https://www.stockbrokers.com/guides/ai-agent-brokers). Robinhood has since added a dividend tracker of its own, which I'll get to.
 
-## What I Built
+## What I built
 
 The whole thing is one interactive web page that Claude built and hosts in my Claude account. Click Refresh and the page [calls Robinhood's MCP server itself](https://x.com/ClaudeDevs/status/2077489907350856038), using my own connection. I only gave the page five read-only tools, so the worst it can do is look at my money, which is also my main hobby. The server itself can place trades; this page can't. (I use the same connection with Claude to research and make trades, but that's a different post.)
 
@@ -39,7 +39,7 @@ Claude built and published all sixteen versions over about two weeks. Every vers
 
 My part was deciding what I wanted to see and how I wanted to see it. I held the Robinhood app up next to each version, kept what I liked, and worked out what should be different. When the data had a gap, I proposed a way around it. I didn't want to build anything myself; I just knew what I wanted, which any product manager will tell you is the hard part. (Engineers may disagree.)
 
-## The Product Decisions
+## The product decisions
 
 The interesting part of this project wasn't the engineering. It was a string of product calls (what to show, what to be honest about, what to copy) and a few roadblocks that needed a way around. The MCP server handled the basics well: positions, cash, live quotes, each holding's dividend schedule and price history, enough to draw every chart on the page. What it didn't have was the two things an income investor wants most, what I've actually been paid and what the account was worth over time. The first I solved by hand: I downloaded my account activity as a CSV from Robinhood's Reports page and gave it to Claude, which stored it in the page alongside the live data. The second I had to reconstruct, and the reconstruction is honest about what it is.
 
@@ -81,7 +81,7 @@ The early versions had a problem I didn't catch right away: Claude had baked the
 
 That's caching: keep a copy of an answer so you don't have to ask for it every time. It makes the page faster and means fewer calls to Robinhood. The trade-off is that the copy can go stale, so you have to decide how old is too old. (Claude's connection to Robinhood keeps a few minutes of its own cache, but the page is mine, so I wanted it handled on my side.) I picked an hour. Under an hour, Refresh says the data is fresh and makes no calls; after that, it pulls again. I asked for it to work like this: if a pull fails, the page keeps the last saved data instead of going blank, and an empty page says "click Refresh" instead of passing off week-old numbers as today's. Less pretty, more honest, and a dashboard has no business hitting someone else's servers every time I get curious.
 
-## Then Robinhood Shipped a Dividend Tracker
+## Then Robinhood shipped a dividend tracker
 
 A week into this, Robinhood shipped the feature I'd been building toward: a dividend tracker. Customers asked for it. At HOOD Summit '25, Vlad Tenev polled the audience on what to build next, and [dividend tracking was one of the top two picks](https://www.tipranks.com/news/the-fly/robinhood-ceo-tenev-polls-hood-summit-25-audience-for-next-platform-feature-thefly). Robinhood [promised it for this year](https://x.com/RobinhoodApp/status/1966587161240559713) ("Customers ask, we execute") and [delivered](https://x.com/RobinhoodApp/status/2086845029616886188).
 
@@ -114,7 +114,7 @@ That last one taught me something about my own holdings. As far as I can tell, t
 | **"Annual income"** | Paid this year + still scheduled | Market value × yield (a run rate) |
 {{< /admonition >}}
 
-## What I'd Ask Robinhood For
+## What I'd ask Robinhood for
 
 The MCP server gets more right than wrong: positions, quotes, dividend schedules and price history are enough to build a real dashboard. Four additions would close the gaps (three, it turns out; see the correction below), and Robinhood's own app already shows every one of them.
 
@@ -135,7 +135,7 @@ I'd rather show than tell, so Claude built a shareable copy of the page on a mad
 
 <p align="center"><strong><a href="https://claude.ai/artifact/PBQkes53zewq1pNiPGYxZY">Open the live concept &rarr;</a></strong><br><em>Hover the charts, sort the columns, open a row. Sample data only.</em></p>
 
-## Lessons Learned & What's Next
+## Lessons learned & what's next
 
 **The data lesson: know your source of truth.** Three times the page looked right and wasn't. I never asked which account the export covered, the first numbers went stale without looking stale, and the account chart looked like Robinhood's while meaning something else. The fix was always the same: decide what's real, treat everything else as an approximation, and say so on the page. Stale data that looks live is worse than an empty box.
 
@@ -151,7 +151,7 @@ Most finance tools seem built for one of two people: someone who wants one reass
 
 I'm not a day trader, and the agents aren't in my Android app yet, so I'll likely stay with Claude, which can see more than my Robinhood account. Nothing in the coverage mentions dividend or account-value history for outside tools, so the wishlist still stands. Next on my list: a daily history log, so I can chart real income over time instead of reconstructing it.
 
-## Try This Yourself
+## Try this yourself
 
 If you use Robinhood, the thing I'd most like you to take from this is to try the MCP server: connect it to an assistant and ask it a question the app doesn't answer. Setup takes a few minutes on a computer.
 

@@ -34,7 +34,7 @@ The editor runs in any browser, so you can try it without building anything: [dw
 A 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, and I learned why the hard way, below), an ESP32-C3 SuperMini, a 3D printer and PLA, and a handful of small parts. Measure your panel before printing. The frame pocket is 162 mm square, and panels from different sellers vary.
 {{< /admonition >}}
 
-## Hardware, Hardware, Then Software
+## Hardware, hardware, then software
 
 This happened on the Raspberry Pi prototype, with my first 256-pixel panel, an 8x32. It worked at first, then random pixels lit up in the wrong colors, more of them the more patterns I ran. I tried what you'd try. A series resistor on the data line helped a little. A 74AHCT125 level shifter (a chip that converts the Pi's 3.3 V data signal to 5 V) made things worse, so I took it out. A big capacitor moved around the board fixed nothing, though it did show the noise was at the input end of the panel. Too little power was next: the supply I had ran the 60-LED strip fine, which proved nothing about the 8x32.
 
@@ -116,7 +116,7 @@ I tested setup on a Windows 11 PC and an iPhone. The iPhone opens the setup page
 
 **Part 2: giving each board its own name.** Every board originally advertised itself as `glowgrid.local` over mDNS (the system that lets you type a `.local` name instead of an IP address). With two boards on one home Wi-Fi, say two kids in two rooms, they fight over the name, and whoever wins gets the other person's sprites. Now each board names itself `glowgrid-` plus the last two bytes of its own hardware ID (its MAC address), so mine is `glowgrid-b274.local`.
 
-## Why the Glow Comes from the Case
+## Why the glow comes from the case
 
 ![The case: frame, grid, diffuser cover, ESP32-C3 holder, and cradle, rendered from the generator script](/images/glow-grid-enclosure-preview.jpg)
 
