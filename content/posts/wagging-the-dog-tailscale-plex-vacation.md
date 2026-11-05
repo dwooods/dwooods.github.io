@@ -19,7 +19,7 @@ This is the story of how I un-decided that, mostly by asking Claude a lot of inc
 
 ![The full path a movie takes from my NAS to a vacation-home TV](/images/tailscale-plex-flow.svg)
 
-## Why I Built This
+## Why I built this
 
 We rely entirely on our own library — no subscriptions, no "well we could just watch something on Netflix instead." So when the TV at the vacation house flatly refused to play a movie I own, on a server I own, that's not a minor inconvenience, that's the entertainment plan for the week collapsing.
 
@@ -35,7 +35,7 @@ My first instinct was "I already pay for a VPN, can't I just use that?" I alread
 
 The other constraint that shaped everything: none of our TVs can run a VPN client, and neither can most smart TVs in general — no Tailscale app for webOS, Tizen, or Roku. Whatever fixes this has to live upstream of the TV, on hardware I control. Which meant: a travel router.
 
-## The Setup
+## The setup
 
 The hardware side of this is almost embarrassingly simple: a Synology DS918+ NAS that's been quietly running Plex for years, and is now the entire reason this project exists. Onto it I installed Tailscale — a mesh VPN built on WireGuard, installed as the official Synology package — and configured it as a *subnet router* that advertises the home LAN out to a private network of my own devices (a "tailnet").
 
@@ -45,7 +45,7 @@ Plex Media Server is the one component in this entire chain that spent the whole
 
 I looked at Synology's own VPN Server package first, since it was already sitting in Package Center, free, zero new accounts. Two things killed it: it only speaks OpenVPN/L2TP/PPTP, not WireGuard, and OpenVPN topped out around 11–12 Mbps on the router hardware I compared — fine for a phone, not great for a TV. Worse, reaching it from outside means forwarding a port on the home router, which requires either a static IP or dynamic DNS, and simply doesn't work at all if the home ISP uses CGNAT. Tailscale needs none of that — no ports, and its relay fallback can ride over ordinary HTTPS, which makes it much more tolerant of restrictive networks — including hotel networks that hate you.
 
-### Tools & AI Assist
+### Tools & AI assist
 
 No repo for this one — this wasn't code, it was network plumbing, so there's no pull request to point at. The entire thing happened in one long-running conversation with Claude, which is a pretty accurate description of how I now do most home-infrastructure work: open a chat, SSH into the NAS in another window, paste output back and forth.
 
@@ -53,7 +53,7 @@ Credit where due: Claude talked me out of wasting an evening on my existing VPN 
 
 The miss was bigger than any of that: a broken grep pattern returned a false negative on the single question the whole project hinged on. More on that below.
 
-## Key Technical Challenges
+## Key technical challenges
 
 ### Synology quietly disables the one thing Tailscale needs
 
@@ -117,7 +117,7 @@ I didn't just take my own word for it either. I pulled up Plex's Now Playing pan
 
 </div>
 
-## Lessons Learned & What's Next
+## Lessons learned & what's next
 
 The generalizable version of this, for anyone reading this who has never heard of Plex and never will: before you build a workaround around any system's rule — a paywall, a rate limiter, an app-store policy — the question that matters isn't "how do I get around this," it's "what is this thing actually checking, and how likely is that specific check to still exist in six months." Plex was checking a source IP range, which is a genuinely fragile way to define "local." I built an entire project on the bet that fragility would hold. So far it has. That is not the same thing as it being a good bet, and I wrote down four different ways Plex could patch it out from under me, mostly so future-me can feel smug about having seen it coming, right before panicking.
 
@@ -131,7 +131,7 @@ One thing worth being straight about, now that I've actually checked: [Plex's Te
 
 Also worth admitting: I have now spent, conservatively, several hours of my life engineering around a $2.99-a-month charge. My hourly rate for problems nobody is paying me to solve remains extremely reasonable.
 
-## Try This Yourself
+## Try this yourself
 
 No GitHub repo to link here — it's a NAS, a $30 travel router, and one very long chat, not code. If you're fighting the same fight, Tailscale's own docs for the Synology package and subnet routers are genuinely good, and the GL.iNet Opal (GL-SFT1200) is the router I landed on for the price and its WireGuard throughput ceiling over the smaller Mango. Worth a read too: the ["Support for Tailscale"](https://forums.plex.tv/t/support-for-tailscale/936755) thread on Plex's own community forums, where this exact subnet-router trick is already laid out in the replies — I didn't invent anything here, I just went and checked that it actually works. Whether the actual TV cooperates is a problem for a future post — right now the whole thing has been proven on a laptop and a phone, which is a very fancy way of saying "it works, probably, we'll see." If your setup breaks in a way I haven't listed, or you find a fifth way Plex could close this off, I'd like to know before their engineers tell me by breaking it.
 
