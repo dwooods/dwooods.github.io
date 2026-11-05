@@ -55,7 +55,7 @@ Here's how the pieces talk to each other:
 
 `run.sh` (symlinked as `ledstrip` on `PATH`) just erases the "was it `source venv/bin/activate` first or `cd` first?" friction — it creates the venv if one doesn't exist yet and launches the menu.
 
-## Building the Project with Claude
+## Building the project with Claude
 
 To be explicit about it, since the rest of this post takes it for granted: I used **Claude** throughout the build — not just to help with a tricky function. I didn't write the code, make the commits, or manage the repo. Instead, I focused on describing what I wanted to build, making design decisions, testing the results, identifying problems, and deciding what to tackle next. Claude handled the implementation — all eleven effects, `led.py`, `led_common.py`, `off.py`, and every `git` operation end-to-end.
 
@@ -73,7 +73,7 @@ Now a change was one prompt and a couple of seconds. That made the project more 
 
 **The barrier got pretty low.** My 13-year-old has never written a line of code. He sent Claude a few chat requests of his own and ended up with the Rocket Launch effect in the menu.
 
-Worth saying plainly: Claude didn't hand me a wrong answer that I had to catch on this project. The Pi 5 diagnosis was right the first time, and the friction was architectural growing pains as the design evolved (more on that below). The real misses came later, on the LED-panel follow-up, which is a story for another post.
+Worth saying plainly: Claude didn't hand me a wrong answer that I had to catch on this project. The Pi 5 diagnosis was right the first time, and the friction was architectural growing pains as the design evolved (more on that below). The real misses came later, on the LED-panel follow-up, which is [a story for another post](/posts/pixel-art-you-can-hold/).
 
 ## Key technical insights & challenges
 
