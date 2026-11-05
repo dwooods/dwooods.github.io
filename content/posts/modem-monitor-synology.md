@@ -25,7 +25,7 @@ This post is about how that went: three modems, three tech visits, a monitor tha
 
 </div>
 
-## Why I Built This
+## Why I built this
 
 The week before I built it was a blur of changes. On Sunday, October 25, I put in a new Netgear modem, and my ASUS router refused to see the internet until I power-cycled the modem. The cause was me. I'd plugged my laptop into the new modem first to test it, and cable modems, as far as I understand, tie themselves to the first device they meet until they're restarted.
 
@@ -37,7 +37,7 @@ Every one of those fixes was a guess made without data. Each ended with "let's s
 
 I also had a place to run it. My NAS already ran Docker, which is a way of packaging a small program with everything it needs so it behaves the same anywhere, so one more small container was cheap.
 
-## Architecture & Tech Stack
+## Architecture & tech stack
 
 A cable modem is the box that turns the coax line from the street into Ethernet, and it keeps a tiny web page about itself that nobody reads (on most modems it lives at 192.168.100.1). That page lists the channels the modem listens on (downstream, 32 on mine) and talks on (upstream, 2 on mine), each channel's signal strength, and a running count of uncorrectable errors, which are chunks of data the modem couldn't repair. It also has an event log, and the entry I came to know best is "No Ranging Response received - T3 time-out," which means the modem asked the provider's equipment for an adjustment and got silence. That page is the whole data source.
 
@@ -53,13 +53,13 @@ A cable modem is the box that turns the coax line from the street into Ethernet,
 
 It runs in a `python:3.12-slim` container on my DS918+, deployed as a stack in [Portainer](https://www.portainer.io), a web dashboard for managing containers. The alerts queue because the thing that notices an outage can't report it over the connection that just died. The dashboard doesn't rely on third-party servers for its code, so it still loads when the thing that's broken is the internet. And each five-minute poll writes a summary row plus one row per channel, which is why the per-channel file is the one that grows.
 
-### Tools & AI Assist
+### Tools & AI assist
 
 Claude wrote the original monitor in an earlier chat and tested it against a simulated modem, which is how it shipped a bug that only appears when a real Gmail login fails: the phone push repeated every minute. In this chat Claude reproduced it (five failed email sends, five pushes) and fixed it with a three-line flag. It also walked me through deployment, read the modem's pages, wrote the patches and ran the CSV analysis that found the bug in the third challenge below.
 
 The misses: it assumed my NAS ran Container Manager, guessed wrong about why Google blocked my app password, set up a 24/7 heartbeat without noticing the NAS sleeps at night, and told me a CSV contained data it didn't. No other AI tools. It was Claude from start to finish.
 
-## Key Challenges
+## Key challenges
 
 ### Claude assumed the wrong NAS, and Google said no
 
@@ -127,7 +127,7 @@ What the fix did and didn't recover:
 
 The monitor's only outages are on the morning of October 29: 35 minutes from 8:38 AM and 15 minutes from 9:19 AM. Those were the Thursday tech visit, with the outside drop replaced in the first window and the inside components in the second. The modem never rebooted.
 
-## Lessons Learned & What's Next
+## Lessons learned & what's next
 
 Here is what the monitor recorded from the first poll on Wednesday, October 28 to the afternoon of Tuesday, November 3, counted from the raw polls file. These are the modem's own counts of line trouble, not a count of dropped connections.
 
@@ -154,7 +154,7 @@ The lesson I'd hand to anyone with a different project: zero is not the same as 
 
 A few days in, I turned the alerts off and went back to reading the dashboard. Nothing was reaching me, or anyone else in the house. The modem still logs the occasional complaint, counted in the table above, but the monitor hasn't logged a dropped connection since the morning of October 29. This is a home connection, not a server room, and a phone that buzzes about errors the internet absorbed on its own is a smoke alarm going off when I make toast. The monitor keeps recording, and the per-channel file trims itself at 60 days. What I still don't have is the thing I wanted at the start: as far as I can tell, no one will tell me when the line goes bad.
 
-## Try This Yourself
+## Try this yourself
 
 The script, the Portainer stack file and a template for the settings are in [examples/modem-monitor](https://github.com/dwooods/dwooods.github.io/tree/main/examples/modem-monitor) in this blog's repo. If you want to try the idea, open your modem's own page, look at the event log and the uncorrectable errors, and see whether anything is writing them down for you. With a home server, a small container that reads that page every few minutes is an evening's work, and a heartbeat from [healthchecks.io](https://healthchecks.io) costs nothing at this scale. If your modem's page is shaped differently, or you find a fifth thing that makes a parser lie, I'd like to hear about it.
 
