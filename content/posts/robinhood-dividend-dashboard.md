@@ -135,9 +135,29 @@ I'd rather show than tell, so Claude built a shareable copy of the page on a mad
 
 <p align="center"><strong><a href="https://claude.ai/artifact/PBQkes53zewq1pNiPGYxZY">Open the live concept &rarr;</a></strong><br><em>Hover the charts, sort the columns, open a row. Sample data only.</em></p>
 
+## Update, November 5: the month with no bar
+
+In early November I opened Robinhood's dividend tracker and October had no bar. Not a short one, not a zero: nothing. January through September were green and November and December were gray, so the gap stood out. My own page had the same hole, for a different reason. Its received-dividends data stopped at the end of September.
+
+I asked whether the MCP server could fill it, and the answer is no. That's ask 2 from the list above showing up in practice. For each holding the server returns the next declared dividend: amount per share, frequency, pay date. Once that dividend pays, the fields roll forward to the following one. Nothing keeps the month that just ended, so a past month only fills in when I hand over an export.
+
+I didn't want to leave a hole, and I didn't want to paint a guess green. So the tracker got a third color.
+
+| Color | Means | Where it comes from |
+|---|---|---|
+| Green | Actual | My records: account exports, statements and the app's history |
+| Purple | Assumed | The last declared amount per share from each company's own announcement, times the shares I hold, on the expected pay date |
+| Gray | Projected | Future payments, live from the MCP server |
+
+Two rules keep purple honest. The "received" total counts green only, and the annual projection includes purple and says so. And a purple payment disappears the moment an export covers its date, so an assumption can't be double counted or turn into a fact without evidence.
+
+Before trusting the method I ran it on September, where I had real records. For the monthly payers, amount per share times shares matched what actually paid, to the cent. That's the difference between an estimate and a guess: the estimate has a track record. October's purple bar is built the same way. Some of its inputs are firmer than others: most pay dates come straight from company releases, and a couple I inferred from the usual schedule. I keep a note on each row saying which.
+
+What I don't know yet is why Robinhood's tracker skipped October. Several holdings pay monthly, so my numbers say there should be payments in it. A display gap, a posting lag and a classification quirk are all possible, and the answer is in October's export, which I haven't loaded. What I do know is that a second source turned a silent blank into a question I could ask.
+
 ## Lessons learned & what's next
 
-**The data lesson: know your source of truth.** Three times the page looked right and wasn't. I never asked which account the export covered, the first numbers went stale without looking stale, and the account chart looked like Robinhood's while meaning something else. The fix was always the same: decide what's real, treat everything else as an approximation, and say so on the page. Stale data that looks live is worse than an empty box.
+**The data lesson: know your source of truth.** Three times the page looked right and wasn't. I never asked which account the export covered, the first numbers went stale without looking stale, and the account chart looked like Robinhood's while meaning something else. The fix was always the same: decide what's real, treat everything else as an approximation, and say so on the page. Stale data that looks live is worse than an empty box. A blank month, in Robinhood's app and in mine, added the corollary: an empty box is only honest if it says what's missing.
 
 **The AI lesson: it builds what you ask, not what you meant.** Claude checked real data, flagged the reconstructed chart before I did, and told me what it had and hadn't tested. But it built the one-day chart exactly as I described it, and my description was wrong. Getting to a working version took minutes. Deciding whether it meant what I thought was still my job.
 
