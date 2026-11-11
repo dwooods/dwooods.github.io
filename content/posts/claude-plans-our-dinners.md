@@ -127,6 +127,12 @@ I tested the check by breaking it on purpose. A test that only passes proves not
 
 Here I overruled caution on purpose. I wanted setup to be easy for anyone trying this, and I wanted Claude to have full access instead of stopping to ask before each step. I also tested whether Claude's client would pause for a human yes before a delete. It didn't: it deleted in one call.
 
+Easy still meant that signing in happens at the command line and never through Claude. The sign-in command prints a Skylight URL; after I sign in, I paste back the address the browser lands on. The credential goes into the macOS Keychain, and no tool Claude can call will log in, log out or read it.
+
+![Terminal output of the sign-in command: a numbered list telling me to open the printed Skylight sign-in URL, which is redacted, then paste the final redirect address back, within 10 minutes](/images/claude-dinner-cli-login.png)
+
+*The first step of signing in. The long sign-in URL is redacted.*
+
 The risk is real. Claude could remove the wrong meal or the wrong event. But this is dinners on a family calendar, not money, and a wrong deletion costs me a minute of putting it back. So instead of a gate I asked for a record: one line for every change, with the tool, whether it was a write or a delete, the outcome and a running count, and deliberately no meal text and no IDs. There's also a cap of 60 changes and 10 deletes an hour, as a leash for a runaway loop.
 
 The record earned its place the night I shipped it. I made three calls four seconds apart and each log line said the running count was 1. The count lived in a variable on the server, and I couldn't count on a Worker keeping variables between requests, so the cap I'd just shipped wasn't capping anything. All the tests had passed, because in a test the variable does survive. The fix was to move the counter into a small piece of storage that does persist, and the next run counted up.
