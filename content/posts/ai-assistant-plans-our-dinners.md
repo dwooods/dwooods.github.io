@@ -51,7 +51,7 @@ I started from an open-source Skylight server that someone else wrote (credited 
 
 </div>
 
-The calendar is the only copy of the plan, because it's what the family looks at. A Google Doc is still created each week as a one-page view, easier to scan and share, though a poor meal plan.
+The calendar is the only copy of the plan, because it's what the family looks at. A Google Doc is still created each week, but it's for me: the whole week on one page, easy to scan and share.
 
 Four tools matter for dinners: one lists the meals on the calendar for a range of dates, one reads calendar events for the same dates, one plans a whole week at once, and one edits a single meal.
 
@@ -150,7 +150,7 @@ if (found) {
 }
 ```
 
-Everything else just gets a warning: a name over 25 characters, a dessert longer than two words, a cooking verb in the notes. Those have real exceptions, and the Friday run happens with nobody around, so a false block would just stall it. It isn't clever, either. It's keyword matching, so "(insert here)" would sail right through. I'm fine with that trade: a missed placeholder costs me a read, and a false alarm costs me the Friday run.
+Everything else just gets a warning: a name over 25 characters, a dessert longer than two words, a cooking verb in the notes. Those have real exceptions, so they only warn. It isn't clever, either. It's keyword matching, so "(insert here)" would sail right through. I'm fine with that trade: a missed placeholder costs me a read, and a false alarm costs me the Friday run.
 
 Then I tried to break it. I deleted the "url" keyword from the check and waited for the tests to fail. They all passed. So the tests weren't testing what I thought, and three more cases went in until breaking the check actually broke something.
 
@@ -158,7 +158,7 @@ Then I tried to break it. I deleted the "url" keyword from the check and waited 
 
 Here I overruled caution on purpose. I wanted setup to be easy for anyone trying this, and I wanted Duet to have full access instead of stopping to ask before each step. I also tested whether Duet's client would pause for a human yes before a delete. It didn't: it deleted in one call.
 
-Easy still meant that signing in happens at the command line and never through the assistant, and no tool Duet can call will log in, log out or read the credential. The project I started from wants your Skylight password in environment variables (settings a program reads when it starts), and I didn't want one in a config file any tool on the machine can read. So sign-in happens in the browser: I sign in, then paste back the address the browser lands on, and what gets stored is an encrypted credential keyed in the macOS Keychain, not the password. On Windows and Linux there's no Keychain equivalent wired in yet, so the credential sits in an unencrypted file that only your user account's permissions protect. The price is a clumsier first step. I took the flow from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
+Easy still meant sign-in never goes through the assistant: no tool Duet can call will log in, log out or read the credential. The project I started from wanted your Skylight password in environment variables (settings a program reads when it starts), and I didn't want a password where any tool on the machine could read it. So you sign in in the browser, and what's stored is a credential, not the password: encrypted with a key in the macOS Keychain on a Mac, and an unencrypted file protected only by your user account on Windows and Linux. I took that flow from another open-source Skylight project.
 
 The risk is real: Duet could remove the wrong meal or event. But this is a family calendar, not money, and for us a wrong deletion costs a minute. That's my risk tolerance, not advice. So instead of a gate I asked for a record: one line for every change, with the tool, whether it was a write or a delete, the outcome and a running count, and deliberately no meal text and no IDs. There's also a cap of 60 changes and 10 deletes an hour, as a leash for a runaway loop.
 
@@ -167,6 +167,8 @@ The record earned its place the night I shipped it. I made three calls four seco
 Then the scheduled part. The Friday run happens on a schedule, with nobody there to say yes, so its rule is blunt: draft, post the text, stop. It never writes, because a write needs my yes to the exact text, and that text shows on devices around the house where I can't recall it.
 
 ![Scheduled task list: Weekly dinner plan, Fridays](/images/claude-dinner-friday-task.png)
+
+<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;">The Friday task: it drafts and posts, but never writes.</p>
 
 Because Skylight's API is unofficial, a change in what it returns could break a tool without any error. The first place that would show is the unattended Friday run, so the day before there's a canary: every Thursday a scheduled Duet task runs five read-only checks, posts one line in its own channel, pass or fail, and emails me if one fails, so I know a day early that Friday's plan won't run and I need another way to plan that week. It uses the same read-only tools, so it needs no new credential. It shares fate with the server it checks, so a missing Thursday line is the signal.
 
@@ -184,7 +186,7 @@ It hasn't caught a real failure yet, so the alarm half is still untested.
 
 After the first week, my notes said: not easier yet. Eight messages to plan six dinners is not the time savings I'd promised myself. The next Friday went better, though I still changed things no rule covers: a sick week, and a night of cooking whatever was already in the fridge.
 
-By my estimate (not a stopwatch), doing it properly by hand takes two to four hours a week. In practice I never did it properly. I printed lists, gave up, and made a store run most mornings for whatever I'd found online that day. Now the meals show up on Friday, I review them, change what I want, send one prompt, and the week is on the calendar in under 20 minutes. That happens about half the weeks. The other half, someone's tired, plans move, nobody wants to cook, and takeout wins. Takeout always has a good pitch.
+By my estimate (not a stopwatch), doing it properly by hand takes two to four hours a week. In practice I never did it properly. I made a store run most mornings for whatever I'd found online that day. Now the meals show up on Friday, I review them, change what I want, send one prompt, and the week is on the calendar in under 20 minutes. That happens about half the weeks. The other half, someone's tired, plans move, nobody wants to cook, and takeout wins. Takeout always has a good pitch.
 
 Two weeks of long days won't pay back in hours any time soon. What I got back is the daily "what's for dinner?" search, which was the part I hated.
 
