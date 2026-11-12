@@ -63,10 +63,6 @@ I assumed the hard part would be the planning. The hard part was the server. Wit
 
 It was probably the longest and most boring part of the whole project. With real documentation you read what each call does. Without it, every tool meant sending the call, reading the response and trying a variant, over and over, by trial and error. I also built it for people who aren't me: more of the API than my family will use, a browser sign-in, local and hosted modes, Windows as well as Mac, and notes on what was and wasn't tested. It took about two weeks of long days, weekends included. After more than 200 commits, Skylight could still change any of it tomorrow.
 
-The iOS app showed things the web app doesn't. I watched its requests through a proxy tool called Proxyman. As far as I could tell, the web app can't delete or merge labels (Skylight's tags on events); the iOS app can. Delete turned out to be a plain `DELETE` on the label, returning 204, which is what my tool already sent. Merge is the same call with a target label added. I decided against a merge tool: what happens to a label that still has events was untested, and I don't plan to consolidate labels. Later I tested delete on a label with real events: events carrying only that label were removed, and events with a profile stayed and lost the label.
-
-I also compared 16 read endpoints between the API version my server defaults to and the one the apps send. Twelve came back identical, two (messages and avatars) differed in shape, and two (chores and rewards) were empty that day. The messages difference was a real bug: every message showed as sent to "selected devices" even when it went to everyone. This only compares shape; a change in meaning would be invisible.
-
 ### Tools & AI assist
 
 Two AI tools did different jobs. Claude built the server: it extended the open-source project, wrote its tests and turned my pasted captures into tool code, where it is genuinely faster than I am. Duet, an AI assistant I have through my Claude access, runs it each week: it drafts the dinners, previews each week before writing, then does the real writes, and handles the Friday run and the Thursday check. Any assistant that can call tools could do that job; Duet is the one I had. The hand-off wasn't clean, because Duet runs differently from the tool I built with. The header image was generated with Google's Nano Banana, and the people in it are AI-generated and fictional. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
@@ -163,7 +159,7 @@ Because Skylight's API is unofficial, a change in what it returns could break a 
 
 The first run passed five of five and, as intended, sent no email. I haven't watched a real failure arrive yet, so that half of the canary is still a plan.
 
-## What we learned along the way
+## Lessons
 
 | We learned | So now |
 |---|---|
@@ -174,9 +170,7 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 | Tests can pass for reasons that won't hold in production. A counter kept in a server variable passed every test and capped nothing. | The counter lives in a small persistent store. |
 | The assistant won't always pause before a delete. Duet's client deleted in one call. | A log of every change and an hourly cap, instead of a gate. |
 
-## Lessons
-
-**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. One client's screen is evidence about that client. As far as I could tell, the web app has no way to delete or merge a label; the iOS app does, and the call behind delete was already in my server.
+**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. As far as I could tell, the web app can't delete or merge labels (Skylight's tags on events); the iOS app can. Watching its requests through a proxy tool called Proxyman showed delete is a plain `DELETE` on the label, which my server already sent. I skipped merge, because what it does to a label that still has events was untested, and deleting a label with real events removed the events that carried only that label. The apps also send a different API version than my server's default. Of 16 read endpoints, twelve matched, two differed in shape and two were empty that day, and one difference was a real bug: every message showed as sent to "selected devices". That compares shape only; a change in meaning would be invisible.
 
 **The AI one.** Duet is very fast from a symptom to the next step. What it doesn't do is check that the evidence supports where it lands. It told me the plan document matched the calendar, and that a Friday routine would pick up a queued meal. Both sounded right; I had checked neither. Reading the week back from Skylight in a separate call and comparing it to the text I approved is my job, and it is cheap. A confident sentence is not a measurement.
 
