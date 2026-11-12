@@ -43,7 +43,7 @@ To reach Skylight, an assistant needs tools, and the standard way to give a chat
 
 ## How it fits together
 
-I started from an open-source Skylight server that someone else wrote (credited in the repo) and extended it. It runs on a Cloudflare Worker, a small program hosted on Cloudflare's network, so Duet can reach it from any chat without my laptop being on. I built it as an integration any AI assistant could use, not just Duet: a library, a local version and a hosted version, and I planned it so another calendar could replace Skylight later.
+I started from an open-source Skylight server that someone else wrote (credited in the repo) and extended it. It runs on a Cloudflare Worker, a small program hosted on Cloudflare's network, so Duet can reach it from any chat without my laptop being on. I built it as an integration any AI assistant could use, not just Duet: a library, a local version and a hosted version, and the design leaves room for someone to swap Skylight for another calendar, like Google Calendar, though that would take real rewriting.
 
 <div style="text-align:center;">
 
