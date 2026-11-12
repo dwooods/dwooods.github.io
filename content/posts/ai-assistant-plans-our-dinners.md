@@ -1,5 +1,5 @@
 ---
-title: "Teaching an AI Assistant to Plan Our Dinners (Without Putting '(plan doc URL)' on Every Screen in the House)"
+title: "I Hate Planning Meals, So I Gave an AI Assistant the Job"
 date: 2026-11-11
 draft: true
 featuredImage: "/images/hero-claude-plans-our-dinners.jpeg"
