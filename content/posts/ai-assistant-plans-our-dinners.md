@@ -67,8 +67,6 @@ It was probably the longest and most boring part of the whole project. Most of m
 
 Two AI tools did different jobs. Claude built the server: it extended the open-source project, wrote its tests and turned my pasted captures into tool code, where it is genuinely faster than I am. Duet, an AI assistant I have through my Claude access, runs it each week: it drafts the dinners, previews each week before writing, then does the real writes, and handles the Friday run and the Thursday check. Any assistant that can call tools could do that job; Duet is the one I had. The hand-off wasn't clean, because Duet runs differently from the tool I built with. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
 
-One miss doesn't fit below: our first prompt was a one-shot paste, because we assumed the chat had no place for standing instructions. It does; each channel has one.
-
 ## What went wrong
 
 ### The first run: eight messages for one week
