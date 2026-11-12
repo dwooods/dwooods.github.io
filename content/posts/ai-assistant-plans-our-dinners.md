@@ -53,7 +53,7 @@ I started from an open-source Skylight server that someone else wrote (credited 
 
 The calendar is the only copy of the plan, because it's what the family looks at. A Google Doc is still created each week as a one-page view, easier to scan and share, though a poor meal plan.
 
-Four tools matter for dinners: one lists the meals on the calendar for a range of dates, one reads calendar events for the same dates, one plans a whole week at once (with a "dry run" mode that writes nothing), and one edits a single meal.
+Four tools matter for dinners: one lists the meals on the calendar for a range of dates, one reads calendar events for the same dates, one plans a whole week at once, and one edits a single meal.
 
 The other half is a standing instruction: a block of text attached to the chat that tells Duet how to plan dinners this family's way. It has a hard limit of 2,000 characters, so the full version lives in my project notes and a compressed copy sits in the chat. Every rule in it exists because something went wrong once.
 
@@ -69,7 +69,7 @@ I also compared 16 read endpoints between the API version my server defaults to 
 
 ### Tools & AI assist
 
-Two AI tools did different jobs. Claude built the server: it extended the open-source project, wrote its tests and turned my pasted captures into tool code, where it is genuinely faster than I am. Duet, an AI assistant I have through my Claude access, runs it each week: it drafts the dinners, does the dry runs and the real writes, and handles the Friday run and the Thursday check. Any assistant that can call tools could do that job; Duet is the one I had. The hand-off wasn't clean, because Duet runs differently from the tool I built with. The header image was generated with Google's Nano Banana, and the people in it are AI-generated and fictional. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
+Two AI tools did different jobs. Claude built the server: it extended the open-source project, wrote its tests and turned my pasted captures into tool code, where it is genuinely faster than I am. Duet, an AI assistant I have through my Claude access, runs it each week: it drafts the dinners, previews each week before writing, then does the real writes, and handles the Friday run and the Thursday check. Any assistant that can call tools could do that job; Duet is the one I had. The hand-off wasn't clean, because Duet runs differently from the tool I built with. The header image was generated with Google's Nano Banana, and the people in it are AI-generated and fictional. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
 
 One miss doesn't fit below: our first prompt was a one-shot paste, because we assumed the chat had no place for standing instructions. It does; each channel has one.
 
