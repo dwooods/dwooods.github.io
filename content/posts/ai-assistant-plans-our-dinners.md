@@ -118,9 +118,13 @@ Meal names turned out to be harder than recipes. The wall display's month view c
 
 On the wall display a recipe link is plain text you can't tap, so nothing the cook needs at the stove can live only behind it. The instructions carry the steps with times and temperatures, and the link is a convenience.
 
+<div style="text-align:center;">
+
 ![Instructions box over its 2,000-character limit](/images/claude-dinner-instructions-limit.png)
 
-<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;">My full rules ran 7,077 characters against a 2,000 limit. Part of one line is covered by a grey box.</p>
+<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">My full rules ran 7,077 characters against a 2,000 limit. Part of one line is covered by a grey box.</p>
+
+</div>
 
 ### Making the server say no
 
