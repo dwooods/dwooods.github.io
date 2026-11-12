@@ -37,9 +37,9 @@ Skylight does have AI of its own. We pay for Skylight Plus, which includes Sidek
 
 </div>
 
-There's no official API or MCP server for Skylight either, as far as I can tell, so there was no way to bring my own assistant. I'd just gotten access to Duet, Claude's AI assistant, so I first tested whether it could write a weekly plan in a Google Doc, which it could. It looked promising, but nobody in my house is going to read a Google Doc, and I didn't want to retype what Duet wrote into a calendar. I could have used Google Calendar, but that sounded dull next to building an integration with Skylight over MCP. So the project became: Duet plans our meals into Skylight, the family keeps the app they know, and I stop planning by hand.
-
 To reach Skylight, an assistant needs tools, and the standard way to give a chat assistant tools is something called an MCP server. In plain words: a small program between the AI and another service that offers the AI a short menu of things it may do ("list the meals for these dates", "add this meal").
+
+There's no official API or MCP server for Skylight either, as far as I can tell, so there was no way to bring my own assistant. I'd just gotten access to Duet, Claude's AI assistant, so I first tested whether it could write a weekly plan in a Google Doc, which it could. It looked promising, but nobody in my house is going to read a Google Doc, and I didn't want to retype what Duet wrote into a calendar. I could have used Google Calendar, but that sounded dull next to building an integration with Skylight over MCP. So the project became: Duet plans our meals into Skylight, the family keeps the app they know, and I stop planning by hand.
 
 ## How it fits together
 
@@ -161,14 +161,7 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 
 ## Lessons
 
-| We learned | So now |
-|---|---|
-| A link you can't tap isn't delivery. | The instructions carry the steps; the link is a convenience. |
-| A check you've never broken may check nothing. | I removed the "url" keyword, the tests still passed, and cases were added until removing it failed. |
-| Tests can pass for reasons that won't hold in production. A counter kept in a server variable passed every test and capped nothing. | The counter lives in a small persistent store. |
-| The assistant won't always pause before a delete. Duet's client deleted in one call. | A log of every change and an hourly cap, instead of a gate. |
-
-**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. As far as I could tell, the web app can't delete or merge labels (Skylight's tags on events); the iOS app can. Watching its requests through a proxy tool called Proxyman showed delete is a plain `DELETE` on the label, which my server already sent. I skipped merge, because what it does to a label that still has events was untested, and deleting a label with real events removed the events that carried only that label. The apps also send a different API version than my server's default. Of 16 read endpoints, twelve matched, two differed in shape and two were empty that day, and one difference was a real bug: every message showed as sent to "selected devices". That compares shape only; a change in meaning would be invisible.
+**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. As far as I could tell, the web app can't delete labels; the iOS app can, and the call behind it was already in my server.
 
 **The AI one.** Duet is very fast from a symptom to the next step. What it doesn't do is check that the evidence supports where it lands. It told me the plan document matched the calendar, and that a Friday routine would pick up a queued meal. Both sounded right; I had checked neither. Reading the week back from Skylight in a separate call and comparing it to the text I approved is my job, and it is cheap. A confident sentence is not a measurement.
 
