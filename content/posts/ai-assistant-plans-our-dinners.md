@@ -118,20 +118,21 @@ Meal names turned out to be harder than recipes. The wall display's month view c
 
 On the wall display a recipe link is plain text you can't tap, so nothing the cook needs at the stove can live only behind it. The instructions carry the steps with times and temperatures, and the link is a convenience.
 
-<div style="max-width: 640px; margin: 0 auto;">
+<div style="display:flex;gap:24px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
+<div style="flex:1 1 320px;min-width:0;text-align:center;">
 
 ![A dinner entry in the calendar app](/images/claude-dinner-popup.png)
 
 <p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">A finished dinner entry as the family sees it. The link to our plan document is covered by a grey box.</p>
 
 </div>
-
-<div style="text-align:center;">
+<div style="flex:1 1 320px;min-width:0;text-align:center;">
 
 ![Instructions box over its 2,000-character limit](/images/claude-dinner-instructions-limit.png)
 
 <p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">My full rules ran 7,077 characters against a 2,000 limit. Part of one line is covered by a grey box.</p>
 
+</div>
 </div>
 
 ### Making the server say no
