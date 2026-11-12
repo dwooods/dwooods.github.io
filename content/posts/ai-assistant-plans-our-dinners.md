@@ -1,5 +1,5 @@
 ---
-title: "I Hate Planning Meals, So I Gave an AI Assistant the Job"
+title: "I Gave an AI Assistant a Chore I Hate. The Hard Part Was Building What It Needed"
 date: 2026-11-11
 draft: true
 featuredImage: "/images/hero-claude-plans-our-dinners.jpeg"
