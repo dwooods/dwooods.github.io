@@ -29,9 +29,9 @@ Then there's everything around the meals: planning the week, the grocery list, g
 
 We use Skylight, a calendar that lives on a wall display and in an app on our phones. My first attempt was just to see what was possible: Duet planned meals in a Google Doc. It worked, but my wife and the family use Skylight, and Duet couldn't reach it. The document also kept drifting from the calendar, and for a while there were two versions of the week that disagreed. The calendar is what the family actually looks at, so I decided it should be the only copy, and the document should be a grocery list and a recipe shelf.
 
-I also moved the planning day. It used to be Sunday, which is the day the plan week starts, so any mistake was found with groceries still unbought. Friday leaves two days to shop and to fix a draft before the week begins. It sounds like scheduling trivia, but it's why the rest of the setup had to run without me watching.
+I also moved the planning day. It used to be Sunday, which is the day the plan week starts, so any mistake was found with groceries still unbought. Friday leaves two days to shop and to fix a draft before the week begins. That's why the rest of the setup had to run without me watching.
 
-To reach Skylight, an assistant needs tools, and the standard way to give a chat assistant tools is something called an MCP server. In plain words: a small program that sits between the AI and some other service, and offers the AI a short menu of things it is allowed to do ("list the meals for these dates", "add this meal"). The AI asks, the program does it and reports back.
+To reach Skylight, an assistant needs tools, and the standard way to give a chat assistant tools is something called an MCP server. In plain words: a small program between the AI and another service that offers the AI a short menu of things it may do ("list the meals for these dates", "add this meal").
 
 Skylight doesn't publish documentation for an API, as far as I can tell, so there was nothing official to build against. What I did instead was open the Skylight web app, watch with my browser's developer tools what it sent when I added or edited a meal, and have Claude turn those requests into tools. I pasted only the request body and the response, never the headers that carry sign-in details.
 
@@ -41,7 +41,7 @@ I started from an open-source Skylight server that someone else wrote (credited 
 
 ![The assistant reads the plan and calendar, then calls my server, which writes to Skylight after I approve](/images/claude-dinner-planning-flow.svg)
 
-The tools that matter for dinners are few. One lists the meals already on the calendar for a range of dates. One reads calendar events for the same dates. One plans a whole week at once, with a "dry run" mode that shows what would happen without writing anything. And one edits a single existing meal.
+Four tools matter for dinners: one lists the meals on the calendar for a range of dates, one reads calendar events for the same dates, one plans a whole week at once (with a "dry run" mode that writes nothing), and one edits a single meal.
 
 The other half is a standing instruction: a block of text attached to the chat that tells Duet how to plan dinners this family's way. It has a hard limit of 2,000 characters, so the full version lives in my project notes and a compressed copy sits in the chat. Every rule in it exists because something went wrong once.
 
@@ -49,20 +49,15 @@ The other half is a standing instruction: a block of text attached to the chat t
 
 I assumed the hard part would be the planning. The hard part was the server. With nothing documented, each tool meant rounds of small tests: send the call, read the response, send a variant. I also built it for people who aren't me: more of the API than my family will use, a browser sign-in, local and hosted modes, Windows as well as Mac, and notes on what was and wasn't tested. It took about two weeks, weekends and my birthday included: most days from 9 a.m., after dropping the kids at school, and several nights until 11. After more than 200 commits, Skylight could still change any of it tomorrow.
 
-The iOS app showed things the web app doesn't. I watched its requests through a proxy tool called Proxyman. The web app can't delete or merge labels (Skylight's tags on events); the iOS app can. Delete turned out to be a plain `DELETE` on the label, returning 204, which is what my tool already sent. Merge is the same call with a target label added, returning 200 and the deleted record:
+The iOS app showed things the web app doesn't. I watched its requests through a proxy tool called Proxyman. As far as I could tell, the web app can't delete or merge labels (Skylight's tags on events); the iOS app can. Delete turned out to be a plain `DELETE` on the label, returning 204, which is what my tool already sent. Merge is the same call with a target label added. I decided against a merge tool: what happens to a label that still has events was untested, and I don't plan to consolidate labels. Later I tested delete on a label with real events: events carrying only that label were removed, and events with a profile stayed and lost the label.
 
-```text
-DELETE categories/{id}                                  -> 204
-DELETE categories/{id}?reassign_to_category_id={target} -> 200
-```
-
-I decided against a merge tool: what happens to a label that still has events was untested, and I don't plan to consolidate labels. Later I tested delete on a label with real events: events carrying only that label were removed, and events with a profile stayed and lost the label.
+I also compared 16 read endpoints between the API version my server defaults to and the one the apps send. Twelve came back identical, two (messages and avatars) differed in shape, and two (chores and rewards) were empty that day. The messages difference was a real bug: every message showed as sent to "selected devices" even when it went to everyone. This only compares shape; a change in meaning would be invisible.
 
 ### Tools & AI assist
 
 Two AI tools did different jobs. Claude built the server: it extended the open-source project, wrote its tests and turned my pasted captures into tool code, where it is genuinely faster than I am. Duet, an AI assistant I have through my Claude access, runs it each week: it drafts the dinners, does the dry runs and the real writes, and handles the Friday run and the Thursday check. Any assistant that can call tools could do that job; Duet is the one I had. The hand-off wasn't clean, because Duet runs differently from the tool I built with. The header image was generated with Google's Nano Banana, and the people in it are AI-generated and fictional. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
 
-The misses are named where they happened, below. One more doesn't fit there: our first prompt was a one-shot paste, because we assumed the chat had no place for standing instructions. It does; each channel has one.
+One miss doesn't fit below: our first prompt was a one-shot paste, because we assumed the chat had no place for standing instructions. It does; each channel has one.
 
 ## What went wrong
 
@@ -74,7 +69,7 @@ It took about eight messages to get one week onto the calendar, more than the Fr
 
 Before any of that came a setup cost I hadn't priced in: a tool menu doesn't tell an assistant how this household eats, so Duet needed the house rules stated once: one night a week is takeout, one is meatless, there's one dessert, which equipment we own, where the recipes come from. It also needed the calendar's limits: a name, a 500-character note and up to 2,000 characters of instructions, each with a job.
 
-Five things went wrong, and the tests had caught none of them. The plan document was built Monday to Sunday, but Skylight's week runs Sunday to Saturday. One dinner no longer fit, and the meatless night fell off the end of the week. The cause was an assumption stated in two places and clear in neither. The drafts held the literal placeholders I opened with. Duet fixed a typo after showing me a draft and mentioned it only at the end, a silent edit that makes "exact text" a lie. A cooking step turned up in a field meant for family notes. And Duet doubled or 1.5x-ed four of the five recipes on its own guess that we eat more than a recipe serves. I missed it in the plan. It surfaced only when I questioned one grocery line: three whole chickens for one dinner. Duet owned it: it had assumed bigger appetites unprompted.
+Five things went wrong, and the tests had caught none of them. The plan document was built Monday to Sunday, but Skylight's week runs Sunday to Saturday. One dinner no longer fit, and the meatless night fell off the end of the week. The assumption was stated in two places and clear in neither. The drafts held the literal placeholders I opened with. Duet fixed a typo after showing me a draft and mentioned it only at the end, a silent edit that makes "exact text" a lie. A cooking step turned up in a field meant for family notes. And Duet doubled or 1.5x-ed four of the five recipes on its own guess that we eat more than a recipe serves. I missed it in the plan. It surfaced only when I questioned one grocery line: three whole chickens for one dinner. Duet owned it: it had assumed bigger appetites unprompted.
 
 ![The Edit Meal screen: empty Instructions field, recipe steps in the note field below it](/images/claude-dinner-edit-meal.png)
 
@@ -101,7 +96,7 @@ Each rule traces to a failure above. If I could keep only one, it's the last: ha
 
 After the fixes, five dinners went in: one meal first, then the other four. I read the whole week back from Skylight in a separate call and compared it to what I'd approved. It matched.
 
-Even that first week bent for a plainer reason. My wife cooked two nights I had planned for: chicken tacos, with no dessert, and spaghetti and meatballs the next evening, my birthday dinner. We'd gone out on the day itself, and what I actually wanted was spaghetti and meatballs at home. I asked Duet to move the two displaced dinners to the following week. It picked days that were clear on both calendars, showed me the exact changes, and waited for a yes. Then it wrote the changes and read each one back against what I had approved.
+Even that first week bent for a plainer reason. My wife cooked two nights I had planned for: chicken tacos, with no dessert, and spaghetti and meatballs the next evening, my birthday dinner. We'd gone out on the day itself, and what I actually wanted was spaghetti and meatballs at home. I asked Duet to move the two displaced dinners to the following week. It picked days that were clear on both calendars, showed me the exact changes, and waited for a yes. Then it wrote them and read each one back.
 
 ### The wall display I photographed and the phone I should have asked about
 
@@ -117,7 +112,7 @@ On the wall display a recipe link is plain text you can't tap, so nothing the co
 
 ### Making the server say no
 
-After the first run I stopped trusting myself to be the only check. Everything I'd caught by reading, I wanted the server to catch too, at least the kind of mistake that has no legitimate form. A placeholder on a wall display is always damage. So the server now looks for them before it writes:
+After the first run I stopped trusting myself to be the only check. Everything I'd caught by reading, I wanted the server to catch too, at least mistakes with no legitimate form. A placeholder on a wall display is always damage, so the server now looks for them before it writes:
 
 ```ts
 // Text in (), [] or <> that stands in for something missing:
@@ -130,15 +125,15 @@ if (found) {
 }
 ```
 
-Errors refuse the write. Everything else is only a warning: a name over 25 characters, a dessert longer than two words, a cooking verb in a note. Those have legitimate exceptions, and a false block would stall the weekly run with nobody there to answer it. The trade-off is that this is keyword matching, so "(insert here)" slips through. I accepted that. A missed placeholder costs a human read; a false alarm costs a stalled run.
+Errors refuse the write. Everything else is only a warning: a name over 25 characters, a dessert longer than two words, a cooking verb in a note. Those have legitimate exceptions, and a false block would stall the weekly run with nobody there to answer it. The trade-off is that this is keyword matching, so "(insert here)" slips through. A missed placeholder costs a human read; a false alarm costs a stalled run.
 
-I tested the check by breaking it on purpose: I removed the "url" keyword and ran the tests. They still passed. That told me the tests weren't checking what I thought, so three cases were added until removing the keyword made them fail.
+I broke the check on purpose by removing the "url" keyword. The tests still passed, so they weren't checking what I thought; three cases were added until removing the keyword made them fail.
 
 ### Full access, and a log instead of a gate
 
 Here I overruled caution on purpose. I wanted setup to be easy for anyone trying this, and I wanted Duet to have full access instead of stopping to ask before each step. I also tested whether Duet's client would pause for a human yes before a delete. It didn't: it deleted in one call.
 
-Easy still meant that signing in happens at the command line and never through the assistant, and no tool Duet can call will log in, log out or read the credential. The project I started from wants your Skylight password in environment variables, and I didn't want one in a config file any tool on the machine can read. So sign-in happens in the browser: the command prints a Skylight URL, and after I sign in I paste back the address the browser lands on. What gets stored is an encrypted credential keyed in the macOS Keychain, not the password. The price is a clumsier first step, because that address has to be copied out of browser history. I didn't invent this flow: I took it from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
+Easy still meant that signing in happens at the command line and never through the assistant, and no tool Duet can call will log in, log out or read the credential. The project I started from wants your Skylight password in environment variables, and I didn't want one in a config file any tool on the machine can read. So sign-in happens in the browser: the command prints a Skylight URL, and after I sign in I paste back the address the browser lands on. What gets stored is an encrypted credential keyed in the macOS Keychain, not the password. The price is a clumsier first step: the address has to be copied out of browser history. I didn't invent this flow: I took it from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
 
 ```text
 node dist/index.js auth login
@@ -156,7 +151,7 @@ node dist/index.js auth login
    and paste the URL at the prompt. This login expires in 10 minutes.
 ```
 
-The risk is real. Duet could remove the wrong meal or the wrong event. But this is dinners on a family calendar, not money, and a wrong deletion costs me a minute of putting it back. So instead of a gate I asked for a record: one line for every change, with the tool, whether it was a write or a delete, the outcome and a running count, and deliberately no meal text and no IDs. There's also a cap of 60 changes and 10 deletes an hour, as a leash for a runaway loop.
+The risk is real: Duet could remove the wrong meal or event. But this is dinners on a family calendar, not money, and a wrong deletion costs a minute. So instead of a gate I asked for a record: one line for every change, with the tool, whether it was a write or a delete, the outcome and a running count, and deliberately no meal text and no IDs. There's also a cap of 60 changes and 10 deletes an hour, as a leash for a runaway loop.
 
 The record earned its place the night I shipped it. I made three calls four seconds apart and each log line said the running count was 1. The count lived in a variable on the server, and I couldn't count on a Worker keeping variables between requests, so the cap I'd just shipped wasn't capping anything. All the tests had passed, because in a test the variable does survive. The fix was to move the counter into a small piece of storage that does persist, and the next run counted up.
 
@@ -172,13 +167,13 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 
 ## Lessons
 
-**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. One client's screen is evidence about that client. The web app has no way to delete or merge a label; the iOS app does, and the call behind delete was already in my server.
+**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. One client's screen is evidence about that client. As far as I could tell, the web app has no way to delete or merge a label; the iOS app does, and the call behind delete was already in my server.
 
 **The AI one.** Duet is very fast from a symptom to the next step. What it doesn't do is check that the evidence supports where it lands. It told me the plan document matched the calendar, and that a Friday routine would pick up a queued meal. Both sounded right; I had checked neither. Reading the week back from Skylight in a separate call and comparing it to the text I approved is my job, and it is cheap. A confident sentence is not a measurement.
 
 **The one you can swap your own project into.** State every assumption once, as a number or a date, and test it with a check that can fail. The week boundary, the portion size, the name length and the placeholder were all the same mistake: something I assumed, never wrote down, and discovered only when a real family would have read it. Whatever you hand to an agent that writes where other people can see, write down what it must never leave behind, then break your own check to see it fire.
 
-My verdict from my notes after that first week: not easier yet. The test was always the second week. The next Friday run was better, though I still changed things for reasons no rule covers: a sick week, and a night of cooking whatever we already had. By my estimate (not a stopwatch), doing it properly by hand took two to four hours a week. In practice I never did: I printed lists, gave up, planned day to day and made a store run most mornings based on whatever I'd found online that morning. Now the meals arrive on Friday, I review them, change what I want and send one prompt, and a full week is in the calendar, shared with the family and documented in under 20 minutes. About half the weeks go that way. The rest bend when people are tired, events move or nobody wants to cook, and ordering food wins. Two weeks of long days won't pay back in hours any time soon. What I got back is the daily search for what to make.
+My verdict from my notes after that first week: not easier yet. The next Friday run was better, though I still changed things for reasons no rule covers: a sick week, and a night of cooking whatever we already had. By my estimate (not a stopwatch), doing it properly by hand took two to four hours a week. In practice I never did: I printed lists, gave up, planned day to day and made a store run most mornings based on whatever I'd found online that morning. Now the meals arrive on Friday, I review them, change what I want and send one prompt, and a full week is in the calendar, shared with the family and documented in under 20 minutes. About half the weeks go that way. The rest bend when people are tired, events move or nobody wants to cook, and ordering food wins. Two weeks of long days won't pay back in hours any time soon. What I got back is the daily search for what to make.
 
 ![The Meals view for the week, with two nights empty](/images/claude-dinner-week-meals.png)
 
