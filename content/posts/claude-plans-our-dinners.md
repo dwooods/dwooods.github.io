@@ -23,9 +23,11 @@ This is the story of how I got an AI to plan our weekly dinners and write them i
 
 ## Why I built this
 
-Every week I had a small chore that was never hard and never quite finished. Pick six dinners, check the calendar for the evenings that cut into cooking time, build a grocery list, and type all of it into the family calendar so that the wall display and the phone app show what's for dinner. We use Skylight, a calendar that lives on a wall display and in an app on our phones.
+For years my wife did most of the cooking. When I had a job I cooked now and then: something on the BBQ, pizza in the Ooni, pasta and a few other simple recipes I'd made many times. Then I lost my job, she had to work more, and dinner became mine along with more of the house. I'm not someone who picks varied meals, and it's tiring. The same few dishes on repeat get boring, and the family notices.
 
-The plan itself lived in a shared document that Claude and I both edited. That worked until it didn't: the document changed after a summary had been written from it, and for a while there were two versions of the week that disagreed. The calendar is what the family actually looks at. I decided the calendar should be the only copy, and the document should be a grocery list and a recipe shelf.
+Then there's everything around the meals: pick the week, check the calendar for the nights that cut into cooking time, build a grocery list, type it all into the family calendar, and do it again the next week. I hate processes that should be automated. What I wanted was someone else to research, plan and write it down each week, with me steering what works and what doesn't. Changes were the other tedious part: a plan that moved on short notice meant fixing a document and a calendar.
+
+We use Skylight, a calendar that lives on a wall display and in an app on our phones. The plan itself lived in a shared document that Claude and I both edited, until the document changed after a summary had been written from it and there were two versions of the week that disagreed. The calendar is what the family actually looks at, so I decided it should be the only copy, and the document should be a grocery list and a recipe shelf.
 
 I also moved the planning day. It used to be Sunday, which is the day the plan week starts, so any mistake was found with groceries still unbought. Friday leaves two days to shop and to fix a draft before the week begins. It sounds like scheduling trivia, but it's why the rest of the setup had to run without me watching.
 
@@ -186,7 +188,7 @@ The server is open source (MIT) and unofficial: it talks to endpoints Skylight d
 
 ---
 
-The moment I knew it worked was small. My wife mentioned that tomorrow's dinner looked good. I hadn't told her; she'd seen it on the calendar, and she was excited to try it. That reminded me I needed to go to the grocery store, and that week I made my first trip to an Asian market, for ingredients no local store carries. I'm the one cooking, and deciding what to cook is the part I hate. Planning was the problem worth automating, so that time now goes to cooking, and we've stopped eating the same handful of meals every week.
+The moment I knew it worked was small. My wife mentioned that tomorrow's dinner looked good. I hadn't told her; she'd seen it on the calendar, and she was excited to try it. That reminded me I needed to go to the grocery store, and that week I made my first trip to an Asian market, for ingredients no local store carries. Deciding was the part worth automating, so that time now goes to cooking, and we've stopped eating the same handful of meals every week.
 
 ![The front of a 99 Ranch Market: a gabled entrance with red lettering above a stone-faced wall](/images/claude-dinner-ranch-market.jpeg)
 
