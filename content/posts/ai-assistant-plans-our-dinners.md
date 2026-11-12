@@ -157,7 +157,13 @@ Then the scheduled part. The Friday run happens on a schedule, with nobody there
 
 Because Skylight's API is unofficial, a change in what it returns could break a tool without any error. The first place that would show is the unattended Friday run, so the day before there's a canary: every Thursday a scheduled Duet task runs five read-only checks, posts one line in its own channel, pass or fail, and emails me if one fails, so I know a day early that Friday's plan won't run and I need another way to plan that week. It uses the same read-only tools, so it needs no new credential. It shares fate with the server it checks, so a missing Thursday line is the signal.
 
+<div style="max-width: 640px; margin: 0 auto;">
+
 ![Canary channel: first run passes](/images/claude-dinner-canary.png)
+
+<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">Duet conversation about the canary running.</p>
+
+</div>
 
 The first run passed five of five and, as intended, sent no email. I haven't watched a real failure arrive yet, so that half of the canary is still a plan.
 
