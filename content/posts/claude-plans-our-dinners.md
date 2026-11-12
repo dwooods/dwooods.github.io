@@ -9,6 +9,8 @@ description: "I built an MCP server so Claude could write our weekly dinners int
 summary: "I gave Claude hands for the family calendar and asked it to plan a week of dinners. The first run nearly sent a literal placeholder to every screen in the house. Here is what I changed so the next run couldn't."
 ---
 
+*Header image: generated with Google's Nano Banana. The people in it are AI-generated.*
+
 Last week I almost put the words "(plan doc URL)" on every screen in my house.
 
 Not on purpose. Claude had drafted a week of dinners and shown them to me as "the exact text" for approval, and the drafts carried a literal placeholder where a link should have been. If I had typed "yes", those words would have gone to the wall display and every phone in the family, with a stray "(dessert name)" for company. I caught it because I was reading the drafts like a reviewer. No test caught it, because at that point there was no test that knew what a placeholder looked like.
@@ -125,7 +127,7 @@ I tested the check by breaking it on purpose: I removed the "url" keyword and ra
 
 Here I overruled caution on purpose. I wanted setup to be easy for anyone trying this, and I wanted Claude to have full access instead of stopping to ask before each step. I also tested whether Claude's client would pause for a human yes before a delete. It didn't: it deleted in one call.
 
-Easy still meant that signing in happens at the command line and never through Claude, and no tool Claude can call will log in, log out or read the credential. The project I started from tells you to put your Skylight email and password in environment variables, and the server logs in with them. I didn't want a password in a config file that any tool on the machine can read. So sign-in here happens in the browser: the command prints a Skylight URL, and after I sign in I paste back the address the browser lands on. What gets stored is an encrypted credential, with its key in the macOS Keychain, not the password. The price is a clumsier first step, because that address has to be copied out of browser history. The design is borrowed from another open-source Skylight project.
+Easy still meant that signing in happens at the command line and never through Claude, and no tool Claude can call will log in, log out or read the credential. The project I started from tells you to put your Skylight email and password in environment variables, and the server logs in with them. I didn't want a password in a config file that any tool on the machine can read. So sign-in here happens in the browser: the command prints a Skylight URL, and after I sign in I paste back the address the browser lands on. What gets stored is an encrypted credential, with its key in the macOS Keychain, not the password. The price is a clumsier first step, because that address has to be copied out of browser history. I didn't invent this flow: I took it from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
 
 ```text
 node dist/index.js auth login
@@ -147,10 +149,6 @@ The risk is real. Claude could remove the wrong meal or the wrong event. But thi
 
 The record earned its place the night I shipped it. I made three calls four seconds apart and each log line said the running count was 1. The count lived in a variable on the server, and I couldn't count on a Worker keeping variables between requests, so the cap I'd just shipped wasn't capping anything. All the tests had passed, because in a test the variable does survive. The fix was to move the counter into a small piece of storage that does persist, and the next run counted up.
 
-![One line from the change log in the hosting dashboard: tool plan_week_meals, effect write, outcome ok, recent 1](/images/claude-dinner-change-log.png)
-
-*One change-log line, from the night I found the counter wasn't counting.*
-
 Then the scheduled part. The Friday run happens on a schedule, with nobody there to say yes, so its rule is blunt: draft, post the text, stop. It never writes, because a write needs my yes to the exact text, and that text shows on devices around the house where I can't recall it.
 
 ![The scheduled task list showing "Weekly dinner plan (Fridays)", every Friday at 10:47 AM](/images/claude-dinner-friday-task.png)
@@ -171,7 +169,7 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 
 **The one you can swap your own project into.** State every assumption once, as a number or a date, and test it with a check that can fail. The week boundary, the portion size, the name length and the placeholder were all the same mistake: something I assumed, never wrote down, and discovered only when a real family would have read it. Whatever you hand to an agent that writes where other people can see, write down what it must never leave behind, and then break your own check to see that it fires.
 
-Even that first week bent for a plainer reason. My wife cooked two nights I had planned for: chicken tacos, with no dessert, and spaghetti and meatballs the next evening, my birthday dinner. We'd gone out on the day itself, and what I actually wanted was spaghetti and meatballs at home. I asked Claude to move the two displaced dinners to the following week. It picked days that were clear on both calendars, showed me the exact changes, and waited for a yes. It rewrote one note, because the practice that shaped it had been a Friday-only thing. Then it wrote the changes and read each one back against what I had approved.
+Even that first week bent for a plainer reason. My wife cooked two nights I had planned for: chicken tacos, with no dessert, and spaghetti and meatballs the next evening, my birthday dinner. We'd gone out on the day itself, and what I actually wanted was spaghetti and meatballs at home. I asked Claude to move the two displaced dinners to the following week. It picked days that were clear on both calendars, showed me the exact changes, and waited for a yes. Then it wrote the changes and read each one back against what I had approved.
 
 My verdict from my notes after that first week: not easier yet. The test was always the second week. The next Friday run was better, though I still changed things for reasons no rule covers: a sick week, and a night of cooking whatever we already had. Overall it worked, and by my estimate (not a stopwatch) it saves me hours of looking up and planning meals. Claude also checks the plan against the calendar and flags conflicts I missed.
 
