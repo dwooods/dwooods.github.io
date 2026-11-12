@@ -29,13 +29,7 @@ I use AI for all sorts of projects, and this looked like a real problem to hand 
 
 Skylight has no official way to automate meal planning. I'd just gotten access to Duet, so I first tested whether it could write a weekly plan in a Google Doc, which it could. It looked promising, but nobody in my house is going to read a Google Doc, and I didn't want to retype what Duet wrote into a calendar. I could have used Google Calendar, but that sounded dull next to building an integration with Skylight over MCP. That's when the skylight-mcp project started.
 
-The calendar is what the family looks at, so it is the only copy of the plan. The document is still created each week: it puts the whole week on one page, easier to scan than meals spread across days, and easier to share, though a poor meal plan.
-
-I also moved the planning day. I'd planned on Saturday for a Monday-to-Sunday week, but Skylight's week runs Sunday to Saturday, so the first version of the document didn't line up with the calendar and I reworked the plan. Friday for a Sunday-to-Saturday week fixes that and leaves two days to shop and fix a draft. Duet had to be told the new day, and the weekly check moved to Thursday.
-
 To reach Skylight, an assistant needs tools, and the standard way to give a chat assistant tools is something called an MCP server. In plain words: a small program between the AI and another service that offers the AI a short menu of things it may do ("list the meals for these dates", "add this meal").
-
-Skylight doesn't publish documentation for an API, as far as I can tell, so there was nothing official to build against. What I did instead was open the Skylight web app, watch with my browser's developer tools what it sent when I added or edited a meal, and have Claude turn those requests into tools. I pasted only the request body and the response, never the headers that carry sign-in details.
 
 ## How it fits together
 
@@ -43,13 +37,17 @@ I started from an open-source Skylight server that someone else wrote (credited 
 
 ![The assistant reads the plan and calendar, then calls my server, which writes to Skylight after I approve](/images/claude-dinner-planning-flow.svg)
 
+The calendar is the only copy of the plan, because it's what the family looks at. A Google Doc is still created each week as a one-page view, easier to scan and share, though a poor meal plan.
+
 Four tools matter for dinners: one lists the meals on the calendar for a range of dates, one reads calendar events for the same dates, one plans a whole week at once (with a "dry run" mode that writes nothing), and one edits a single meal.
 
 The other half is a standing instruction: a block of text attached to the chat that tells Duet how to plan dinners this family's way. It has a hard limit of 2,000 characters, so the full version lives in my project notes and a compressed copy sits in the chat. Every rule in it exists because something went wrong once.
 
 ### What took longer than the dinners
 
-I assumed the hard part would be the planning. The hard part was the server. With nothing documented, each tool meant rounds of small tests: send the call, read the response, send a variant. I also built it for people who aren't me: more of the API than my family will use, a browser sign-in, local and hosted modes, Windows as well as Mac, and notes on what was and wasn't tested. It took about two weeks, weekends and my birthday included: most days from 9 a.m., after dropping the kids at school, and several nights until 11. After more than 200 commits, Skylight could still change any of it tomorrow.
+I assumed the hard part would be the planning. The hard part was the server. Skylight doesn't publish documentation for an API, as far as I can tell, so there was nothing official to build against. I opened the web app, watched with my browser's developer tools what it sent when I added or edited a meal, and had Claude turn those requests into tools. I pasted only the request body and the response, never the headers that carry sign-in details.
+
+It was probably the longest and most boring part of the whole project. With real documentation you read what each call does. Without it, every tool meant sending the call, reading the response and trying a variant, over and over, by trial and error. I also built it for people who aren't me: more of the API than my family will use, a browser sign-in, local and hosted modes, Windows as well as Mac, and notes on what was and wasn't tested. It took about two weeks, weekends and my birthday included: most days from 9 a.m., after dropping the kids at school, and several nights until 11. After more than 200 commits, Skylight could still change any of it tomorrow.
 
 The iOS app showed things the web app doesn't. I watched its requests through a proxy tool called Proxyman. As far as I could tell, the web app can't delete or merge labels (Skylight's tags on events); the iOS app can. Delete turned out to be a plain `DELETE` on the label, returning 204, which is what my tool already sent. Merge is the same call with a target label added. I decided against a merge tool: what happens to a label that still has events was untested, and I don't plan to consolidate labels. Later I tested delete on a label with real events: events carrying only that label were removed, and events with a profile stayed and lost the label.
 
@@ -71,7 +69,7 @@ It took about eight messages to get one week onto the calendar, more than the Fr
 
 Before any of that came a setup cost I hadn't priced in: a tool menu doesn't tell an assistant how this household eats, so Duet needed the house rules stated once: one night a week is takeout, one is meatless, there's one dessert, which equipment we own, where the recipes come from. It also needed the calendar's limits: a name, a 500-character note and up to 2,000 characters of instructions, each with a job.
 
-Five things went wrong, and the tests had caught none of them. The plan document was built Monday to Sunday, but Skylight's week runs Sunday to Saturday. One dinner no longer fit, and the meatless night fell off the end of the week. The assumption was stated in two places and clear in neither. The drafts held literal placeholders, like "(plan doc URL)" where the link to our shared meal-plan Google Doc belonged. Duet fixed a typo after showing me a draft and mentioned it only at the end, a silent edit that makes "exact text" a lie. A cooking step turned up in a field meant for family notes. And Duet doubled or 1.5x-ed four of the five recipes on its own guess that we eat more than a recipe serves. I missed it in the plan. It surfaced only when I questioned one grocery line: three whole chickens for one dinner. Duet owned it: it had assumed bigger appetites unprompted.
+Five things went wrong, and the tests had caught none of them. The plan document was built Monday to Sunday, but Skylight's week runs Sunday to Saturday. One dinner no longer fit, and the meatless night fell off the end of the week. The drafts held literal placeholders, like "(plan doc URL)" where the link to our shared meal-plan Google Doc belonged. Duet fixed a typo after showing me a draft and mentioned it only at the end, a silent edit that makes "exact text" a lie. A cooking step turned up in a field meant for family notes. And Duet doubled or 1.5x-ed four of the five recipes on its own guess that we eat more than a recipe serves. I missed it in the plan. It surfaced only when I questioned one grocery line: three whole chickens for one dinner. Duet owned it: it had assumed bigger appetites unprompted.
 
 ![The Edit Meal screen: empty Instructions field, recipe steps in the note field below it](/images/claude-dinner-edit-meal.png)
 
@@ -150,6 +148,17 @@ Because Skylight's API is unofficial, a change in what it returns could break a 
 ![The canary channel chat: email alert, Thursday schedule, first run passes](/images/claude-dinner-canary.png)
 
 The first run passed five of five and, as intended, sent no email. I haven't watched a real failure arrive yet, so that half of the canary is still a plan.
+
+## What we learned along the way
+
+| We learned | So now |
+|---|---|
+| Plan to the app's week. Skylight's runs Sunday to Saturday; I'd planned Monday to Sunday. | Planning moved from Saturday to Friday and the check to Thursday; Duet had to be told. |
+| Design for the screen people use. The wall display clips names at about 18 characters; phones show them in full. | Names aim for 25 characters, never over 35. The plain dish name is the name; the detail goes in the instructions. |
+| A link you can't tap isn't delivery. | The instructions carry the steps; the link is a convenience. |
+| A check you've never broken may check nothing. | I removed the "url" keyword, the tests still passed, and I added cases until removing it failed. |
+| Tests can pass for reasons that won't hold in production. A counter kept in a server variable passed every test and capped nothing. | The counter lives in a small persistent store. |
+| The assistant won't always pause before a delete. Duet's client deleted in one call. | A log of every change and an hourly cap, instead of a gate. |
 
 ## Lessons
 
