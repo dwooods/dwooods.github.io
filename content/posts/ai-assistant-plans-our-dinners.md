@@ -201,6 +201,6 @@ The server is open source (MIT) and unofficial: it talks to endpoints Skylight d
 - Code and README: [github.com/dwooods/skylight-mcp](https://github.com/dwooods/skylight-mcp)
 - Package: `@davidwoods/skylight-mcp` on npm
 
----
+## The part that made it worth it
 
 The moment I knew it worked was small. My wife mentioned that tomorrow's dinner looked good. I hadn't told her; she'd seen it on the calendar. On Tuesday I cooked the [green chicken enchiladas](https://damndelicious.net/2019/03/01/green-chicken-enchiladas/), and the family loved them. Left to me, it would have been one of our usual handful of meals again. Duet picked something we like and don't cook often, and I didn't have to think about it.
