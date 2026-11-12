@@ -1,6 +1,6 @@
 ---
 title: "I Gave an AI Assistant a Chore I Hate. The Hard Part Was Building What It Needed"
-date: 2026-11-11
+date: 2026-11-12
 draft: false
 featuredImage: "/images/hero-claude-plans-our-dinners.jpeg"
 featuredImagePreview: "/images/hero-claude-plans-our-dinners.jpeg"
@@ -27,7 +27,7 @@ I got laid off, my wife picked up more shifts, and I had the time, so I took ove
 
 I use AI for all sorts of projects, and this looked like a real problem to hand one. My old process was printing each meal and handing the pages to my wife. I wanted to plan a week ahead and have her check it in Skylight: a 15-inch Skylight Calendar touchscreen on our wall, plus its app on our phones, which we already used for events and had never used for meals.
 
-Skylight does have AI of its own. We pay for Skylight Plus, which includes Sidekick, though I'd never tried it until I sat down to write this. I typed "chicken, burgers, pasta, Asian, Italian", picked seven days and four people, and got seven dinners: all chicken, three of them chicken burgers. That's partly on me for typing "burgers". But it's a meal generator, not an assistant. It filled every night I picked without checking the calendar it lives in, so as far as I could see, a date night still gets a dinner. The recipes are generated, not ones from sites I use and can check. I couldn't tell whether it can run each week on its own, any change after the plan is mine to make by hand, and there's no back and forth. I wanted to stop managing meals, not move where I manage them.
+Skylight does have AI of its own. We pay for Skylight Plus, which includes Sidekick, though I'd never tried it until I sat down to write this. I typed "chicken, burgers, pasta, Asian, Italian", picked seven days and four people, and got seven dinners: all chicken, three of them chicken burgers. That's partly on me for typing "burgers". But it's a meal generator, not an assistant. It filled every night I picked without checking the family calendar, so as far as I could see, a date night still gets a dinner. The recipes are generated, not ones from sites I use and can check. I couldn't tell whether it can run each week on its own, any change after the plan is mine to make by hand, and there's no back and forth. I wanted to stop managing meals, not move where I manage them.
 
 <div style="max-width: 320px; margin: 0 auto;">
 
@@ -43,7 +43,7 @@ There's no official API or MCP server for Skylight either, as far as I can tell,
 
 ## How it fits together
 
-I started from an open-source Skylight server that someone else wrote (credited in the repo) and extended it. It runs on a Cloudflare Worker, a small program hosted on Cloudflare's network, so Duet can reach it from any chat without my laptop being on. I built it as an integration any AI assistant could use, not just Duet: a library, a local version and a hosted version, and the design leaves room for someone to swap Skylight for another calendar, like Google Calendar, though that would take real rewriting.
+I started from an open-source Skylight server that someone else wrote (credited in the repo) and extended it. It runs on a Cloudflare Worker, a small program hosted on Cloudflare's network, so Duet can reach it from any chat without my laptop being on. I built it so any AI assistant could use it, not just Duet.
 
 <div style="text-align:center;">
 
@@ -59,7 +59,7 @@ The other half is a standing instruction: a block of text attached to the chat t
 
 ### What took longer than the dinners
 
-I assumed the hard part would be the planning. The hard part was the server. With no official API, there was nothing to build against. I opened the web app, watched with my browser's developer tools what it sent when I added or edited a meal, and had Claude turn those requests into tools. I pasted only the request body and the response, never the headers that carry sign-in details.
+I assumed the hard part would be the planning. The hard part was the server. With no official API, there was nothing to build against. I opened the web app, watched with my browser's developer tools what it sent when I added or edited a meal, and had Claude turn those requests into tools. I pasted the request and response data into Claude, but left out the headers that carry sign-in details.
 
 It was probably the longest and most boring part of the whole project. Most of my career as a product manager has involved APIs, including building a developer portal, so I know what good documentation saves you: you read what each call does and how the people who built it meant it to be used. Without it, every tool meant sending the call, reading the response and trying a variant, over and over, by trial and error. That's also why I built it for people who aren't me: more of the API than my family will use, a browser sign-in, local and hosted modes, Windows as well as Mac, and notes on what was and wasn't tested, so the next person doesn't have to repeat it. I took as few shortcuts as I could, for a side project nobody is paying me for. It took about two weeks of long days, weekends included. After more than 200 commits, Skylight could still change any of it tomorrow.
 
@@ -158,9 +158,9 @@ Then I tried to break it. I deleted the "url" keyword from the check and waited 
 
 Here I overruled caution on purpose. I wanted setup to be easy for anyone trying this, and I wanted Duet to have full access instead of stopping to ask before each step. I also tested whether Duet's client would pause for a human yes before a delete. It didn't: it deleted in one call.
 
-Easy still meant that signing in happens at the command line and never through the assistant, and no tool Duet can call will log in, log out or read the credential. The project I started from wants your Skylight password in environment variables, and I didn't want one in a config file any tool on the machine can read. So sign-in happens in the browser: I sign in, then paste back the address the browser lands on, and what gets stored is an encrypted credential keyed in the macOS Keychain, not the password. On Windows and Linux there's no Keychain equivalent wired in yet, so the credential sits in an unencrypted file that only your user account's permissions protect. The price is a clumsier first step. I took the flow from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
+Easy still meant that signing in happens at the command line and never through the assistant, and no tool Duet can call will log in, log out or read the credential. The project I started from wants your Skylight password in environment variables (settings a program reads when it starts), and I didn't want one in a config file any tool on the machine can read. So sign-in happens in the browser: I sign in, then paste back the address the browser lands on, and what gets stored is an encrypted credential keyed in the macOS Keychain, not the password. On Windows and Linux there's no Keychain equivalent wired in yet, so the credential sits in an unencrypted file that only your user account's permissions protect. The price is a clumsier first step. I took the flow from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
 
-The risk is real: Duet could remove the wrong meal or event. But this is dinners on a family calendar, not money, and a wrong deletion costs a minute. So instead of a gate I asked for a record: one line for every change, with the tool, whether it was a write or a delete, the outcome and a running count, and deliberately no meal text and no IDs. There's also a cap of 60 changes and 10 deletes an hour, as a leash for a runaway loop.
+The risk is real: Duet could remove the wrong meal or event. But this is a family calendar, not money, and for us a wrong deletion costs a minute. That's my risk tolerance, not advice. So instead of a gate I asked for a record: one line for every change, with the tool, whether it was a write or a delete, the outcome and a running count, and deliberately no meal text and no IDs. There's also a cap of 60 changes and 10 deletes an hour, as a leash for a runaway loop.
 
 The record earned its place the night I shipped it. I made three calls four seconds apart and each log line said the running count was 1. The count lived in a variable on the server, and I couldn't count on a Worker keeping variables between requests, so the cap I'd just shipped wasn't capping anything. All the tests had passed, because in a test the variable does survive. The fix was to move the counter into a small piece of storage that does persist, and the next run counted up.
 
