@@ -45,7 +45,11 @@ To reach Skylight, an assistant needs tools, and the standard way to give a chat
 
 I started from an open-source Skylight server that someone else wrote (credited in the repo) and extended it. It runs on a Cloudflare Worker, a small program hosted on Cloudflare's network, so Duet can reach it from any chat without my laptop being on. I built it as an integration any AI assistant could use, not just Duet: a library, a local version and a hosted version, and I planned it so another calendar could replace Skylight later.
 
+<div style="text-align:center;">
+
 ![The assistant reads the plan and calendar, then calls my server, which writes to Skylight after I approve](/images/claude-dinner-planning-flow.svg)
+
+</div>
 
 The calendar is the only copy of the plan, because it's what the family looks at. A Google Doc is still created each week as a one-page view, easier to scan and share, though a poor meal plan.
 
