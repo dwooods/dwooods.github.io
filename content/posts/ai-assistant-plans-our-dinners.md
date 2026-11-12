@@ -165,7 +165,7 @@ Because Skylight's API is unofficial, a change in what it returns could break a 
 
 </div>
 
-The first run passed five of five and, as intended, sent no email. I haven't watched a real failure arrive yet, so that half of the canary is still a plan.
+It hasn't caught a real failure yet, so the alarm half is still untested.
 
 ## Lessons
 
