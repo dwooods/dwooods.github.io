@@ -15,9 +15,9 @@ I'm terrible at planning meals, and for the past two months it has been my job. 
 
 <div style="max-width: 640px; margin: 0 auto;">
 
-![A dinner entry in the calendar app](/images/claude-dinner-popup.png)
+![Week of dinners, two nights empty](/images/claude-dinner-week-meals.png)
 
-<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">A finished dinner entry as the family sees it. The link to our plan document is covered by a grey box.</p>
+<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">The app's Meals view, filtered to dinners. The two empty nights are on purpose.</p>
 
 </div>
 
@@ -118,6 +118,14 @@ Meal names turned out to be harder than recipes. The wall display's month view c
 
 On the wall display a recipe link is plain text you can't tap, so nothing the cook needs at the stove can live only behind it. The instructions carry the steps with times and temperatures, and the link is a convenience.
 
+<div style="max-width: 640px; margin: 0 auto;">
+
+![A dinner entry in the calendar app](/images/claude-dinner-popup.png)
+
+<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">A finished dinner entry as the family sees it. The link to our plan document is covered by a grey box.</p>
+
+</div>
+
 <div style="text-align:center;">
 
 ![Instructions box over its 2,000-character limit](/images/claude-dinner-instructions-limit.png)
@@ -173,17 +181,18 @@ It hasn't caught a real failure yet, so the alarm half is still untested.
 
 ## Lessons
 
-**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. As far as I could tell, the web app can't delete labels (Skylight's tags on events); the iOS app can, and the call behind it was already in my server.
+After the first week, my notes said: not easier yet. Eight messages to plan six dinners is not the time savings I'd promised myself. The next Friday went better, though I still changed things no rule covers: a sick week, and a night of cooking whatever was already in the fridge.
 
-**The AI one.** Duet is very fast from a symptom to the next step. What it doesn't do is check that the evidence supports where it lands. It told me the plan document matched the calendar, and that a Friday routine would pick up a queued meal. Both sounded right; I had checked neither. Reading the week back from Skylight in a separate call and comparing it to the text I approved is my job, and it is cheap. A confident sentence is not a measurement.
+By my estimate (not a stopwatch), doing it properly by hand takes two to four hours a week. In practice I never did it properly. I printed lists, gave up, and made a store run most mornings for whatever I'd found online that day. Now the meals show up on Friday, I review them, change what I want, send one prompt, and the week is on the calendar in under 20 minutes. That happens about half the weeks. The other half, someone's tired, plans move, nobody wants to cook, and takeout wins. Takeout always has a good pitch.
 
-**The one you can swap your own project into.** State every assumption once, as a number or a date, and test it with a check that can fail. The week boundary, the portion size, the name length and the placeholder were all the same mistake: something I assumed, never wrote down, and discovered only when a real family would have read it. Whatever you hand to an agent that writes where other people can see, write down what it must never leave behind, then break your own check to see it fire.
+Two weeks of long days won't pay back in hours any time soon. What I got back is the daily "what's for dinner?" search, which was the part I hated.
 
-My verdict from my notes after that first week: not easier yet. The next Friday run was better, though I still changed things for reasons no rule covers: a sick week, and a night of cooking whatever we already had. By my estimate (not a stopwatch), doing it properly by hand took two to four hours a week. In practice I never did: I printed lists, gave up, planned day to day and made a store run most mornings based on whatever I'd found online that morning. Now the meals arrive on Friday, I review them, change what I want and send one prompt, and a full week is in the calendar, shared with the family and documented in under 20 minutes. About half the weeks go that way. The rest bend when people are tired, events move or nobody wants to cook, and ordering food wins. Two weeks of long days won't pay back in hours any time soon. What I got back is the daily search for what to make.
+| Lesson | What taught me |
+|---|---|
+| "The UI doesn't offer it" is weak evidence the API lacks it. | As far as I could tell, the web app can't delete labels (Skylight's tags on events). The iOS app can, and the call behind it was already in my server. |
+| A confident sentence is not a measurement. | Duet told me the plan document matched the calendar, and that a Friday routine would pick up a queued meal. Both sounded right; I had checked neither. Reading the week back from Skylight is my job, and it's cheap. |
 
-![Week of dinners, two nights empty](/images/claude-dinner-week-meals.png)
-
-<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;">The app's Meals view, filtered to dinners. The two empty nights are on purpose.</p>
+**The one you can steal for your own project.** State every assumption once, as a number or a date, and test it with a check that can fail. The week boundary, the portion size, the name length and the placeholder were all the same mistake: something I assumed, never wrote down, and found out about only when my family was about to read it. Whatever you hand to an agent that writes where other people can see, write down what it must never leave behind, then break your own check to see it fire.
 
 ## Try it yourself
 
