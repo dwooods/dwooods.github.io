@@ -71,17 +71,21 @@ Two AI tools did different jobs. Claude built the server: it extended the open-s
 
 ### The first run: eight messages for one week
 
-For the first real run I started with a dry run: read the calendar and the meals, draft six dinners, show everything, write nothing.
+The first run was me learning how to teach Duet, and my first time handing real work to an AI assistant. You can't just say "plan meals" and expect it to come out the way you pictured it. I started with a dry run: read the calendar and the meals, draft six dinners, show everything, write nothing. It took about eight messages to get one week onto the calendar, more than the chore it was supposed to replace.
 
-It took about eight messages to get one week onto the calendar, more than the Friday chore it was supposed to replace.
+Most of what makes a week work, I hadn't told it:
 
-Before any of that came a setup cost I hadn't priced in: a tool menu doesn't tell an assistant how this household eats, so Duet needed the house rules stated once: one night a week is takeout, one is meatless, there's one dessert, which equipment we own, where the recipes come from. It also needed the calendar's limits: a name, a 500-character note and up to 2,000 characters of instructions, each with a job.
+- House rules: one takeout night, one meatless night, one dessert, the equipment we own, where the recipes come from.
+- Meals that differ from each other across the week.
+- The rest of the calendar: nights that need a fast dinner, and nights like date night that need none.
 
-Five things went wrong, and the tests had caught none of them. The plan document was built Monday to Sunday, but Skylight's week runs Sunday to Saturday. One dinner no longer fit, and the meatless night fell off the end of the week. The drafts held literal placeholders, like "(plan doc URL)" where the link to our shared meal-plan Google Doc belonged. Duet fixed a typo after showing me a draft and mentioned it only at the end, a silent edit that makes "exact text" a lie. A cooking step turned up in a field meant for family notes. And Duet doubled or 1.5x-ed four of the five recipes on its own guess that we eat more than a recipe serves. I missed it in the plan. It surfaced only when I questioned one grocery line: three whole chickens for one dinner. Duet owned it: it had assumed bigger appetites unprompted.
+Five things went wrong, and the tests caught none of them:
 
-![Recipe steps in the note field, Instructions empty](/images/claude-dinner-edit-meal.png)
-
-<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;">An early dinner entry, family details covered by grey boxes. The recipe steps landed in the note field and Instructions is empty.</p>
+- The plan ran Monday to Sunday, but Skylight's week runs Sunday to Saturday, so one dinner no longer fit and the meatless night fell off the end.
+- The drafts held literal placeholders, like "(plan doc URL)" where the link to our meal-plan Google Doc belonged.
+- Duet fixed a typo after showing me a draft and mentioned it only at the end, a silent edit that makes "exact text" a lie.
+- A cooking step landed in a field meant for family notes.
+- Duet doubled or 1.5x-ed four of the five recipes on its own guess. I missed it until one grocery line: three whole chickens for one dinner.
 
 The fix was to turn each surprise into a sentence in the standing instructions. Here is the shape of the rules, trimmed:
 
@@ -104,7 +108,7 @@ Each rule traces to a failure above. If I could keep only one, it's the last: ha
 
 After the fixes, five dinners went in: one meal first, then the other four. I read the whole week back from Skylight in a separate call and compared it to what I'd approved. It matched.
 
-Even that first week bent for a plainer reason. My wife cooked two nights I had planned for: chicken tacos, with no dessert, and spaghetti and meatballs the next evening, my birthday dinner. We'd gone out on the day itself, and what I actually wanted was spaghetti and meatballs at home. I asked Duet to move the two displaced dinners to the following week. It picked days that were clear on both calendars, showed me the exact changes, and waited for a yes. Then it wrote them and read each one back.
+Even that first week bent. My wife cooked two of my planned nights, one of them my birthday dinner, so I asked Duet to move them to the following week. It picked days that were clear on both calendars, showed me the changes, waited for a yes, then wrote them and read each one back.
 
 ### The wall display I photographed and the phone I should have asked about
 
