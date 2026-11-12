@@ -27,7 +27,17 @@ I got laid off, my wife picked up more shifts, and I had the time, so I took ove
 
 I use AI for all sorts of projects, and this looked like a real problem to hand one. My old process was printing each meal and handing the pages to my wife. I wanted to plan a week ahead and have her check it in Skylight, the calendar on our wall display and phones, which we already used for events and had never used for meals.
 
-Skylight has no official way to automate meal planning. I'd just gotten access to Duet, so I first tested whether it could write a weekly plan in a Google Doc, which it could. It looked promising, but nobody in my house is going to read a Google Doc, and I didn't want to retype what Duet wrote into a calendar. I could have used Google Calendar, but that sounded dull next to building an integration with Skylight over MCP. That's when the skylight-mcp project started.
+Skylight does have AI of its own. We pay for Skylight Plus, which includes Sidekick, though I'd never tried it until I sat down to write this. I typed "chicken, burgers, pasta, Asian, Italian", picked seven days and four people, and got seven dinners: all chicken, three of them chicken burgers. That's partly on me for typing "burgers". But it's a meal generator, not an assistant. It filled every night I picked without checking the calendar it lives in, so as far as I could see, a date night still gets a dinner. The recipes are generated, not ones from sites I use and can check. I couldn't tell whether it can run each week on its own, any change after the plan is mine to make by hand, and there's no back and forth. I wanted to stop managing meals, not move where I manage them.
+
+<div style="max-width: 320px; margin: 0 auto;">
+
+![Skylight's Sidekick review screen: seven chicken dinners for the week, three of them chicken burgers](/images/skylight-sidekick-review-meals.jpeg)
+
+<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">Skylight's Sidekick, given "chicken, burgers, pasta, Asian, Italian".</p>
+
+</div>
+
+There's no official API or MCP server for Skylight either, as far as I can tell, so there was no way to bring my own assistant. I'd just gotten access to Duet, Claude's AI assistant, so I first tested whether it could write a weekly plan in a Google Doc, which it could. It looked promising, but nobody in my house is going to read a Google Doc, and I didn't want to retype what Duet wrote into a calendar. I could have used Google Calendar, but that sounded dull next to building an integration with Skylight over MCP. So the project became: Duet plans our meals into Skylight, the family keeps the app they know, and I stop planning by hand.
 
 To reach Skylight, an assistant needs tools, and the standard way to give a chat assistant tools is something called an MCP server. In plain words: a small program between the AI and another service that offers the AI a short menu of things it may do ("list the meals for these dates", "add this meal").
 
@@ -45,7 +55,7 @@ The other half is a standing instruction: a block of text attached to the chat t
 
 ### What took longer than the dinners
 
-I assumed the hard part would be the planning. The hard part was the server. Skylight doesn't publish documentation for an API, as far as I can tell, so there was nothing official to build against. I opened the web app, watched with my browser's developer tools what it sent when I added or edited a meal, and had Claude turn those requests into tools. I pasted only the request body and the response, never the headers that carry sign-in details.
+I assumed the hard part would be the planning. The hard part was the server. With no official API, there was nothing to build against. I opened the web app, watched with my browser's developer tools what it sent when I added or edited a meal, and had Claude turn those requests into tools. I pasted only the request body and the response, never the headers that carry sign-in details.
 
 It was probably the longest and most boring part of the whole project. With real documentation you read what each call does. Without it, every tool meant sending the call, reading the response and trying a variant, over and over, by trial and error. I also built it for people who aren't me: more of the API than my family will use, a browser sign-in, local and hosted modes, Windows as well as Mac, and notes on what was and wasn't tested. It took about two weeks, weekends and my birthday included: most days from 9 a.m., after dropping the kids at school, and several nights until 11. After more than 200 commits, Skylight could still change any of it tomorrow.
 
