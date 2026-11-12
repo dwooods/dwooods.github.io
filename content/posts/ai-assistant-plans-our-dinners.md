@@ -61,7 +61,7 @@ The other half is a standing instruction: a block of text attached to the chat t
 
 I assumed the hard part would be the planning. The hard part was the server. With no official API, there was nothing to build against. I opened the web app, watched with my browser's developer tools what it sent when I added or edited a meal, and had Claude turn those requests into tools. I pasted only the request body and the response, never the headers that carry sign-in details.
 
-It was probably the longest and most boring part of the whole project. With real documentation you read what each call does. Without it, every tool meant sending the call, reading the response and trying a variant, over and over, by trial and error. I also built it for people who aren't me: more of the API than my family will use, a browser sign-in, local and hosted modes, Windows as well as Mac, and notes on what was and wasn't tested. It took about two weeks of long days, weekends included. After more than 200 commits, Skylight could still change any of it tomorrow.
+It was probably the longest and most boring part of the whole project. Most of my career as a product manager has involved APIs, including building a developer portal, so I know what good documentation saves you: you read what each call does and how the people who built it meant it to be used. Without it, every tool meant sending the call, reading the response and trying a variant, over and over, by trial and error. That's also why I built it for people who aren't me: more of the API than my family will use, a browser sign-in, local and hosted modes, Windows as well as Mac, and notes on what was and wasn't tested, so the next person doesn't have to repeat it. I took as few shortcuts as I could, for a side project nobody is paying me for. It took about two weeks of long days, weekends included. After more than 200 commits, Skylight could still change any of it tomorrow.
 
 ### Tools & AI assist
 
@@ -161,7 +161,7 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 
 ## Lessons
 
-**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. As far as I could tell, the web app can't delete labels; the iOS app can, and the call behind it was already in my server.
+**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. As far as I could tell, the web app can't delete labels (Skylight's tags on events); the iOS app can, and the call behind it was already in my server.
 
 **The AI one.** Duet is very fast from a symptom to the next step. What it doesn't do is check that the evidence supports where it lands. It told me the plan document matched the calendar, and that a Friday routine would pick up a queued meal. Both sounded right; I had checked neither. Reading the week back from Skylight in a separate call and comparing it to the text I approved is my job, and it is cheap. A confident sentence is not a measurement.
 
