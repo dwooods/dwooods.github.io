@@ -65,11 +65,11 @@ It was probably the longest and most boring part of the whole project. Most of m
 
 ### Tools & AI assist
 
-Two AI tools did different jobs. Claude built the server: it extended the open-source project, wrote its tests and turned my pasted captures into tool code, where it is genuinely faster than I am. Duet, an AI assistant I have through my Claude access, runs it each week: it drafts the dinners, previews each week before writing, then does the real writes, and handles the Friday run and a Thursday check that Skylight's API still works. Any assistant that can call tools could do that job; Duet is the one I had. The hand-off wasn't clean, because Duet runs differently from the tool I built with. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
+Two AI tools did different jobs. Claude built the server: it extended the open-source project, wrote its tests and turned my pasted captures into tool code, where it is genuinely faster than I am. Duet runs it each week: it drafts the dinners, previews each week before writing, then does the real writes, and handles the Friday run and a Thursday check that Skylight's API still works. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
 
 ## What went wrong
 
-### The first run: eight messages for one week
+### The first run: learning to teach it
 
 The first run was me learning how to teach Duet, and my first time handing real work to an AI assistant. You can't just say "plan meals" and expect it to come out the way you pictured it. I started with a dry run: read the calendar and the meals, draft six dinners, show everything, write nothing. It took about eight messages to get one week onto the calendar, more than the chore it was supposed to replace.
 
@@ -158,7 +158,7 @@ Then I tried to break it. I deleted the "url" keyword from the check and waited 
 
 Here I overruled caution on purpose. I wanted setup to be easy for anyone trying this, and I wanted Duet to have full access instead of stopping to ask before each step. I also tested whether Duet's client would pause for a human yes before a delete. It didn't: it deleted in one call.
 
-Easy still meant that signing in happens at the command line and never through the assistant, and no tool Duet can call will log in, log out or read the credential. The project I started from wants your Skylight password in environment variables, and I didn't want one in a config file any tool on the machine can read. So sign-in happens in the browser: I sign in, then paste back the address the browser lands on, and what gets stored is an encrypted credential keyed in the macOS Keychain, not the password. On Windows and Linux there's no Keychain equivalent wired in yet, so the credential sits in an unencrypted file that only your user account's permissions protect. The README says so plainly. The price is a clumsier first step. I took the flow from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
+Easy still meant that signing in happens at the command line and never through the assistant, and no tool Duet can call will log in, log out or read the credential. The project I started from wants your Skylight password in environment variables, and I didn't want one in a config file any tool on the machine can read. So sign-in happens in the browser: I sign in, then paste back the address the browser lands on, and what gets stored is an encrypted credential keyed in the macOS Keychain, not the password. On Windows and Linux there's no Keychain equivalent wired in yet, so the credential sits in an unencrypted file that only your user account's permissions protect. The price is a clumsier first step. I took the flow from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
 
 The risk is real: Duet could remove the wrong meal or event. But this is dinners on a family calendar, not money, and a wrong deletion costs a minute. So instead of a gate I asked for a record: one line for every change, with the tool, whether it was a write or a delete, the outcome and a running count, and deliberately no meal text and no IDs. There's also a cap of 60 changes and 10 deletes an hour, as a leash for a runaway loop.
 
