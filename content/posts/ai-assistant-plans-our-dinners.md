@@ -15,7 +15,7 @@ I'm terrible at planning meals, and for the past two months it has been my job. 
 
 <div style="max-width: 640px; margin: 0 auto;">
 
-![A finished dinner entry in the family calendar app, with recipe link, steps and a start-time note](/images/claude-dinner-popup.png)
+![A dinner entry in the calendar app](/images/claude-dinner-popup.png)
 
 <p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">A finished dinner entry as the family sees it. The link to our plan document is covered by a grey box.</p>
 
@@ -31,7 +31,7 @@ Skylight does have AI of its own. We pay for Skylight Plus, which includes Sidek
 
 <div style="max-width: 320px; margin: 0 auto;">
 
-![Skylight's Sidekick review screen: seven chicken dinners for the week, three of them chicken burgers](/images/skylight-sidekick-review-meals.jpeg)
+![Sidekick's plan: seven chicken dinners, three of them burgers](/images/skylight-sidekick-review-meals.jpeg)
 
 <p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">Skylight's Sidekick, given "chicken, burgers, pasta, Asian, Italian".</p>
 
@@ -47,7 +47,7 @@ I started from an open-source Skylight server that someone else wrote (credited 
 
 <div style="text-align:center;">
 
-![The assistant reads the plan and calendar, then calls my server, which writes to Skylight after I approve](/images/dinner-planning-flow.svg)
+![Flow from assistant to my server to Skylight, after my approval](/images/dinner-planning-flow.svg)
 
 </div>
 
@@ -81,7 +81,7 @@ Before any of that came a setup cost I hadn't priced in: a tool menu doesn't tel
 
 Five things went wrong, and the tests had caught none of them. The plan document was built Monday to Sunday, but Skylight's week runs Sunday to Saturday. One dinner no longer fit, and the meatless night fell off the end of the week. The drafts held literal placeholders, like "(plan doc URL)" where the link to our shared meal-plan Google Doc belonged. Duet fixed a typo after showing me a draft and mentioned it only at the end, a silent edit that makes "exact text" a lie. A cooking step turned up in a field meant for family notes. And Duet doubled or 1.5x-ed four of the five recipes on its own guess that we eat more than a recipe serves. I missed it in the plan. It surfaced only when I questioned one grocery line: three whole chickens for one dinner. Duet owned it: it had assumed bigger appetites unprompted.
 
-![The Edit Meal screen: empty Instructions field, recipe steps in the note field below it](/images/claude-dinner-edit-meal.png)
+![Recipe steps in the note field, Instructions empty](/images/claude-dinner-edit-meal.png)
 
 <p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;">An early dinner entry, family details covered by grey boxes. The recipe steps landed in the note field and Instructions is empty.</p>
 
@@ -116,7 +116,7 @@ Meal names turned out to be harder than recipes. The wall display's month view c
 
 On the wall display a recipe link is plain text you can't tap, so nothing the cook needs at the stove can live only behind it. The instructions carry the steps with times and temperatures, and the link is a convenience.
 
-![The standing-instructions box at 7,077 of 2,000 characters, with an over-the-limit error](/images/claude-dinner-instructions-limit.png)
+![Instructions box over its 2,000-character limit](/images/claude-dinner-instructions-limit.png)
 
 <p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;">My full rules ran 7,077 characters against a 2,000 limit. Part of one line is covered by a grey box.</p>
 
@@ -155,7 +155,7 @@ Then the scheduled part. The Friday run happens on a schedule, with nobody there
 
 Because Skylight's API is unofficial, a change in what it returns could break a tool without any error. The first place that would show is the unattended Friday run, so the day before there's a canary: every Thursday a scheduled Duet task runs five read-only checks and posts one line in its own channel, pass or fail. It uses the same read-only tools, so it needs no new credential. It shares fate with the server it checks, so a missing Thursday line is the signal.
 
-![The canary channel chat: email alert, Thursday schedule, first run passes](/images/claude-dinner-canary.png)
+![Canary channel: first run passes](/images/claude-dinner-canary.png)
 
 The first run passed five of five and, as intended, sent no email. I haven't watched a real failure arrive yet, so that half of the canary is still a plan.
 
@@ -163,8 +163,6 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 
 | We learned | So now |
 |---|---|
-| Plan to the app's week. Skylight's runs Sunday to Saturday; I'd planned Monday to Sunday. | Planning moved from Saturday to Friday and the check to Thursday; Duet had to be told. |
-| Design for the screen people use. The wall display clips names at about 18 characters; phones show them in full. | Names aim for 25 characters, never over 35. The plain dish name is the name; the detail goes in the instructions. |
 | A link you can't tap isn't delivery. | The instructions carry the steps; the link is a convenience. |
 | A check you've never broken may check nothing. | I removed the "url" keyword, the tests still passed, and cases were added until removing it failed. |
 | Tests can pass for reasons that won't hold in production. A counter kept in a server variable passed every test and capped nothing. | The counter lives in a small persistent store. |
@@ -178,7 +176,7 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 
 My verdict from my notes after that first week: not easier yet. The next Friday run was better, though I still changed things for reasons no rule covers: a sick week, and a night of cooking whatever we already had. By my estimate (not a stopwatch), doing it properly by hand took two to four hours a week. In practice I never did: I printed lists, gave up, planned day to day and made a store run most mornings based on whatever I'd found online that morning. Now the meals arrive on Friday, I review them, change what I want and send one prompt, and a full week is in the calendar, shared with the family and documented in under 20 minutes. About half the weeks go that way. The rest bend when people are tired, events move or nobody wants to cook, and ordering food wins. Two weeks of long days won't pay back in hours any time soon. What I got back is the daily search for what to make.
 
-![The Meals view for the week, with two nights empty](/images/claude-dinner-week-meals.png)
+![Week of dinners, two nights empty](/images/claude-dinner-week-meals.png)
 
 <p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;">The app's Meals view, filtered to dinners. The two empty nights are on purpose.</p>
 
