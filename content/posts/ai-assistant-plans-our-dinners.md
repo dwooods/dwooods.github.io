@@ -23,7 +23,7 @@ I'm terrible at planning meals, and for the past two months it has been my job. 
 
 ## Why I built this
 
-I got laid off, my wife picked up more shifts, and I had the time. She did the cooking while I had a job, so this was my turn to pick up the slack, and I didn't want her coming home from work to think about dinner too. The meal-hunting was also a lot of mental load, stacked on a job search and the rest of the house chores.
+I got laid off, my wife picked up more shifts, and I had the time, so I took over meal planning and cooking, and she could stop worrying about dinner. But my way of meal planning and cooking dinner was too much mental load, on top of looking for a job and house chores. I needed help, and I wasn't going to ask my wife or kids.
 
 I use AI for all sorts of projects, and this looked like a real problem to hand one. My old process was printing each meal and handing the pages to my wife. I wanted to plan a week ahead and have her check it in Skylight, the calendar on our wall display and phones, which we already used for events and had never used for meals.
 
@@ -156,7 +156,7 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 | Plan to the app's week. Skylight's runs Sunday to Saturday; I'd planned Monday to Sunday. | Planning moved from Saturday to Friday and the check to Thursday; Duet had to be told. |
 | Design for the screen people use. The wall display clips names at about 18 characters; phones show them in full. | Names aim for 25 characters, never over 35. The plain dish name is the name; the detail goes in the instructions. |
 | A link you can't tap isn't delivery. | The instructions carry the steps; the link is a convenience. |
-| A check you've never broken may check nothing. | I removed the "url" keyword, the tests still passed, and I added cases until removing it failed. |
+| A check you've never broken may check nothing. | I removed the "url" keyword, the tests still passed, and cases were added until removing it failed. |
 | Tests can pass for reasons that won't hold in production. A counter kept in a server variable passed every test and capped nothing. | The counter lives in a small persistent store. |
 | The assistant won't always pause before a delete. Duet's client deleted in one call. | A log of every change and an hourly cap, instead of a gate. |
 
