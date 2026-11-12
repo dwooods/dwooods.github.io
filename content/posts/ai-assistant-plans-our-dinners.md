@@ -124,7 +124,7 @@ On the wall display a recipe link is plain text you can't tap, so nothing the co
 
 ### Making the server say no
 
-After the first run I stopped trusting myself to be the only check. Everything I'd caught by reading, I wanted the server to catch too, at least mistakes with no legitimate form. A placeholder on a wall display is always damage, so the server now looks for them before it writes:
+I caught "(plan doc URL)" because I was reading the drafts like a reviewer. That's not a safety system; that's me having a careful day. So the server reads before it writes, too. A placeholder on a screen the whole family sees is never right, so the server refuses the write:
 
 ```ts
 // Text in (), [] or <> that stands in for something missing:
@@ -137,9 +137,9 @@ if (found) {
 }
 ```
 
-Errors refuse the write. Everything else is only a warning: a name over 25 characters, a dessert longer than two words, a cooking verb in a note. Those have legitimate exceptions, and a false block would stall the weekly run with nobody there to answer it. The trade-off is that this is keyword matching, so "(insert here)" slips through. A missed placeholder costs a human read; a false alarm costs a stalled run.
+Everything else just gets a warning: a name over 25 characters, a dessert longer than two words, a cooking verb in the notes. Those have real exceptions, and the Friday run happens with nobody around, so a false block would just stall it. It isn't clever, either. It's keyword matching, so "(insert here)" would sail right through. I'm fine with that trade: a missed placeholder costs me a read, and a false alarm costs me the Friday run.
 
-I broke the check on purpose by removing the "url" keyword. The tests still passed, so they weren't checking what I thought; three cases were added until removing the keyword made them fail.
+Then I tried to break it. I deleted the "url" keyword from the check and waited for the tests to fail. They all passed. So the tests weren't testing what I thought, and three more cases went in until breaking the check actually broke something.
 
 ### Full access, and a log instead of a gate
 
