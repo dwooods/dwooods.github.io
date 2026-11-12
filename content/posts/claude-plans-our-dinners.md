@@ -39,7 +39,7 @@ Skylight doesn't publish documentation for an API, as far as I can tell, so ther
 
 I started from an open-source Skylight server that someone else wrote (credited in the repo) and extended it. The server runs on a Cloudflare Worker, which is a small program hosted on Cloudflare's network. Hosting it there means Claude can reach it from any chat without my laptop being on.
 
-![Claude reads the plan and calendar, calls my server, which writes to Skylight after I approve the exact text](/images/claude-dinner-planning-flow.svg)
+![Claude reads the plan and calendar, then calls my server, which writes to Skylight after I approve](/images/claude-dinner-planning-flow.svg)
 
 The tools that matter for dinners are few. One lists the meals already on the calendar for a range of dates. One reads calendar events for the same dates. One plans a whole week at once, with a "dry run" mode that shows what would happen without writing anything. And one edits a single existing meal.
 
@@ -47,7 +47,7 @@ The other half is a standing instruction: a block of text attached to the chat t
 
 ### What took longer than the dinners
 
-I assumed the hard part would be the planning. The hard part was the server. Skylight has no official API, so every tool started as a question about what the app does. With nothing documented, each one meant rounds of small tests: send the call, read the response, send a variant. I also built it for people who aren't me: more of the API than my family will use, a better sign-in, local and hosted modes, Windows as well as Mac, and notes on what was tested and what wasn't. It took about two weeks, weekends and my birthday included: most days from 9 a.m., after dropping the kids at school, and several nights until 11. After more than 200 commits, Skylight could still change any of it tomorrow.
+I assumed the hard part would be the planning. The hard part was the server. Every tool started as a question about what the app does. With nothing documented, each one meant rounds of small tests: send the call, read the response, send a variant. I also built it for people who aren't me: more of the API than my family will use, a better sign-in, local and hosted modes, Windows as well as Mac, and notes on what was tested and what wasn't. It took about two weeks, weekends and my birthday included: most days from 9 a.m., after dropping the kids at school, and several nights until 11. After more than 200 commits, Skylight could still change any of it tomorrow.
 
 The iOS app showed things the web app doesn't. I watched its requests through a proxy tool called Proxyman. The web app can't delete or merge labels (Skylight's tags on events); the iOS app can. Delete turned out to be a plain `DELETE` on the label, returning 204, which is what my tool already sent. Merge is the same call with a target label added, returning 200 and the deleted record:
 
@@ -62,7 +62,7 @@ I decided against a merge tool. What happens to a label that still has events wa
 
 Claude extended the server, wrote its tests and the first versions of the standing instructions, and ran the dry runs and the real writes. It also turned my pasted captures into tool code, where it is genuinely faster than I am. The header image was generated with Google's Nano Banana, and the people in it are AI-generated and fictional. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
 
-The misses are worth naming. Claude put placeholders into text it called final, scaled recipes up on its own assumption, and edited a draft without telling me. Our first prompt was a one-shot paste, because we assumed the chat had no place for standing instructions. It does; each channel has one. No other AI tools were involved.
+The misses are named where they happened, below. One more doesn't fit there: our first prompt was a one-shot paste, because we assumed the chat had no place for standing instructions. It does; each channel has one. No other AI tools were involved.
 
 ## What went wrong
 
@@ -100,6 +100,8 @@ back, show me, and wait for my yes before the rest.
 Each rule traces to a failure above. If I could keep only one, it's the last: a half-finished set of dinners on a wall display is the worst way this can fail.
 
 After the fixes, five dinners went in: one meal first, then the other four. I read the whole week back from Skylight in a separate call and compared it to what I'd approved. It matched.
+
+Even that first week bent for a plainer reason. My wife cooked two nights I had planned for: chicken tacos, with no dessert, and spaghetti and meatballs the next evening, my birthday dinner. We'd gone out on the day itself, and what I actually wanted was spaghetti and meatballs at home. I asked Claude to move the two displaced dinners to the following week. It picked days that were clear on both calendars, showed me the exact changes, and waited for a yes. Then it wrote the changes and read each one back against what I had approved.
 
 ### The wall display I photographed and the phone I should have asked about
 
@@ -166,7 +168,7 @@ Then the scheduled part. The Friday run happens on a schedule, with nobody there
 
 Because Skylight's API is unofficial, a change in what it returns could break a tool without any error. The first place that would show is the unattended Friday run, so the day before there's a canary: every Thursday a scheduled Claude task runs five read-only checks and posts one line in its own channel, pass or fail. It uses the same read-only tools, so it needs no new credential. The catch is that it shares fate with the server it checks, so if the server is down, a missing Thursday line is the signal. A scheduled run can't send mail itself, so I picked the routine's own email alert.
 
-![The canary channel chat: Claude explains alert options, I pick email and a Thursday 9:45 AM schedule, and the first run posts a pass](/images/claude-dinner-canary.png)
+![The canary channel chat: I pick an email alert and a Thursday schedule, and the first run posts a pass](/images/claude-dinner-canary.png)
 
 *The canary's first run, Thursday at 9:46 AM.*
 
@@ -179,8 +181,6 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 **The AI one.** Claude is very fast from a symptom to the next step. What it doesn't do is check that the evidence supports where it lands. It told me the plan document matched what was on the calendar. It told me a Friday routine would pick up a queued meal. Both sounded right, and I had checked neither. Reading the week back from Skylight in a separate call, and comparing it to the text I approved, is my job, and it is cheap. A confident sentence is not a measurement.
 
 **The one you can swap your own project into.** State every assumption once, as a number or a date, and test it with a check that can fail. The week boundary, the portion size, the name length and the placeholder were all the same mistake: something I assumed, never wrote down, and discovered only when a real family would have read it. Whatever you hand to an agent that writes where other people can see, write down what it must never leave behind, and then break your own check to see that it fires.
-
-Even that first week bent for a plainer reason. My wife cooked two nights I had planned for: chicken tacos, with no dessert, and spaghetti and meatballs the next evening, my birthday dinner. We'd gone out on the day itself, and what I actually wanted was spaghetti and meatballs at home. I asked Claude to move the two displaced dinners to the following week. It picked days that were clear on both calendars, showed me the exact changes, and waited for a yes. Then it wrote the changes and read each one back against what I had approved.
 
 My verdict from my notes after that first week: not easier yet. The test was always the second week. The next Friday run was better, though I still changed things for reasons no rule covers: a sick week, and a night of cooking whatever we already had. Overall it worked, and by my estimate (not a stopwatch) it saves me hours of looking up and planning meals. Claude also checks the plan against the calendar and flags conflicts I missed.
 
