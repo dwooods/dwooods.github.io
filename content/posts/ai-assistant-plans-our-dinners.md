@@ -6,7 +6,7 @@ featuredImage: "/images/hero-claude-plans-our-dinners.jpeg"
 featuredImagePreview: "/images/hero-claude-plans-our-dinners.jpeg"
 tags: ["ai", "claude", "duet", "mcp", "cloudflare-workers", "skylight", "meal-planning", "automation"]
 description: "I built an MCP server so an AI assistant could write our weekly dinners into the family calendar. The first real run broke in five small ways, and none of them were caught by tests."
-summary: "I gave my AI assistant hands for the family calendar and asked it to plan a week of dinners. The first run nearly sent a literal placeholder to every screen in the house. Here is what I changed so the next run couldn't."
+summary: "The first real run nearly put a literal \"(plan doc URL)\" on the wall display and every phone in the family. Here is what I built, and what I changed, so the next run couldn't."
 ---
 
 *Header image: generated with Google's Nano Banana. The people in it are AI-generated.*
