@@ -55,7 +55,7 @@ The calendar is the only copy of the plan, because it's what the family looks at
 
 Four tools matter for dinners: one lists the meals on the calendar for a range of dates, one reads calendar events for the same dates, one plans a whole week at once, and one edits a single meal.
 
-The other half is a standing instruction: a block of text attached to the chat that tells Duet how to plan dinners this family's way. It has a hard limit of 2,000 characters, so the full version lives in my project notes and a compressed copy sits in the chat. Every rule in it exists because something went wrong once.
+The other half is a standing instruction: a block of text attached to the chat that tells Duet how this family eats. It works the way you'd teach a new person how you like dinner. Each time something comes out wrong, or I correct a choice, we update the instructions, so next week it can make that call on its own. Duet doesn't learn by itself; the instructions are what it learns from, and every rule in them exists because something went wrong once.
 
 ### What took longer than the dinners
 
