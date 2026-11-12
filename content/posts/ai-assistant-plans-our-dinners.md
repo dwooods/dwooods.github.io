@@ -172,4 +172,4 @@ The server is open source (MIT) and unofficial: it talks to endpoints Skylight d
 
 ---
 
-The moment I knew it worked was small. My wife mentioned that tomorrow's dinner looked good. I hadn't told her; she'd seen it on the calendar, and she was excited to try it. On Tuesday the family loved the [green chicken enchiladas](https://damndelicious.net/2019/03/01/green-chicken-enchiladas/) Duet picked. Deciding was the part worth automating, and we've stopped eating the same handful of meals every week.
+The moment I knew it worked was small. My wife mentioned that tomorrow's dinner looked good. I hadn't told her; she'd seen it on the calendar, and she was excited to try it. On Tuesday the family loved the [green chicken enchiladas](https://damndelicious.net/2019/03/01/green-chicken-enchiladas/) Duet picked. Left to me, it would have been one of our usual handful of meals again. Duet picked something we like and don't cook often, and I didn't have to think about it.
