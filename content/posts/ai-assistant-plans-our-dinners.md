@@ -133,23 +133,7 @@ I broke the check on purpose by removing the "url" keyword. The tests still pass
 
 Here I overruled caution on purpose. I wanted setup to be easy for anyone trying this, and I wanted Duet to have full access instead of stopping to ask before each step. I also tested whether Duet's client would pause for a human yes before a delete. It didn't: it deleted in one call.
 
-Easy still meant that signing in happens at the command line and never through the assistant, and no tool Duet can call will log in, log out or read the credential. The project I started from wants your Skylight password in environment variables, and I didn't want one in a config file any tool on the machine can read. So sign-in happens in the browser: the command prints a Skylight URL, and after I sign in I paste back the address the browser lands on. What gets stored is an encrypted credential keyed in the macOS Keychain, not the password. The price is a clumsier first step: the address has to be copied out of browser history. I didn't invent this flow: I took it from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
-
-```text
-node dist/index.js auth login
-1. Open this URL in your browser and sign in to Skylight
-   (Windows Terminal: hold Ctrl and click it; otherwise copy it into your browser):
-
-   [ sign-in URL redacted ]
-
-2. Skylight bounces the browser through https://ourskylight.com/welcome?code=... too fast
-   to copy. Get it from browser history: Cmd-Y (Mac) / Ctrl-H (PC), search "welcome?code",
-   right-click the Skylight result dated today (top of the list; older ones are earlier
-   sign-ins and will not work), Copy link address.
-
-3. Run the same command you just ran, with `complete` instead of `login`,
-   and paste the URL at the prompt. This login expires in 10 minutes.
-```
+Easy still meant that signing in happens at the command line and never through the assistant, and no tool Duet can call will log in, log out or read the credential. The project I started from wants your Skylight password in environment variables, and I didn't want one in a config file any tool on the machine can read. So sign-in happens in the browser: I sign in, then paste back the address the browser lands on, and what gets stored is an encrypted credential keyed in the macOS Keychain, not the password. The price is a clumsier first step. I took the flow from another open-source Skylight project and brought it into the server I started from, which only offered the password route.
 
 The risk is real: Duet could remove the wrong meal or event. But this is dinners on a family calendar, not money, and a wrong deletion costs a minute. So instead of a gate I asked for a record: one line for every change, with the tool, whether it was a write or a delete, the outcome and a running count, and deliberately no meal text and no IDs. There's also a cap of 60 changes and 10 deletes an hour, as a leash for a runaway loop.
 
