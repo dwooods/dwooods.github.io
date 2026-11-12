@@ -47,7 +47,7 @@ I started from an open-source Skylight server that someone else wrote (credited 
 
 <div style="text-align:center;">
 
-![The assistant reads the plan and calendar, then calls my server, which writes to Skylight after I approve](/images/claude-dinner-planning-flow.svg)
+![The assistant reads the plan and calendar, then calls my server, which writes to Skylight after I approve](/images/dinner-planning-flow.svg)
 
 </div>
 
