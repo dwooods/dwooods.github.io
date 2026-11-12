@@ -45,6 +45,19 @@ The tools that matter for dinners are few. One lists the meals already on the ca
 
 The other half is a standing instruction: a block of text attached to the chat that tells Claude how to plan dinners this family's way. It has a hard limit of 2,000 characters, so the full version lives in my project notes and a compressed copy sits in the chat. Every rule in that text exists because something went wrong once.
 
+### What took longer than the dinners
+
+I assumed the hard part would be the planning. The hard part was the server. Skylight has no official API, so every tool started as a question about what the app does. With nothing documented, each one meant rounds of small tests: send the call, read the response, send a variant. I also built it for people who aren't me: more of the API than my family will use, a better sign-in, local and hosted modes, Windows as well as Mac, and notes on what was tested and what wasn't. It took about two weeks and over 200 commits, and Skylight could change any of it tomorrow.
+
+The iOS app showed things the web app doesn't. I watched its requests through a proxy tool called Proxyman. The web app can't delete or merge labels (Skylight's tags on events); the iOS app can. Delete turned out to be a plain `DELETE` on the label, returning 204, which is what my tool already sent. Merge is the same call with a target label added, returning 200 and the deleted record:
+
+```text
+DELETE categories/{id}                                  -> 204
+DELETE categories/{id}?reassign_to_category_id={target} -> 200
+```
+
+I decided against a merge tool. What happens to a label that still has events was untested, and I don't plan to consolidate labels. Later I tested delete on a label with real events: events carrying only that label were removed, and events with a profile stayed and lost the label.
+
 ### Tools & AI assist
 
 Claude extended the server, wrote its tests and the first versions of the standing instructions, and ran the dry runs and the real writes. It also turned my pasted captures into tool code, where it is genuinely faster than I am. The header image was generated with Google's Nano Banana, and the people in it are AI-generated and fictional. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
@@ -59,7 +72,7 @@ For the first real run I started with a dry run: read the calendar and the meals
 
 It took about eight messages to get one week of dinners onto the calendar. That's the honest number, and it's more than the Friday chore it was supposed to replace.
 
-Before any of that, there was a setup cost I hadn't priced in. A tool menu doesn't tell an assistant how this household eats. Claude needed the rules of the house stated once: one night a week is takeout, one is meatless, there's one dessert, which equipment we own, where the recipes come from. It also needed the limits the calendar enforces, because the dinner entry has three separate fields (a name, a short note of 500 characters, and instructions of up to 2,000) and each has a job. It's the onboarding any new helper would get, and skipping it means the helper invents a version of your family.
+Before any of that, there was a setup cost I hadn't priced in. A tool menu doesn't tell an assistant how this household eats, so Claude needed the house rules stated once: one night a week is takeout, one is meatless, there's one dessert, which equipment we own, where the recipes come from. It also needed the calendar's limits: a name, a 500-character note and up to 2,000 characters of instructions, each with a job.
 
 Five things went wrong, and the tests had caught none of them. The plan document was built Monday to Sunday, but Skylight's week runs Sunday to Saturday. One dinner no longer fit, and the meatless night fell off the end of the week. The cause was an assumption stated in two places and clear in neither. The drafts held the literal placeholders I opened with. Claude fixed a typo after showing me a draft and mentioned it only at the end, a silent edit that makes "exact text" a lie. A cooking step turned up in a field meant for family notes. And Claude doubled or 1.5x-ed four of the five recipes on its own guess that we eat more than a recipe serves. I missed it in the plan. It surfaced only when Claude listed the changed grocery lines and I questioned one: three whole chickens for one dinner. Claude owned it: it had assumed bigger appetites unprompted.
 
@@ -84,9 +97,9 @@ plan_week_meals: dryRun true first, then write ONE meal, read it
 back, show me, and wait for my yes before the rest.
 ```
 
-The week is stated once, as dates, because "this week" means a different Monday depending on who is reading. Recipes are "as written" because an unstated default is a decision someone else makes for you. The plan document is created first because an earlier version of the instructions had a template line, and Claude copied it verbatim into real output. And one meal goes first because a half-finished set of dinners on a wall display is the worst way this can fail.
+Each rule traces to a failure above. If I could keep only one, it's the last: a half-finished set of dinners on a wall display is the worst way this can fail.
 
-After the fixes, five dinners went in: one meal first, then the other four. I read the whole week back from Skylight in a separate call and compared it to what I'd approved. It matched. Some of the corrections in those eight messages weren't Claude's fault at all: I wanted plain burgers instead of smash burgers, a different dessert, and one dish moved out of the week. Those are taste decisions.
+After the fixes, five dinners went in: one meal first, then the other four. I read the whole week back from Skylight in a separate call and compared it to what I'd approved. It matched.
 
 ### The wall display I photographed and the phone I should have asked about
 
@@ -94,17 +107,13 @@ Meal names turned out to be harder than recipes. I photographed the wall display
 
 That left the rule underspecified. "Keep names short" isn't an instruction a model reads the same way twice, so I gave it a target and a cap instead: aim for 25 characters, never more than 35 with a dessert. Then a second pass from the reader's side: the family already knows what the dish is, so the name should be the plain dish ("Baked salmon") and the descriptive version goes on the first line of the instructions. Identity goes in the field people scan, precision in the field they open.
 
-The same photograph taught me one more thing. On the wall display the recipe link in a meal is plain text, not something you can tap, while in the phone app it's a real link. So nothing the cook needs at the stove can live only behind the link. The instructions carry the steps in short sentences with times and temperatures, and the link is a convenience.
+On the wall display the recipe link in a meal is plain text, not something you can tap, while in the phone app it's a real link. So nothing the cook needs at the stove can live only behind the link. The instructions carry the steps in short sentences with times and temperatures, and the link is a convenience.
 
 A boring one: the standing-instructions field rejected my first version with a generic "link, formatting or a reserved phrase" error. The cause was most likely the angle brackets in my `<name>: <link>` placeholders. Swapping them for plain parentheses fixed it. If you paste text into a settings field and it complains without saying where, check for angle brackets first.
 
 ![The standing-instructions box at 7,077 of 2,000 characters, with an over-the-limit error](/images/claude-dinner-instructions-limit.png)
 
 *My full rules ran 7,077 characters against a 2,000 limit. Part of one line is covered by a grey box.*
-
-![The instructions box at 1,884 of 2,000 characters, rejected for a link, formatting or a reserved phrase](/images/claude-dinner-instructions-rejected.png)
-
-*The compressed version, under the limit and still refused. Part of one line is covered by a grey box.*
 
 ### Making the server say no
 
@@ -165,7 +174,7 @@ The first run passed five of five and, as intended, sent no email. I haven't wat
 
 ## Lessons
 
-**The technical one.** A chat keeps the tool list it fetched when it started. After I redeployed, my old chat kept showing the old behavior while a fresh chat showed the new text. Now a stale client is my first suspect, and I check any deploy in a new session before touching the code.
+**The technical one.** "The UI doesn't offer it" is weak evidence the API lacks it. One client's screen is evidence about that client. The web app has no way to delete or merge a label; the iOS app does, and the call behind delete was already in my server.
 
 **The AI one.** Claude is very fast from a symptom to the next step. What it doesn't do is check that the evidence supports where it lands. It told me the plan document matched what was on the calendar. It told me a Friday routine would pick up a queued meal. Both sounded right, and I had checked neither. Reading the week back from Skylight in a separate call, and comparing it to the text I approved, is my job, and it is cheap. A confident sentence is not a measurement.
 
