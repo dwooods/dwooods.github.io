@@ -5,7 +5,7 @@ draft: true
 featuredImage: "/images/hero-claude-plans-our-dinners.jpeg"
 featuredImagePreview: "/images/hero-claude-plans-our-dinners.jpeg"
 tags: ["ai", "claude", "duet", "mcp", "cloudflare-workers", "skylight", "meal-planning", "automation"]
-description: "I built an MCP server so an AI assistant could write our weekly dinners into the family calendar. The first real run broke in five small ways, and none of them were caught by tests."
+description: "How an AI assistant plans our weekly dinners and writes them into our Skylight family calendar through an MCP server I built, and the five things that went wrong that no test caught."
 summary: "The first real run nearly put a literal \"(plan doc URL)\" on the wall display and every phone in the family. Here is what I built, and what I changed, so the next run couldn't."
 ---
 
