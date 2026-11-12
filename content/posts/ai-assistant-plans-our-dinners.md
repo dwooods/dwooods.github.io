@@ -172,8 +172,4 @@ The server is open source (MIT) and unofficial: it talks to endpoints Skylight d
 
 ---
 
-The moment I knew it worked was small. My wife mentioned that tomorrow's dinner looked good. I hadn't told her; she'd seen it on the calendar, and she was excited to try it. That reminded me I needed to go to the grocery store, and that week I made my first trip to an Asian market, for ingredients no local store carries. On Tuesday the family loved the [green chicken enchiladas](https://damndelicious.net/2019/03/01/green-chicken-enchiladas/) Duet picked. Deciding was the part worth automating, so that time now goes to cooking, and we've stopped eating the same handful of meals every week.
-
-![The front of a 99 Ranch Market: a gabled entrance with red lettering above a stone-faced wall](/images/claude-dinner-ranch-market.jpeg)
-
-*The front of 99 Ranch Market in Concord, CA.*
+The moment I knew it worked was small. My wife mentioned that tomorrow's dinner looked good. I hadn't told her; she'd seen it on the calendar, and she was excited to try it. That reminded me I needed to go to the grocery store, and that week I made my first trip to 99 Ranch Market, an Asian market, for ingredients no local store carries. On Tuesday the family loved the [green chicken enchiladas](https://damndelicious.net/2019/03/01/green-chicken-enchiladas/) Duet picked. Deciding was the part worth automating, so that time now goes to cooking, and we've stopped eating the same handful of meals every week.
