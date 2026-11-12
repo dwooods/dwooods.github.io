@@ -65,7 +65,7 @@ It was probably the longest and most boring part of the whole project. Most of m
 
 ### Tools & AI assist
 
-Two AI tools did different jobs. Claude built the server: it extended the open-source project, wrote its tests and turned my pasted captures into tool code, where it is genuinely faster than I am. Duet, an AI assistant I have through my Claude access, runs it each week: it drafts the dinners, previews each week before writing, then does the real writes, and handles the Friday run and the Thursday check. Any assistant that can call tools could do that job; Duet is the one I had. The hand-off wasn't clean, because Duet runs differently from the tool I built with. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
+Two AI tools did different jobs. Claude built the server: it extended the open-source project, wrote its tests and turned my pasted captures into tool code, where it is genuinely faster than I am. Duet, an AI assistant I have through my Claude access, runs it each week: it drafts the dinners, previews each week before writing, then does the real writes, and handles the Friday run and a Thursday check that Skylight's API still works. Any assistant that can call tools could do that job; Duet is the one I had. The hand-off wasn't clean, because Duet runs differently from the tool I built with. I made the decisions: what a meal name should look like, which checks block a write, when the weekly run is allowed to write at all.
 
 ## What went wrong
 
@@ -151,7 +151,7 @@ Then the scheduled part. The Friday run happens on a schedule, with nobody there
 
 ![Scheduled task list: Weekly dinner plan, Fridays](/images/claude-dinner-friday-task.png)
 
-Because Skylight's API is unofficial, a change in what it returns could break a tool without any error. The first place that would show is the unattended Friday run, so the day before there's a canary: every Thursday a scheduled Duet task runs five read-only checks and posts one line in its own channel, pass or fail. It uses the same read-only tools, so it needs no new credential. It shares fate with the server it checks, so a missing Thursday line is the signal.
+Because Skylight's API is unofficial, a change in what it returns could break a tool without any error. The first place that would show is the unattended Friday run, so the day before there's a canary: every Thursday a scheduled Duet task runs five read-only checks, posts one line in its own channel, pass or fail, and emails me if one fails, so I know a day early that Friday's plan won't run and I need another way to plan that week. It uses the same read-only tools, so it needs no new credential. It shares fate with the server it checks, so a missing Thursday line is the signal.
 
 ![Canary channel: first run passes](/images/claude-dinner-canary.png)
 
