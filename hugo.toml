@@ -83,6 +83,12 @@ enableGitInfo = false
     Email = "daveawoods@gmail.com"
     RSS = "true"
 
+  # Visitor analytics: GoatCounter (cookie-free, no personal data). Dashboard: https://dwooods.goatcounter.com
+  [params.analytics]
+    enable = true
+    [params.analytics.goatCounter]
+      code = "dwooods"
+
   [params.page]
     # Click-to-zoom on markdown images (LoveIt's lightgallery). Off by default in the theme.
     lightgallery = true
