@@ -89,7 +89,7 @@ The sprites that ship with the repo are drawn as text, one character per pixel, 
 
 The last one, a missile-defense scene, on the real panel, filmed on my phone:
 
-<video autoplay loop muted playsinline controls preload="metadata" width="100%" poster="/images/glow-grid-missile-defense-real-panel.gif" style="max-width:480px;display:block;margin:1em auto;">
+<video autoplay loop muted playsinline controls preload="metadata" width="100%" poster="/images/glow-grid-missile-defense-real-panel-poster.jpg" style="max-width:480px;display:block;margin:1em auto;">
   <source src="/images/glow-grid-missile-defense-real-panel.mp4" type="video/mp4">
   <img src="/images/glow-grid-missile-defense-real-panel.gif" alt="The missile-defense sprite playing on the real panel">
 </video>

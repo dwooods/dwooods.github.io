@@ -41,7 +41,7 @@ So I wanted three things:
 2. **A memory of our league** — scoring rules, rosters, trades, player situations — so I didn't have to re-explain the league every time I asked a question.
 3. **A co-manager** that could occasionally tap me on the shoulder and say, "Hey, you might want to check your lineup."
 
-<img src="/images/fantasy-football-meme-planning.png" alt="Men will deny being good at planning things until fantasy football comes around" style="max-width: 350px; width: 100%; height: auto; display: block; margin: 0 auto;">
+<img src="/images/fantasy-football-meme-planning.jpg" alt="Men will deny being good at planning things until fantasy football comes around" style="max-width: 350px; width: 100%; height: auto; display: block; margin: 0 auto;">
 
 I wasn't trying to learn MCP because I needed another technology to put on my resume. I wanted to make fantasy football easier, and MCP happened to be a pretty good way to do it.
 
