@@ -9,6 +9,10 @@ featuredImage: "/images/plex-marketing-stream-anywhere.png"
 featuredImagePreview: "/images/plex-marketing-stream-anywhere.png"
 ---
 
+{{< admonition type="warning" title="Correction, November 13, 2026" open=true >}}
+The original version said the GL.iNet travel router was ordered and that the TV test was coming. Neither was true: I haven't bought a router and have no trip planned. What I've tested is a Windows laptop and a phone, and both work. The TV is untested. The text below is fixed to match.
+{{< /admonition >}}
+
 We don't have Netflix. We don't have Hulu, Max, or whatever streaming service currently has the show everyone's talking about. What we have is a NAS in a closet with a few hundred movies and TV seasons on it, a Plex server, and — as of a few weeks ago — a genuine grudge against Plex's product team.
 
 Here's the problem: those movies live at our permanent address. We watch them on vacation, at a house that is very much not our permanent address, on someone else's Wi-Fi, with zero access to their router. Historically, Plex treated any device connected back to your home network as local, full stop — tunneling in with a VPN to make your own TV look like it never left the house was a known, if slightly nerdy, trick. Then sometime in the 2025–2026 window, Plex turned that into a subscription feature and started actively enforcing against it.
@@ -39,7 +43,7 @@ The other constraint that shaped everything: none of our TVs can run a VPN clien
 
 The hardware side of this is almost embarrassingly simple: a Synology DS918+ NAS that's been quietly running Plex for years, and is now the entire reason this project exists. Onto it I installed Tailscale — a mesh VPN built on WireGuard, installed as the official Synology package — and configured it as a *subnet router* that advertises the home LAN out to a private network of my own devices (a "tailnet").
 
-At the vacation house, a GL.iNet Opal (GL-SFT1200) travel router — ordered, not yet in hand — will run the Tailscale client and hand the TV a completely normal-looking Wi-Fi network. The router handles the tunnel; the TV never knows it exists.
+At the vacation house, a travel router (the GL.iNet Opal, GL-SFT1200, is the one I'd buy, but I haven't) would run the Tailscale client and hand the TV a completely normal-looking Wi-Fi network. The router handles the tunnel; the TV never knows it exists.
 
 Plex Media Server is the one component in this entire chain that spent the whole project actively working against me.
 
@@ -125,7 +129,7 @@ The other lesson wasn't really about networking. It was about using AI for infra
 
 The honest scorecard, tested with no Plex Pass and no Remote Watch Pass active: a Windows laptop off the home network, tunneled in through Tailscale, played media in Plex Web with zero paywall. A Pixel phone, on cellular data only, Wi-Fi fully off, played media in the actual Plex mobile app with zero paywall. Both work today. The phone test isn't just a lab condition, either — it's already my actual commute: riding public transit to work, watching something on my phone, nowhere near either network's Wi-Fi, and Plex has no idea there's anything to charge me for.
 
-What hasn't been tested is the one thing that actually matters for the trip: the smart TV itself. Plex's enforcement reportedly targeted TV platforms first, which means a browser and a phone passing is not proof a TV app will. That test happens once the GL.iNet router arrives, gets configured, and gets planted in front of whatever TV is waiting for us at the vacation house — which is a problem for a future post, not this one.
+What hasn't been tested is the one thing that actually matters for the trip: the smart TV itself. Plex's enforcement reportedly targeted TV platforms first, which means a browser and a phone passing is not proof a TV app will. That test needs a router I haven't bought and a trip we haven't planned, so for now the TV is untested.
 
 One thing worth being straight about, now that I've actually checked: [Plex's Terms of Service](https://www.plex.tv/about/privacy-legal/plex-terms-of-service/) prohibit "obtaining Plex Pass functionality without a valid Plex Pass," and Remote Watch Pass gates exactly the functionality this project unlocks. On a literal reading, that's this. I'm not touching anyone else's content or breaking into anything — this is my own server and my own media — but "it's my own stuff" and "it's within the contract I agreed to" are two different questions, and I'd rather say that plainly than pretend I found a free loophole with no fine print attached. The actual consequence Plex spells out for a Terms violation is account suspension or termination, not a lawsuit. Whether they'd ever bother enforcing that against someone running their own homelab for personal use — versus the kinds of use cases Plex may have been trying to prevent — I don't know.
 
@@ -133,7 +137,7 @@ Also worth admitting: I have now spent, conservatively, several hours of my life
 
 ## Try this yourself
 
-No GitHub repo to link here — it's a NAS, a $30 travel router, and one very long chat, not code. If you're fighting the same fight, Tailscale's own docs for the Synology package and subnet routers are genuinely good, and the GL.iNet Opal (GL-SFT1200) is the router I landed on for the price and its WireGuard throughput ceiling over the smaller Mango. Worth a read too: the ["Support for Tailscale"](https://forums.plex.tv/t/support-for-tailscale/936755) thread on Plex's own community forums, where this exact subnet-router trick is already laid out in the replies — I didn't invent anything here, I just went and checked that it actually works. Whether the actual TV cooperates is a problem for a future post — right now the whole thing has been proven on a laptop and a phone, which is a very fancy way of saying "it works, probably, we'll see." If your setup breaks in a way I haven't listed, or you find a fifth way Plex could close this off, I'd like to know before their engineers tell me by breaking it.
+No GitHub repo to link here — it's a NAS, a $30 travel router, and one very long chat, not code. If you're fighting the same fight, Tailscale's own docs for the Synology package and subnet routers are genuinely good, and the GL.iNet Opal (GL-SFT1200) is the router I landed on for the price and its WireGuard throughput ceiling over the smaller Mango. Worth a read too: the ["Support for Tailscale"](https://forums.plex.tv/t/support-for-tailscale/936755) thread on Plex's own community forums, where this exact subnet-router trick is already laid out in the replies — I didn't invent anything here, I just went and checked that it actually works. Whether the actual TV cooperates is still unknown — right now the whole thing has been proven on a laptop and a phone, which is a very fancy way of saying "it works, probably, we'll see." If your setup breaks in a way I haven't listed, or you find a fifth way Plex could close this off, I'd like to know before their engineers tell me by breaking it.
 
 ---
 

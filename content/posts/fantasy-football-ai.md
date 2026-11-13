@@ -21,6 +21,10 @@ So instead of learning to actually manage a fantasy team properly, I decided to 
 
 Jury's still out on whether that actually worked.
 
+{{< admonition type="note" title="Update, November 13" open=true >}}
+The jury is back. After nine games I'm 4–5, fourth in the eight-team league, and I expect to lose this week.
+{{< /admonition >}}
+
 Through week 3, I'm 1–2 and sitting fifth in an eight-team league.
 
 But I did end up with a pretty fun experiment: I connected our family Sleeper league to Claude, gave Claude a persistent memory of our league, and built an MCP server so it could pull real FantasyPros rankings, projections, player news, and injury information. The goal wasn't to build some superhuman fantasy football optimizer. It was much simpler: **could I use AI to make managing our league easier — and maybe have a little more fun doing it?** It turns out the answer is yes.
