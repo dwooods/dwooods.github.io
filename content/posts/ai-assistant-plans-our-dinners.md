@@ -186,7 +186,7 @@ It hasn't caught a real failure yet, so the alarm half is still untested.
 
 After the first week, my notes said: not easier yet. Eight messages to plan six dinners is not the time savings I'd promised myself. The next Friday went better, though I still changed things no rule covers: a sick week, and a night of cooking whatever was already in the fridge.
 
-By my estimate (not a stopwatch), doing it properly by hand takes two to four hours a week. In practice I never did it properly. I made a store run most mornings for whatever I'd found online that day. Now the meals show up on Friday, I review them, change what I want, send one prompt, and the week is on the calendar in under 20 minutes. That happens about half the weeks. The other half, someone's tired, plans move, nobody wants to cook, and takeout wins. Takeout always has a good pitch.
+By my estimate (not a stopwatch), doing it properly by hand takes two to four hours a week. In practice I never did it properly. I made a store run most mornings for whatever I'd found online that day. Now the meals show up on Friday, I review them, change what I want, send one prompt, and the week is on the calendar in under 10 minutes. Most nights we cook. Every week also has a date night and a takeout night, for when nobody wants to cook. Takeout always has a good pitch.
 
 Two weeks of long days won't pay back in hours any time soon. What I got back is the daily "what's for dinner?" search, which was the part I hated.
 
