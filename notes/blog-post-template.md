@@ -3,7 +3,7 @@
 Master copy for drafting any new post on dwooods.github.io. Any Claude chat can read it from:
 https://raw.githubusercontent.com/dwooods/dwooods.github.io/main/notes/blog-post-template.md
 
-Version 1.0 · Last updated 2026-11-03 · Change log at the bottom.
+Version 1.1 · Last updated 2026-11-03 · Change log at the bottom.
 
 ## For David: how to use this
 
@@ -85,8 +85,31 @@ If something David built is later superseded, don't quietly edit: add a short da
 - File: `content/posts/<slug>.md`.
 - Front matter: `title`, `date`, `draft: true` (never false unless David says so), `tags`, `description` (under about 160 characters), `summary` (a punchy 1-2 sentence hook that shows the loop; LoveIt uses it on the homepage and list pages), and `featuredImage` / `featuredImagePreview` pointing to `/images/hero-<slug>.jpeg` if there is a hero.
 - Images live in `static/images/` and are referenced as `/images/<file>` with plain markdown image syntax, so they zoom site-wide. Raw HTML `<img>`, the hero and video do not zoom (use raw HTML on purpose for decorative thumbnails). Every image gets alt text. Put a screenshot or GIF at the top. Tell David which other moments deserve a screenshot, GIF or diagram, and what each should show.
-- Diagrams must be pre-rendered SVG images, never fenced mermaid blocks (LoveIt's mermaid script does not load on this site). Save as `static/images/<slug>-<what>.svg`, on its own line with blank lines above and below. Render with `htmlLabels: false`, neutral theme, white background; check `foreignObject` count is 0.
-- Raster images: resize every one before it is committed (max 1600px wide, never upscale, JPEG quality 82). Give David this script proactively, without being asked, and tell him to run it from the blog repo root in PowerShell with the original already in `static\images\`, then report the printed sizes. Reference only the resized output (a new filename) and keep the original out of the repo. Text inside screenshots must be readable at 1600px.
+
+### Diagrams (SVG only)
+
+Never use a fenced mermaid block: LoveIt's mermaid script does not load on this site, so the diagram silently fails. Never paste SVG markup into the post body either; Hugo's markdown renderer here can strip raw inline HTML or SVG, so it renders blank. A diagram is a separate `.svg` file in `static/images/<slug>-<what>.svg`, referenced with `![one-sentence alt text](/images/<slug>-<what>.svg)` on its own line with a blank line above and below (no leading spaces).
+
+Every SVG you produce must meet all of these, and you must check and report them:
+- Native SVG `<text>` labels only. No `<foreignObject>`, no HTML labels, no external fonts or scripts. (HTML labels display in desktop Chrome but vanish in Safari and on some phones.) Report the count of `foreignObject` (must be 0) and of `<text` (must be above 0).
+- A white background set on the root tag: `style="background-color:#fff"`. It is static and will not follow the site's light/dark switch, so use light, neutral colors that read on white.
+- A `viewBox`, with no fixed pixel width or height, so it scales to the page.
+- Text readable at about 800px wide and when zoomed to 1600px.
+- If built from mermaid: render with `htmlLabels: false`, neutral theme.
+- Test it by loading the file as an `<img>`, not by inlining it.
+- Deliver it as a downloadable `.svg` file, not pasted into chat. SVGs do not need the JPEG resize script below.
+- Give a one-sentence alt text.
+
+### Raster images (screenshots, photos, heroes): watch the file size
+
+Oversized images are the most common way a post gets slow. AI image generators routinely hand back 2,000-3,000px files of 2 MB or more; phone screenshots and photos can be as bad. Rules:
+- Resize every raster image before it is committed: max 1600px wide, never upscale, JPEG quality 82, aspect ratio preserved. That typically lands around 150-300 KB.
+- Treat any PNG, JPEG or photo over about 300 KB, or wider than 1600px, as needing the script. Ask David for the original's size if you don't know it.
+- Give David the script proactively, in the same message where an image first comes up, without being asked. He runs it from the blog repo root in PowerShell with the original already in `static\images\`, then reports the printed "Original" and "New size" lines.
+- Reference only the resized output (a new filename; do not overwrite the source) and tell him to keep the original multi-MB file out of the repo so it is never committed.
+- Do not treat an image as done until David reports the resized dimensions and size. If the draft references an image he has not resized, say so in the open-questions list.
+- The script does not handle GIFs or video. For those, tell David the file size and ask whether it should be trimmed.
+- Text inside screenshots must stay readable at 1600px. If the resized output is narrower than the content column, cap it rather than upscaling.
 
 ```powershell
 Add-Type -AssemblyName System.Drawing
@@ -109,9 +132,11 @@ $g.Dispose(); $bmp.Dispose(); $img.Dispose()
 "New size: $w x $h, " + [int]((Get-Item $out).Length / 1KB) + " KB"
 ```
 
+### Other Hugo conventions
+
 - LoveIt stretches featured images to the full content column. If the hero is narrower than that, cap it with a page-scoped style right after the front matter instead of upscaling: `<style>.featured-image img, .featured-image img.lazyloaded { max-width: <native-px>px; width: 100% !important; }</style>`.
 - Sample data only. No real account data, balances, keys, or personal identifiers in text or images.
-- Preview (optional, offer it after any major change): from the blog repo, `hugo server -D --disableFastRender` (Hugo Extended; `-D` shows drafts), then `http://localhost:1313/posts/<slug>/`. Hard-refresh after a pull; a stale server shows truncated text.
+- Preview (optional, offer it after any major change): from the blog repo, `hugo server -D --disableFastRender` (Hugo Extended; `-D` shows drafts), then `http://localhost:1313/posts/<slug>/`. Hard-refresh after a pull; a stale server shows truncated text. Click each markdown image to confirm it zooms.
 - Pushing: never push to `main` or flip `draft` to false without asking David and getting a clear yes, every time. Text edits to a draft post (`draft: true`) go to `main` once he says so; anything that touches a live page goes by pull request and is merged only when he says "merge it". Each new post's homepage summary should read as a parallel example of the loop; keep the homepage intro at pattern level.
 
 ## DELIVERABLES
@@ -120,7 +145,7 @@ $g.Dispose(); $bmp.Dispose(); $img.Dispose()
 2. The full draft as a downloadable `.md` file, with the word count.
 3. A self-score using the rubric below.
 4. A list of [TODO: ask David] markers and open questions.
-5. The image list and the resize script.
+5. An image list: for each image, what it shows, where it goes, its alt text, and (for rasters) whether it still needs the resize script; for each SVG, the `foreignObject` and `<text` counts. Include the resize script.
 
 Do not offer to publish. David will review the draft, then take it to his blog project for rating and push.
 
@@ -153,7 +178,7 @@ With the table, also give:
   4. The ending is an abstraction, a list, or several closing lines instead of one concrete image or result.
   5. The same point or story appears twice (previewed, then retold).
   6. Two products or two stories compete (ask which one is the product).
-  7. Any diagram is a fenced mermaid block, or any image carrying small text uses raw HTML instead of markdown image syntax.
+  7. Any diagram is a fenced mermaid block, pasted inline SVG, or an SVG with `foreignObject` labels; any image carrying small text uses raw HTML instead of markdown image syntax; or any raster image is over about 300 KB or wider than 1600px without the resize script having been run.
 
 ---
 
@@ -162,3 +187,4 @@ With the table, also give:
 | Date | Change | Why |
 |---|---|---|
 | 2026-11-03 | v1.0: first version, merged from the length-capped blog-post prompt, the blog project instructions (voice, structure, Hugo conventions, resize script), the diagram conventions, and the rating rubric in `blog-post-ratings.md`. Made self-contained and fetchable by URL. | David asked for a standing template so a new prompt is not generated for each post. |
+| 2026-11-03 | v1.1: split image rules into "Diagrams (SVG only)" and "Raster images: watch the file size". SVG now has an explicit checklist (no `foreignObject`, white background, `viewBox`, separate `.svg` file, never pasted inline) and must be reported with counts. Added the oversized-image warning (over about 300 KB or wider than 1600px needs the PowerShell resize; do not treat an image as done until David reports sizes). Deliverable 5 and pattern check 7 extended to match. | A chat produced an SVG without these constraints, and David asked that the template warn against it and cover oversized images and the resize script. |
