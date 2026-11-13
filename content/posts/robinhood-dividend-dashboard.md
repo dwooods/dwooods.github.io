@@ -33,7 +33,7 @@ What's on it: account value, today's change, estimated income, a Positions table
 Except for the two Robinhood app screenshots in the dividend tracker section, every screenshot in this post runs on the same made-up sample portfolio, not my account. The tickers are real; the share counts, prices and dollar amounts are not.
 {{< /admonition >}}
 
-![The Positions table with AGNC expanded to a three-month chart, cursor reading a single day's value. Sample portfolio, not real numbers.](/images/income-view-concept-positions.png)
+![The Positions table with AGNC expanded to a three-month chart, cursor reading a single day's value. Sample portfolio, not real numbers.](/images/income-view-concept-positions.jpg)
 
 Claude built and published all sixteen versions over about two weeks. Every version is still recoverable, which is why the screenshots below are labeled by version. Claude also kept a decision journal as we went: what we changed, what we tried and dropped, and why. I now ask for one at the start of every project, because I never know which ones will turn into a blog post, and the conversation that built it may be three chats back by the time I write. Most of this post comes from that journal.
 
@@ -47,7 +47,7 @@ The interesting part of this project wasn't the engineering. It was a string of 
 
 Most of the spec for this page was a screenshot of Robinhood's app and the word "that." The page started with the details (1): a table of every holding and what it pays. The longer I looked at it, the more I wanted the big picture first, with the numbers rolled up at the top and the details a click away. That's the same drill-down Robinhood's app already uses.
 
-![Three versions of the page. Version 4: a serif headline, stat cards and a bar chart of holdings. Version 7: an account-value chart across the top. Version 13: Robinhood's colors and type, with a green Refresh button. Sample data.](/images/dividend-dashboard-design-steps.png)
+![Three versions of the page. Version 4: a serif headline, stat cards and a bar chart of holdings. Version 7: an account-value chart across the top. Version 13: Robinhood's colors and type, with a green Refresh button. Sample data.](/images/dividend-dashboard-design-steps.jpg)
 
 *From the details, to the big picture, to Robinhood's look. All sample data.*
 
@@ -61,7 +61,7 @@ My favorite detail: Robinhood's accent color turns orange on a down day and gree
 
 ### The wrong swings
 
-![The tree swing cartoon: ten panels showing how the customer explained it, how each role understood or built it, and the tire on a rope the customer really needed.](/images/tree-swing-cartoon.png)
+![The tree swing cartoon: ten panels showing how the customer explained it, how each role understood or built it, and the tire on a rope the customer really needed.](/images/tree-swing-cartoon.jpg)
 
 *Every product manager knows this one. ([Source](https://www.productftw.com/productftw-2-the-tire-swing-cartoon/))*
 
@@ -96,7 +96,7 @@ It's basically the income half of my page. Type "Dividend tracker" into the app'
 
 So of course I asked Claude to rebuild it, with the same playbook as before. The forward-looking half is all in the MCP server: each holding's dividend per share, how often it pays, and when. Shares times dividend, for every payment left this year, landed within about one percent of Robinhood's projection, and NLY matched to the cent.
 
-![The Dividend Dashboard's version of the dividend tracker: year-to-date received, an annual projection, green actual and gray projected monthly bars, and a list of yielding positions with one expanded to show yield, dividend per share, received, annual projected and next dates. Sample data.](/images/income-book-dividend-tracker.png)
+![The Dividend Dashboard's version of the dividend tracker: year-to-date received, an annual projection, green actual and gray projected monthly bars, and a list of yielding positions with one expanded to show yield, dividend per share, received, annual projected and next dates. Sample data.](/images/income-book-dividend-tracker.jpg)
 
 *My copy of the tracker, on the sample portfolio. Green is paid, gray is projected, same as Robinhood's.*
 
@@ -175,7 +175,7 @@ I'm not a day trader, and the agents aren't in my Android app yet, so I'll likel
 
 If you use Robinhood, the thing I'd most like you to take from this is to try the MCP server: connect it to an assistant and ask it a question the app doesn't answer. Setup takes a few minutes on a computer.
 
-1. **Add the connector.** In the Claude desktop app, go to Settings → Connectors → Add custom connector and paste `https://agent.robinhood.com/mcp/trading`. ChatGPT, Cursor and Claude Code work too; Robinhood's [setup article](https://robinhood.com/us/en/support/articles/agentic-trading-overview/) has the steps for each.
+1. **Add the connector.** In the Claude desktop app, go to Settings → Connectors → Add custom connector and paste `https://agent.robinhood.com/mcp/trading`. Other AI tools work too; Robinhood's [setup article](https://robinhood.com/us/en/support/articles/agentic-trading-overview/) has the steps for each.
 2. **Sign in through Robinhood.** Connecting sends you to Robinhood to log in, so the assistant never sees your password. You need an individual investing account in good standing.
 3. **Finish the Agentic account setup.** Know what you're granting: the assistant can read all your Robinhood accounts but can only trade in the Agentic one.
 

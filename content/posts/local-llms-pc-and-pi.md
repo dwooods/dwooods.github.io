@@ -255,7 +255,7 @@ It still wasn't usable for `qwen3-vl:2b`: that model's normal time per case was 
 
 **Postscript, September 22 — I went back and crashed it on purpose.** That was where I left it when I wrote the section above: probabilistic, cause unknown. I wasn't happy leaving it as an open question, so I reran the vision suite with a logger Claude wrote for the occasion. Once a second it recorded the chip's temperature, whether the firmware was throttling, the voltage and current on every power rail, the CPU speed and the fan speed, and it forced each line onto the disk immediately, so the last second before a reset would survive it. It crashed on the first try, three minutes and ten seconds in, and this time I have the whole thing.
 
-![Four stacked time-series panels over the 191 seconds before the Pi reset, one sample per second: SoC temperature, fan RPM, SoC core current, and 5 V input voltage. A vertical line marks the model swap from minicpm-v4.6 to qwen3-vl:2b; a dashed line marks the last sample before the reset.](/images/chart-pi-crash-timeline.png)
+![Four stacked time-series panels over the 191 seconds before the Pi reset, one sample per second: SoC temperature, fan RPM, SoC core current, and 5 V input voltage. A vertical line marks the model swap from minicpm-v4.6 to qwen3-vl:2b; a dashed line marks the last sample before the reset.](/images/chart-pi-crash-timeline.jpg)
 
 *The 29 seconds that mattered, one sample per second. Pink bands on the top panel are the seconds the firmware's temperature limit kicked in. The dashed line is the last row the logger wrote; the next one came 3 minutes 48 seconds later, after the reboot, at 47°C.*
 
