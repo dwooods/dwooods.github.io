@@ -207,3 +207,15 @@ The server is open source (MIT) and unofficial: it talks to endpoints Skylight d
 ## The part that made it worth it
 
 The moment I knew it worked was small. My wife mentioned that tomorrow's dinner looked good. I hadn't told her; she'd seen it on the calendar. On Tuesday I cooked the [green chicken enchiladas](https://damndelicious.net/2019/03/01/green-chicken-enchiladas/), and the family loved them. Left to me, it would have been one of our usual handful of meals again. Duet picked something we like and don't cook often, and I didn't have to think about it.
+
+{{< admonition type="note" title="Update, November 17" open=true >}}
+I added a Dinner ratings page, built by Claude in Duet. After each dinner I mark it Keep, Maybe or Drop and jot a note, so I can see which meals worked and which we'd make again. Last week's five rated dinners came out three Keep, one Maybe, one Drop. It's separate from Skylight, which has no field for ratings.
+{{< /admonition >}}
+
+<div style="max-width: 320px; margin: 0 auto;">
+
+![Dinner ratings page for the week of Nov 8: three Keep, one Maybe, one Drop](/images/claude-dinner-ratings.jpeg)
+
+<p style="font-size:0.6em;opacity:0.7;margin-top:-0.75em;text-align:center;">Dinner ratings, week of Nov 8.</p>
+
+</div>
