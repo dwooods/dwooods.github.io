@@ -1,0 +1,30 @@
+name: Comments keep-alive
+
+# The Waline comments backend uses a free Supabase project, which pauses after
+# about 7 days of low database activity. This job reads comments twice a week.
+# It fails (and GitHub emails the repo owner) if the API errors, which also
+# flags a paused database.
+
+on:
+  schedule:
+    - cron: "17 14 * * 1,4"   # Mondays and Thursdays, 14:17 UTC
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read comments through the Waline API
+        run: |
+          set -euo pipefail
+          url="https://dwooods-blog-comments.vercel.app/api/comment?path=/posts/led-strip/&pageSize=1"
+          code=$(curl -sS -o body.json -w '%{http_code}' --retry 3 --retry-delay 10 \
+            -H "Origin: https://thewoodshed.dev" \
+            -H "Referer: https://thewoodshed.dev/" "$url")
+          echo "HTTP $code"
+          head -c 300 body.json; echo
+          test "$code" = "200"
+          python3 -c 'import json,sys; sys.exit(0 if json.load(open("body.json")).get("errno")==0 else 1)'
