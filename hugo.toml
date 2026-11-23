@@ -100,7 +100,22 @@ enableGitInfo = false
       copy = true
       maxShownLines = 50
        render = { mermaid = true } # Useful for architecture flowcharts in posts like the LED strip one
-       
+
+    # Share icons on posts. The theme's defaults also turn on Line, Weibo,
+    # Diaspora and Telegram; they're off here. Anything not listed keeps the
+    # theme default (false).
+    [params.page.share]
+      enable = true
+      X = true
+      Threads = true
+      Facebook = true
+      Linkedin = true
+      HackerNews = true
+      Line = false
+      Weibo = false
+      Diaspora = false
+      Telegram = false
+
     # Comments framework is on; giscus itself stays off until it's configured
     # (see the setup steps in the giscus block below).
     [params.page.comment]
@@ -137,9 +152,9 @@ enableGitInfo = false
   [markup.highlight]
     codeFences = true
     guessSyntax = true
+    noClasses = false
     lineNos = true
     lineNumbersInTable = true
-    noClasses = false
   [markup.goldmark.renderer]
     unsafe = true
   [markup.tableOfContents]
