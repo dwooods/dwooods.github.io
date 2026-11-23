@@ -4,6 +4,7 @@ date: 2026-09-10
 draft: false
 description: "About David Woods"
 hiddenFromHomePage: true
+comment: false
 ---
 
 I've spent the last 14+ years building products in FinTech, payments, APIs, and platform infrastructure. My work has ranged from payment processing and card networks to real-time data platforms and Open Banking. I've always been drawn to complicated problems where product, technology, and systems have to come together.
