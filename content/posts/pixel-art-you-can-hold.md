@@ -28,7 +28,7 @@ I started on a Raspberry Pi 5 and moved to an ESP32-C3, a small board that sits 
 
 ## What you'll need
 
-The editor runs in any browser, so you can try it without building anything: [dwooods.github.io/glow-grid](https://dwooods.github.io/glow-grid/). For the hardware, the [Printables page](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) has the parts list, wiring, assembly order and my slicer profile, so I won't copy them here.
+The editor runs in any browser, so you can try it without building anything: [thewoodshed.dev/glow-grid](https://thewoodshed.dev/glow-grid/). For the hardware, the [Printables page](https://www.printables.com/model/1884854-glow-grid-16x16-led-panel-case-frame-grid-diffuser) has the parts list, wiring, assembly order and my slicer profile, so I won't copy them here.
 
 {{< admonition type="info" title="The short version" open=true >}}
 A 16x16 WS2812B flexible panel, a 5 V supply rated for addressable LEDs (6 A, and I learned why the hard way, below), an ESP32-C3 SuperMini, a 3D printer and PLA, and a handful of small parts. Measure your panel before printing. The frame pocket is 162 mm square, and panels from different sellers vary.
@@ -155,7 +155,7 @@ Two things. I plan one board per kid, which is what the per-board names were for
 
 ## Try it yourself
 
-**Just want to try it?** Open the [editor](https://dwooods.github.io/glow-grid/) and draw something.
+**Just want to try it?** Open the [editor](https://thewoodshed.dev/glow-grid/) and draw something.
 
 **Want to build it?**
 

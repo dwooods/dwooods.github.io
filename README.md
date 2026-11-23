@@ -2,7 +2,7 @@
 
 Personal site/blog built with [Hugo](https://gohugo.io/) and the [LoveIt](https://github.com/dillonzq/LoveIt) theme, deployed to GitHub Pages via GitHub Actions.
 
-Live at: https://dwooods.github.io/
+Live at: https://thewoodshed.dev/
 
 ## Local development
 
